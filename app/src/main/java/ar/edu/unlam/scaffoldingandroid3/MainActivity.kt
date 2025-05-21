@@ -3,48 +3,45 @@ package ar.edu.unlam.scaffoldingandroid3
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import ar.edu.unlam.scaffoldingandroid3.ui.screens.MapScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
+import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Actividad principal de la aplicación.
+ *
+ * Esta actividad es el punto de entrada de la UI y configura:
+ * - El tema de la aplicación
+ * - La navegación principal
+ * - El scaffold base
+ *
+ * Utiliza @AndroidEntryPoint para permitir la inyección de dependencias
+ * de Hilt en la actividad y sus componentes.
+ */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             ScaffoldingAndroid3Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding),
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    MapScreen(
+                        onNewRouteClick = {
+                            // TODO: Implementar navegación a la pantalla de nueva ruta
+                        },
+                        onLoadRoutesClick = {
+                            // TODO: Implementar navegación a la pantalla de cargar rutas
+                        },
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(
-    name: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier,
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ScaffoldingAndroid3Theme {
-        Greeting("Android")
     }
 }

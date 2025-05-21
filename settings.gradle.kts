@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "ScaffoldingAndroid3"
 include(":app")
- 
