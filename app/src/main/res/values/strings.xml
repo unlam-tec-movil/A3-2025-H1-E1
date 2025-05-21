@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ScaffoldingAndroid3</string>
+    <string name="app_name">Scaffolding Android 3</string>
+    <string name="load_routes">Cargar rutas</string>
+    <string name="new_route">Nueva ruta</string>
+    <string name="record_route">Grabar ruta</string>
+    <string name="my_routes">Mis rutas</string>
+    <string name="record_route_description">Iniciar grabación de nueva ruta</string>
+    <string name="my_routes_description">Ver mis rutas guardadas</string>
 </resources>
