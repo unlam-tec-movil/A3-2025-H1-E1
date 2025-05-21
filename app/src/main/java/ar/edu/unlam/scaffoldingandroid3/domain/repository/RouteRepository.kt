@@ -5,25 +5,25 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Interfaz que define las operaciones de persistencia para las rutas.
- * 
+ *
  * Esta interfaz es parte de la capa de dominio y define el contrato que deben
  * implementar los repositorios concretos. Sigue el patrón Repository para
  * abstraer las operaciones de persistencia.
- * 
+ *
  * Las implementaciones concretas pueden usar Room, Retrofit u otras fuentes de datos
  * sin que el dominio necesite conocer estos detalles.
  */
 interface RouteRepository {
     /**
      * Guarda una ruta en el repositorio.
-     * 
+     *
      * @param route La ruta a guardar
      */
     suspend fun saveRoute(route: Route)
 
     /**
      * Obtiene una ruta específica por su ID.
-     * 
+     *
      * @param id El identificador de la ruta
      * @return La ruta encontrada o null si no existe
      */
@@ -31,14 +31,14 @@ interface RouteRepository {
 
     /**
      * Obtiene todas las rutas almacenadas.
-     * 
+     *
      * @return Un Flow que emite la lista de rutas
      */
     fun getAllRoutes(): Flow<List<Route>>
 
     /**
      * Elimina una ruta específica.
-     * 
+     *
      * @param id El identificador de la ruta a eliminar
      */
     suspend fun deleteRoute(id: String)
