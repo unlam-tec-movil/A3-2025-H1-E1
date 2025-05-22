@@ -16,7 +16,6 @@ on:
       - gradlew*
 
 jobs:
-
   ktlint:
     runs-on: ubuntu-latest
     steps:
