@@ -19,13 +19,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-@Preview(showBackground = true)
+/**
+ * Card de las rutas recorridas, se visualizan en el historial de actividad.
+ */
 @Composable
 fun HistoryCard(
     modifier: Modifier = Modifier,
+    date: String,
+    location: String,
+    distance: String,
+    duration: String,
     onPlayClick: () -> Unit = {},
 ) {
     Card(
@@ -55,23 +60,23 @@ fun HistoryCard(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "01/01/2025",
+                        text = date,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                     )
                     Text(
-                        text = "Lugar",
+                        text = location,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Row {
                         Text(
-                            text = "10 km",
+                            text = distance,
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "120 min",
+                            text = duration,
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )

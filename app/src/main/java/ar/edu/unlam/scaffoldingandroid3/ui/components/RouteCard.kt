@@ -24,17 +24,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /**
  * Card de cada ruta guardada
  */
 
-@Preview(showBackground = true)
 @Composable
 fun RouteCard(
     modifier: Modifier = Modifier,
+    userName: String,
+    location: String,
+    distance: String,
+    duration: String,
     onPlayClick: () -> Unit = {},
 ) {
     Card(
@@ -64,23 +66,23 @@ fun RouteCard(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "Usuario",
+                        text = userName,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                     )
                     Text(
-                        text = "Lugar",
+                        text = location,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Row {
                         Text(
-                            text = "10 km",
+                            text = distance,
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "120 min",
+                            text = duration,
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
