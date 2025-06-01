@@ -1,7 +1,6 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.content.MediaType.Companion.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,68 +33,74 @@ import androidx.compose.ui.unit.dp
 
 @Preview(showBackground = true)
 @Composable
-fun RouteCard(modifier: Modifier = Modifier,
-              onPlayClick: () -> Unit = {}){
-    Card(modifier = modifier
-        .fillMaxWidth()
-        .padding(8.dp)){
-
+fun RouteCard(
+    modifier: Modifier = Modifier,
+    onPlayClick: () -> Unit = {},
+) {
+    Card(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+    ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Reemplazar por imágen
                 Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray)
+                    modifier =
+                        Modifier
+                            .size(64.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.LightGray),
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
                         text = "Usuario",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+                        color = Color.Gray,
                     )
                     Text(
                         text = "Lugar",
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
                     Row {
                         Text(
                             text = "10 km",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
+                            color = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "120 min",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
+                            color = Color.Gray,
                         )
                     }
                 }
             }
             IconButton(
                 onClick = onPlayClick,
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape
-                    )
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape,
+                        ),
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = "Play",
-                    tint = Color.White
+                    tint = Color.White,
                 )
             }
         }

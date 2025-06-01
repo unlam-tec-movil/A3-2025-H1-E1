@@ -8,9 +8,9 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun RouteList() {
     LazyColumn {
-        items(5) { index -> // Por ahora hardcodeado
+        items(5) { index ->
             RouteCard(
-                onPlayClick = {}
+                onPlayClick = {},
             )
         }
     }

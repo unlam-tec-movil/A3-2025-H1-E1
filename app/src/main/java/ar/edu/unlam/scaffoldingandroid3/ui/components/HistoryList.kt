@@ -8,9 +8,9 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun HistoryList() {
     LazyColumn {
-        items(5) { index -> // Por ahora hardcodeado
+        items(5) { index ->
             HistoryCard(
-                onPlayClick = {}
+                onPlayClick = {},
             )
         }
     }
