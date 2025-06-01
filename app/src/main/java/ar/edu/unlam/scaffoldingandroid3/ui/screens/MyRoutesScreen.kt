@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ar.edu.unlam.scaffoldingandroid3.ui.components.BottomNavigationBar
 import ar.edu.unlam.scaffoldingandroid3.ui.components.RouteCard
+import ar.edu.unlam.scaffoldingandroid3.ui.components.RouteList
 
 @Preview(showBackground = true)
 @Composable
@@ -29,7 +30,7 @@ fun MyRoutesScreen(){
                 style = MaterialTheme.typography.titleLarge
             )
 
-            RouteCard()
+            RouteList()
 
         }
         BottomNavigationBar(
