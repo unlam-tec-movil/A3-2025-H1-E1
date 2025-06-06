@@ -8,5 +8,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.entity
 
 data class LocationPointEntity(
     val latitude: Double = 0.0,
-    val longitude: Double = 0.0
+    val longitude: Double = 0.0,
 )
