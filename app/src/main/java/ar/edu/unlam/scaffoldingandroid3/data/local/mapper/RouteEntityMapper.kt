@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.mapper
  * Métodos: Route.toEntity(), RouteEntity.toDomain(), List<RouteEntity>.toDomain()
  * Maneja conversión de Route.Point list a relación separada si es necesario
  */
+
+object RouteEntityMapper

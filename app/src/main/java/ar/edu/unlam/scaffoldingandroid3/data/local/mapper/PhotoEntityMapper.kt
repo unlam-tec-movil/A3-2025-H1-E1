@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.mapper
  * Métodos: Photo.toEntity(), PhotoEntity.toDomain()
  * Convierte LocationPoint a latitude/longitude separados para Room
  */
+
+object PhotoEntityMapper

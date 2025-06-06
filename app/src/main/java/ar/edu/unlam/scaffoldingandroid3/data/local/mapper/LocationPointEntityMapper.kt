@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.mapper
  * Métodos: LocationPoint.toEntity(), LocationPointEntity.toDomain()
  * Conversión directa de propiedades GPS con validación de datos
  */
+
+object LocationPointEntityMapper

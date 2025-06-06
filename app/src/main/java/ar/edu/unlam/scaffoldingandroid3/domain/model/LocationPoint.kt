@@ -10,7 +10,7 @@ data class LocationPoint(
     val latitude: Double,
     val longitude: Double,
     val timestamp: Long,
-    val accuracy: Float,      // ← Precisión GPS (importante para filtering)
-    val speed: Float?,        // ← Velocidad actual (para métricas)
-    val altitude: Double?     // ← Altitud (para gráficos elevación)
+    val accuracy: Float,      // Precisión GPS (importante para filtering)
+    val speed: Float?,        // Velocidad actual (para métricas)
+    val altitude: Double?     // Altitud (para gráficos elevación)
 )

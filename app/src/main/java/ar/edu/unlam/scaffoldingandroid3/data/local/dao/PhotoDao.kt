@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.dao
  * @Dao, métodos: @Insert, @Delete, @Query getPhotosByRoute, getPhotoById, deletePhotosByRoute
  * Para gestionar fotos tomadas durante recorridos
  */
+
+interface PhotoDao

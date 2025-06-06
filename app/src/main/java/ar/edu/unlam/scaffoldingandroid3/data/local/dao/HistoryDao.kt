@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.dao
  * @Dao, métodos: @Insert, @Delete, @Query getAllHistory, getHistoryByDateRange
  * Flow<List<HistoryEntity>> para mostrar historial reactivo
  */
+
+interface HistoryDao

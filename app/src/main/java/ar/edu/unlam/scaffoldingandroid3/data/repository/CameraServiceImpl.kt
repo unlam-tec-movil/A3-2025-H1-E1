@@ -6,3 +6,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.repository
  * Implementa: capturePhoto(), hasPermission(), requestPermission()
  * Usa CameraX para captura + permisos Android + file storage
  */
+
+class CameraServiceImpl

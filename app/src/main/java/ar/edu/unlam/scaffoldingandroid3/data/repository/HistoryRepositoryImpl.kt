@@ -6,3 +6,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.repository
  * Implementa: getHistory(), saveCompletedActivity(), deleteHistoryItem()
  * Para pantalla "Tu historial de actividad"
  */
+
+class HistoryRepositoryImpl

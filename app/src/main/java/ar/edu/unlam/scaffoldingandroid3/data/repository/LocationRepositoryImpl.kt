@@ -6,3 +6,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.repository
  * Implementa: startLocationUpdates(), getCurrentLocation(), hasPermission()
  * Usa FusedLocationProviderClient + LocationRequest para tracking GPS
  */
+
+class LocationRepositoryImpl

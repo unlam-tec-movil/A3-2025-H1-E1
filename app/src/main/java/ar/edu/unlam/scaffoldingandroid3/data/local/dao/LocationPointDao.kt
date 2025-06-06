@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.dao
  * @Dao, métodos: @Insert, @Query getPointsBySession, deletePointsBySession
  * Para almacenar trail de puntos GPS durante tracking en tiempo real
  */
+
+interface LocationPointDao

@@ -6,3 +6,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.repository
  * Implementa: changeMapType(), getNearbyRoutes(), saveMapPreferences()
  * Maneja configuración de GoogleMap + búsqueda rutas cercanas
  */
+
+class MapServiceImpl

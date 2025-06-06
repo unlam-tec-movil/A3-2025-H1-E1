@@ -14,3 +14,5 @@ package ar.edu.unlam.scaffoldingandroid3.domain.usecase
  *
  * SOLUCIÓN: ViewModel usa Repository directo para operaciones simples.
  */
+
+class GetActivityStatsUseCase

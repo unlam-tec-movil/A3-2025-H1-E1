@@ -6,3 +6,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.repository
  * Implementa métodos: savePhoto(), getPhotosByRoute(), deletePhoto()
  * Conversión domain ↔ entity usando mapper
  */
+
+class PhotoRepositoryImpl

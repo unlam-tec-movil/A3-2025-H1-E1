@@ -6,3 +6,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local
  * Abstract methods para todos los DAOs: routeDao(), photoDao(), etc.
  * Singleton pattern con Room.databaseBuilder
  */
+
+abstract class AppDatabase

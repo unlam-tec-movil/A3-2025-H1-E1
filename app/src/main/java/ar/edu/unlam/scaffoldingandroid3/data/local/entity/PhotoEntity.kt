@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.entity
  * @Entity, @PrimaryKey, @ForeignKey a RouteEntity
  * Propiedades: id, routeId, filePath, name, description, latitude, longitude, timestamp, fileSize
  */
+
+data class PhotoEntity(val id: Long = 0)

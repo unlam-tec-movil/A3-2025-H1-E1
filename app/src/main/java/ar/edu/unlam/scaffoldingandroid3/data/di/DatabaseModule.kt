@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.di
  * @Provides @Singleton AppDatabase, todos los DAOs
  * Room.databaseBuilder + configuración de database
  */
+
+object DatabaseModule

@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.mapper
  * Métodos: History.toEntity(), HistoryEntity.toDomain()
  * Maneja serialización de datos complejos como fotos y estadísticas
  */
+
+object HistoryEntityMapper

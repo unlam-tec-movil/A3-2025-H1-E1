@@ -5,3 +5,5 @@ package ar.edu.unlam.scaffoldingandroid3.data.di
  * @Provides FusedLocationProviderClient, CameraX, SharedPreferences
  * Dependencias de Android específicas para servicios
  */
+
+object ServiceModule
