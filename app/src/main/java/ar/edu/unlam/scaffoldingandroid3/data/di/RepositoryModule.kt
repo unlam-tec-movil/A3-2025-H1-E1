@@ -33,3 +33,10 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun bindRouteRepository(routeRepositoryImpl: RouteRepositoryImpl): RouteRepository
 }
+
+/**
+ * TODO: Actualizar - Agregar @Binds para TODOS los repositories
+ * Agregar: PhotoRepository, LocationRepository, TrackingSessionRepository,
+ * HistoryRepository, CameraService, MapService
+ * Conecta interfaces domain con implementaciones data
+ */
