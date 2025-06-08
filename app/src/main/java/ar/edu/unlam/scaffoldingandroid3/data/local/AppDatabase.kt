@@ -1,5 +1,12 @@
 package ar.edu.unlam.scaffoldingandroid3.data.local
 
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import ar.edu.unlam.scaffoldingandroid3.data.local.converters.RouteConverters
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
+import ar.edu.unlam.scaffoldingandroid3.data.local.entity.RouteEntity
+
 /**
  * TODO: Database Room - Configuración principal de la base de datos
  * @Database con todas las entities, @TypeConverters, version = 1
@@ -7,4 +14,8 @@ package ar.edu.unlam.scaffoldingandroid3.data.local
  * Singleton pattern con Room.databaseBuilder
  */
 
-abstract class AppDatabase
+@Database(entities = [RouteEntity::class], version = 1)
+@TypeConverters(RouteConverters::class)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun routeDao(): RouteDao
+}

@@ -1,9 +1,20 @@
 package ar.edu.unlam.scaffoldingandroid3.data.local.entity
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
+
 /**
  * TODO: Entity Room - Tabla de rutas guardadas/favoritas
  * @Entity, @PrimaryKey, propiedades: id, name, distance, duration, createdAt, isFavorite
  * Relación 1:N con PhotoEntity y LocationPointEntity
  */
 
-data class RouteEntity(val id: Long = 0)
+@Entity(tableName = "routes")
+data class RouteEntity(
+    @PrimaryKey val id: String,
+    val name: String,
+    val points: List<Route.Point>,
+    val distance: Double,
+    val duration: Long,
+)
