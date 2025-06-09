@@ -23,7 +23,7 @@ import javax.inject.Inject
 class RouteRepositoryImpl
     @Inject
     constructor(
-        private val dao: RouteDao
+        private val dao: RouteDao,
     ) : RouteRepository {
         override suspend fun saveRoute(route: Route) {
             val entity = route.toEntity()
@@ -31,12 +31,11 @@ class RouteRepositoryImpl
         }
 
         override suspend fun getRoute(id: String): Route? {
-            val entity = dao.getRoute(id)?: return null
+            val entity = dao.getRoute(id) ?: return null
             return entity.toDomain()
         }
 
-        override fun getAllRoutes(): Flow<List<Route>> =
-            dao.getAllRoutes().map { list -> list.map { it.toDomain() } }
+        override fun getAllRoutes(): Flow<List<Route>> = dao.getAllRoutes().map { list -> list.map { it.toDomain() } }
 
         override suspend fun deleteRoute(id: String) {
             dao.deleteRoute(id)

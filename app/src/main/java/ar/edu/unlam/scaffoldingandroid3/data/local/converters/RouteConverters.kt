@@ -9,8 +9,7 @@ import com.google.gson.reflect.TypeToken
 // TypeConverter y se almacena en formato Json (String).
 class RouteConverters {
     @TypeConverter
-    fun fromPointsList(points: List<Route.Point>): String =
-        Gson().toJson(points)
+    fun fromPointsList(points: List<Route.Point>): String = Gson().toJson(points)
 
     @TypeConverter
     fun toPointsList(data: String): List<Route.Point> {

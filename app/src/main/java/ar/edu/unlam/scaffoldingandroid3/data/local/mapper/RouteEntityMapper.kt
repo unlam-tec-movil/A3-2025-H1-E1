@@ -9,22 +9,22 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
  * Maneja conversión de Route.Point list a relación separada si es necesario
  */
 
-fun Route.toEntity(): RouteEntity{
+fun Route.toEntity(): RouteEntity  {
     return RouteEntity(
         id = id,
         name = name,
         points = points,
         distance = distance,
-        duration = duration
+        duration = duration,
     )
 }
 
-fun RouteEntity.toDomain(): Route{
+fun RouteEntity.toDomain(): Route  {
     return Route(
         id = id,
         name = name,
         points = points,
         distance = distance,
-        duration = duration
+        duration = duration,
     )
 }
