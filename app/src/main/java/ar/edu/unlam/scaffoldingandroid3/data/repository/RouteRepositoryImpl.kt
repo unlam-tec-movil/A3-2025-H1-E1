@@ -1,14 +1,11 @@
 package ar.edu.unlam.scaffoldingandroid3.data.repository
 
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
-import ar.edu.unlam.scaffoldingandroid3.data.local.entity.RouteEntity
 import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toDomain
 import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toEntity
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 

@@ -70,7 +70,6 @@ android {
     }
 }
 
-
 dependencies {
     configurations.all {
         resolutionStrategy {

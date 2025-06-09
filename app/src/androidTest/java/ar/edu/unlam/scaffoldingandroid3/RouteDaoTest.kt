@@ -10,24 +10,29 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RouteDaoTest {
-
     private lateinit var database: AppDatabase
     private lateinit var routeDao: RouteDao
 
     @Before
     fun setUp() {
         // Crea una base de datos en memoria para pruebas
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(), AppDatabase::class.java
-        ).allowMainThreadQueries() // Solo para testing
-            .build()
+        database =
+            Room.inMemoryDatabaseBuilder(
+                    ApplicationProvider
+                        .getApplicationContext(),
+                    AppDatabase::class.java
+                ).allowMainThreadQueries() // Solo para testing
+         .build()
 
         routeDao = database.routeDao()
     }
@@ -47,8 +52,10 @@ class RouteDaoTest {
     fun insertAndGetRoute_savesAndReadsCorrectly() = runBlocking {
         // Arrange: Crea una ruta de prueba
         val routeId = "route1"
-        val points = listOf(
-            Route.Point(1.0, 2.0, 1234567890), Route.Point(3.0, 4.0, 1234567891)
+        val points =
+            listOf(
+                Route.Point(1.0, 2.0, 1234567890),
+                Route.Point(3.0, 4.0, 1234567891)
         )
         val entity = RouteEntity(
             id = routeId,
