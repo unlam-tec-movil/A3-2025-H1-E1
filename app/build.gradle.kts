@@ -71,6 +71,11 @@ android {
 }
 
 dependencies {
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.test:core:1.5.0")
+        }
+    }
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -91,6 +96,9 @@ dependencies {
     // Instrumentation Tests
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
+    androidTestImplementation(libs.androidx.core)
 
     // Compose UI tests
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -116,4 +124,13 @@ dependencies {
 
     // Coil
     implementation(libs.coil)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    testImplementation(libs.androidx.room.testing)
+
+    // Gson converter
+    implementation(libs.gson)
 }
