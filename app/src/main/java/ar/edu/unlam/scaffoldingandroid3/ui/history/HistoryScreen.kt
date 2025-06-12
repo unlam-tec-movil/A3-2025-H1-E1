@@ -20,10 +20,6 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.BottomNavigationBar
  */
 @Composable
 fun HistoryScreen(
-    date: String,
-    location: String,
-    distance: String,
-    duration: String,
 ) {
     Scaffold(
         bottomBar = {
@@ -42,10 +38,10 @@ fun HistoryScreen(
                 style = MaterialTheme.typography.titleLarge,
             )
             HistoryList(
-                date = date,
-                location = location,
-                distance = distance,
-                duration = duration,
+                date = "date",
+                location = "location",
+                distance = "distance",
+                duration = "duration",
             )
         }
     }

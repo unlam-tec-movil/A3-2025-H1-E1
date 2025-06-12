@@ -20,10 +20,6 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.BottomNavigationBar
  */
 @Composable
 fun MyRoutesScreen(
-    userName: String,
-    location: String,
-    distance: String,
-    duration: String,
 ) {
     Scaffold(
         bottomBar = {
@@ -42,10 +38,10 @@ fun MyRoutesScreen(
                 style = MaterialTheme.typography.titleLarge,
             )
             RouteList(
-                userName = userName,
-                location = location,
-                distance = distance,
-                duration = duration,
+                userName = "userName",
+                location = "location",
+                distance = "distance",
+                duration = "duration",
             )
         }
     }

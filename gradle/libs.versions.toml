@@ -9,6 +9,7 @@ activityCompose = "1.10.1"
 composeBom = "2025.04.01"
 coroutines = "1.7.3"
 maps-compose = "4.3.0"
+navigationCompose = "2.9.0"
 play-services-maps = "18.2.0"
 play-services-location = "21.1.0"
 coil = "2.7.0"
@@ -28,6 +29,7 @@ roomTestingVersion = "2.7.1"
 androidx-core = { module = "androidx.test:core", version = "1.5.0" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version = "1.1.5" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version = "3.5.1" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-rules = { module = "androidx.test:rules", version = "1.5.0" }
 androidx-runner = { module = "androidx.test:runner", version = "1.5.2" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

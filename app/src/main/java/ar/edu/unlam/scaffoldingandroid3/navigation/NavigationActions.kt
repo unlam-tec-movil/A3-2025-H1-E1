@@ -1,4 +1,4 @@
-package ar.edu.unlam.scaffoldingandroid3.ui.navigation
+package ar.edu.unlam.scaffoldingandroid3.navigation
 
 /**
  * TODO: Class - Helper para navegación type-safe
