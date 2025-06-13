@@ -10,9 +10,11 @@ import ar.edu.unlam.scaffoldingandroid3.ui.history.HistoryScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.routes.MyRoutesScreen
 
 /**
- * TODO: Composable - NavHost principal de la app
- * Configurar rutas: map, routes, history, tracking, photo, route_detail
- * Usar BottomNavigation + NavigationActions
+ * Composable - NavHost principal de la app
+ * TODO: Configurar rutas: tracking, photo, route_detail
+ * -Usar BottomNavigation + NavigationActions
+ * -Separar UI vs navegación: las pantallas (Screens) no conocen al NavController, sólo reciben
+ * el callback de navegación como lambdas o viven dentro del NavHost.
  */
 
 @Composable
@@ -32,9 +34,11 @@ fun NavGraph(
             MapScreen(
                 onNewRouteClick = {
                     // TODO: Implementar navegación a la pantalla de nueva ruta
+                    // navegar a Screen.NewRoute.route
                 },
                 onLoadRoutesClick = {
                     // TODO: Implementar navegación a la pantalla de cargar rutas
+                    // navegar a Screen.LoadRoutes.route
                 },
             )
         }

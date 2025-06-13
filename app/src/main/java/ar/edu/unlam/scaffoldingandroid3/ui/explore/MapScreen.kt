@@ -32,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import ar.edu.unlam.scaffoldingandroid3.R
-import ar.edu.unlam.scaffoldingandroid3.ui.shared.BottomNavigationBar
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
@@ -185,12 +184,12 @@ fun MapScreen(
             }
         }
 
-        // Navigation Bar
-        BottomNavigationBar(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
-        )
+//        // Navigation Bar
+//        BottomNavigationBar(
+//            modifier =
+//                Modifier
+//                    .fillMaxWidth()
+//                    .align(Alignment.BottomCenter),
+//        )
     }
 }

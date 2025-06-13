@@ -33,7 +33,9 @@ import androidx.compose.ui.unit.dp
  * @param modifier Modificador para personalizar el layout del componente
  */
 @Composable
-fun BottomNavigationBar(modifier: Modifier = Modifier) {
+fun BottomNavigationBar(
+    modifier: Modifier = Modifier
+) {
     Surface(
         modifier = modifier.height(80.dp),
         color = Color.White,
