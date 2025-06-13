@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import ar.edu.unlam.scaffoldingandroid3.navigation.NavGraph
+import ar.edu.unlam.scaffoldingandroid3.ui.navigation.NavGraph
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.BottomNavigationBar
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
 import dagger.hilt.android.AndroidEntryPoint

@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import ar.edu.unlam.scaffoldingandroid3.navigation.Screen
+import ar.edu.unlam.scaffoldingandroid3.ui.navigation.Screen
 
 /**
  * Barra de navegación inferior que permite moverse entre las diferentes secciones de la app.

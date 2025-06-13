@@ -1,4 +1,4 @@
-package ar.edu.unlam.scaffoldingandroid3.navigation
+package ar.edu.unlam.scaffoldingandroid3.ui.navigation
 
 /**
  * TODO: Sealed class - Destinos de navegación
