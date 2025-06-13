@@ -20,16 +20,20 @@ import ar.edu.unlam.scaffoldingandroid3.ui.tracking.TrackingScreen
 
 @Composable
 fun NavGraph(
-    navController: NavHostController, modifier: Modifier = Modifier
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
 ) {
     NavHost(
-        navController = navController, startDestination = Screen.Map.route, modifier = modifier
+        navController = navController,
+        startDestination = Screen.Map.route,
+        modifier = modifier,
     ) {
         composable(Screen.Tracking.route) {
             TrackingScreen(
                 onNavigationBack = {
-                    navController.popBackStack()  // vuelve a la última en el stack (Map)
-                })
+                    navController.popBackStack() // vuelve a la última en el stack (Map)
+                },
+            )
         }
         composable(Screen.MyRoutes.route) {
             MyRoutesScreen()

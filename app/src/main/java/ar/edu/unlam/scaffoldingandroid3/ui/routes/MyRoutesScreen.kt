@@ -16,12 +16,12 @@ import androidx.compose.ui.unit.dp
  * eso se implemente
  */
 @Composable
-fun MyRoutesScreen(
-) {
+fun MyRoutesScreen() {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
     ) {
         Text(
             text = "Mis rutas",
@@ -34,5 +34,4 @@ fun MyRoutesScreen(
             duration = "duration",
         )
     }
-
 }

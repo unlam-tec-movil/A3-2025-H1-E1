@@ -134,6 +134,6 @@ dependencies {
     // Gson converter
     implementation(libs.gson)
 
-    //navigation
-    implementation (libs.androidx.navigation.compose)
+    // navigation
+    implementation(libs.androidx.navigation.compose)
 }

@@ -16,12 +16,12 @@ import androidx.compose.ui.unit.dp
  * eso se implemente
  */
 @Composable
-fun HistoryScreen(
-) {
+fun HistoryScreen() {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
     ) {
         Text(
             text = "Mi historial de actividad",
@@ -34,5 +34,4 @@ fun HistoryScreen(
             duration = "duration",
         )
     }
-
 }

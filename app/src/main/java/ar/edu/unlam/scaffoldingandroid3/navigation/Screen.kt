@@ -8,7 +8,10 @@ package ar.edu.unlam.scaffoldingandroid3.navigation
 
 sealed class Screen(val route: String) {
     object Tracking : Screen("tracking")
+
     object MyRoutes : Screen("myRoutes")
+
     object Map : Screen("map")
+
     object History : Screen("history")
 }

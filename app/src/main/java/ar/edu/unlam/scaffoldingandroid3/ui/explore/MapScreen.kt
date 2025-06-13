@@ -185,6 +185,6 @@ fun MapScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun MapPreview(){
+fun MapPreview() {
     MapScreen(onNewRouteClick = {}, onLoadRoutesClick = {})
 }
