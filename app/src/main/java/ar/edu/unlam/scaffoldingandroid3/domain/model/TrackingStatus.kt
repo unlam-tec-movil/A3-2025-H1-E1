@@ -5,7 +5,7 @@ package ar.edu.unlam.scaffoldingandroid3.domain.model
  * Valores: ACTIVE, PAUSED, COMPLETED para controlar flujo de tracking
  */
 
-enum class TrackingStatus{
+enum class TrackingStatus {
     ACTIVE,
     PAUSED,
     COMPLETED,
