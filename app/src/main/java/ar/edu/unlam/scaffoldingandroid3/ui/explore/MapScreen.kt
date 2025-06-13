@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import ar.edu.unlam.scaffoldingandroid3.R
@@ -122,9 +123,7 @@ fun MapScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(bottom = 144.dp),
-            // Espacio para los botones y el navigation bar
+                    .fillMaxHeight(),
             cameraPositionState = cameraPositionState,
             properties =
                 MapProperties(
@@ -137,9 +136,7 @@ fun MapScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp),
-            // Espacio para el navigation bar
+                    .align(Alignment.BottomCenter),
             color = Color.White,
             shadowElevation = 8.dp,
         ) {
@@ -183,13 +180,11 @@ fun MapScreen(
                 }
             }
         }
-
-//        // Navigation Bar
-//        BottomNavigationBar(
-//            modifier =
-//                Modifier
-//                    .fillMaxWidth()
-//                    .align(Alignment.BottomCenter),
-//        )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MapPreview(){
+    MapScreen(onNewRouteClick = {}, onLoadRoutesClick = {})
 }
