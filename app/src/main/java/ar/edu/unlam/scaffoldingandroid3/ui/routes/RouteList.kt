@@ -21,7 +21,7 @@ fun RouteList(
     duration: String,
 ) {
     LazyColumn {
-        items(5) { index ->
+        items(15) { index ->
             RouteCard(
                 userName = userName + index,
                 location = location + index,

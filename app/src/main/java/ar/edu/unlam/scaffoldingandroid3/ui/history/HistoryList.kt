@@ -21,12 +21,12 @@ fun HistoryList(
     duration: String,
 ) {
     LazyColumn {
-        items(5) { index ->
+        items(15) { index ->
             HistoryCard(
                 date = date,
-                location = location,
-                distance = distance,
-                duration = duration,
+                location = location + index,
+                distance = distance + index,
+                duration = duration + index,
                 onPlayClick = {},
             )
         }

@@ -124,11 +124,23 @@ private fun NavigationItem(
                 .background(containerColor)
                 .clickable {
                     // Navega evitando múltiples instancias y restaurando estado
-                    navController.navigate(route) {
-                        launchSingleTop = true
-                        restoreState = true
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                    if (currentRoute != route) {
+                        navController.navigate(route) {
+                            // 1) Pop hasta la pantalla de inicio del grafo (MapScreen)
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                                inclusive = false //Guarda el estado del mapa
+                            }
+                            // 2) Evita apilar varias instancias
+                            launchSingleTop = true
+                            // 3) No restaura el estado guardado
+                            /*
+                            Tener en cuenta que "restoreState = false" hace que se elimine el estado
+                            de la pantalla superpuesta, esto hace que se pierda la instancia
+                            de TrackingScreen()
+                            TODO: Investigar funcionamiento en casos de uso al grabar ruta
+                            */
+                            restoreState = false
                         }
                     }
                 },
