@@ -9,5 +9,3 @@ enum class MapType {
     DEFAULT,
     SATELLITE,
 }
-
-
