@@ -27,7 +27,7 @@ fun NavGraph(
         startDestination = Screen.Map.route,
         modifier = modifier
     ){
-        composable(Screen.Saved.route){
+        composable(Screen.MyRoutes.route){
             MyRoutesScreen()
         }
         composable(Screen.Map.route){
