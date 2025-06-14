@@ -8,7 +8,7 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.RouteEntity
 
 /**
- * TODO: Database Room - Configuración principal de la base de datos
+ * Database Room - Configuración principal de la base de datos
  * @Database con todas las entities, @TypeConverters, version = 1
  * Abstract methods para todos los DAOs: routeDao(), photoDao(), etc.
  * Singleton pattern con Room.databaseBuilder

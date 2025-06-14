@@ -13,7 +13,7 @@ import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Singleton
 
 /**
- * TODO: Módulo Hilt - Configuración Room database
+ * Módulo Hilt - Configuración Room database
  * @Provides @Singleton AppDatabase, todos los DAOs
  * Room.databaseBuilder + configuración de database
  */

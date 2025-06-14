@@ -21,12 +21,12 @@ fun RouteList(
     duration: String,
 ) {
     LazyColumn {
-        items(5) { index ->
+        items(15) { index ->
             RouteCard(
-                userName = userName,
-                location = location,
-                distance = distance,
-                duration = duration,
+                userName = userName + index,
+                location = location + index,
+                distance = distance + index,
+                duration = duration + index,
                 onPlayClick = {},
             )
         }

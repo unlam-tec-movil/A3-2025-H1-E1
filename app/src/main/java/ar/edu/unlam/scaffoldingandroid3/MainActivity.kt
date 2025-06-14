@@ -4,10 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import ar.edu.unlam.scaffoldingandroid3.ui.explore.MapScreen
+import androidx.navigation.compose.rememberNavController
+import ar.edu.unlam.scaffoldingandroid3.ui.navigation.NavGraph
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.BottomNavigationBar
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,17 +30,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ScaffoldingAndroid3Theme {
-                Surface(
+                val navController = rememberNavController()
+                Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
-                    MapScreen(
-                        onNewRouteClick = {
-                            // TODO: Implementar navegación a la pantalla de nueva ruta
-                        },
-                        onLoadRoutesClick = {
-                            // TODO: Implementar navegación a la pantalla de cargar rutas
-                        },
+                    bottomBar = { BottomNavigationBar(navController = navController) },
+                ) { innerPadding ->
+                    NavGraph(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
             }
