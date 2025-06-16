@@ -2,15 +2,12 @@ package ar.edu.unlam.scaffoldingandroid3.ui.history
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ar.edu.unlam.scaffoldingandroid3.ui.shared.BottomNavigationBar
 
 /**
  * TODO
@@ -19,34 +16,22 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.BottomNavigationBar
  * eso se implemente
  */
 @Composable
-fun HistoryScreen(
-    date: String,
-    location: String,
-    distance: String,
-    duration: String,
-) {
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(modifier = Modifier.fillMaxWidth())
-        },
-    ) { paddingValues ->
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-        ) {
-            Text(
-                text = "Mi historial de actividad",
-                style = MaterialTheme.typography.titleLarge,
-            )
-            HistoryList(
-                date = date,
-                location = location,
-                distance = distance,
-                duration = duration,
-            )
-        }
+fun HistoryScreen() {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+    ) {
+        Text(
+            text = "Mi historial de actividad",
+            style = MaterialTheme.typography.titleLarge,
+        )
+        HistoryList(
+            date = "date",
+            location = "location",
+            distance = "distance",
+            duration = "duration",
+        )
     }
 }
