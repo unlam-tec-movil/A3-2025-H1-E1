@@ -32,11 +32,22 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindRouteRepository(routeRepositoryImpl: RouteRepositoryImpl): RouteRepository
-}
 
-/**
- * TODO: Actualizar - Agregar @Binds para TODOS los repositories
- * Agregar: PhotoRepository, LocationRepository, TrackingSessionRepository,
- * HistoryRepository, CameraService, MapService
- * Conecta interfaces domain con implementaciones data
- */
+    @Binds
+    @Singleton
+    abstract fun bindLocationRepository(
+        locationRepositoryImpl: ar.edu.unlam.scaffoldingandroid3.data.repository.LocationRepositoryImpl,
+    ): ar.edu.unlam.scaffoldingandroid3.domain.repository.LocationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTrackingSessionRepository(
+        trackingSessionRepositoryImpl: ar.edu.unlam.scaffoldingandroid3.data.repository.TrackingSessionRepositoryImpl,
+    ): ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSensorRepository(
+        sensorRepositoryImpl: ar.edu.unlam.scaffoldingandroid3.data.repository.SensorRepositoryImpl,
+    ): ar.edu.unlam.scaffoldingandroid3.domain.repository.SensorRepository
+}
