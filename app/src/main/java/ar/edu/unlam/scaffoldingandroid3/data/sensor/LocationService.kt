@@ -104,7 +104,11 @@ class LocationService
             if (!hasLocationPermission()) return null
 
             return try {
+                @Suppress("MissingPermission")
                 fusedLocationClient.lastLocation.await()
+            } catch (e: SecurityException) {
+                // Permisos denegados después de verificación
+                null
             } catch (e: Exception) {
                 null
             }
