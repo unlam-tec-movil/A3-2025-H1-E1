@@ -254,17 +254,16 @@ class TrackingService : Service() {
     }
 
     private fun createNotification(): Notification {
-        val intent =
-            Intent().apply {
-                component = ComponentName(this@TrackingService, MainActivity::class.java)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+        val intent = Intent().apply {
+            setClass(this@TrackingService, MainActivity::class.java)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
         val pendingIntent =
             PendingIntent.getActivity(
                 this,
-                0,
+                MAIN_ACTIVITY_REQUEST_CODE,
                 intent,
-                PendingIntent.FLAG_IMMUTABLE,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT,
             )
 
         val statusText =
@@ -289,17 +288,16 @@ class TrackingService : Service() {
         val actionText = if (_trackingStatus.value == TrackingStatus.ACTIVE) "Pausar" else "Reanudar"
         val action = if (_trackingStatus.value == TrackingStatus.ACTIVE) ACTION_PAUSE_TRACKING else ACTION_RESUME_TRACKING
 
-        val intent =
-            Intent().apply {
-                component = ComponentName(this@TrackingService, TrackingService::class.java)
-                this.action = action
-            }
+        val intent = Intent().apply {
+            setClass(this@TrackingService, TrackingService::class.java)
+            this.action = action
+        }
         val pendingIntent =
             PendingIntent.getService(
                 this,
-                1,
+                PAUSE_RESUME_REQUEST_CODE,
                 intent,
-                PendingIntent.FLAG_IMMUTABLE,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT,
             )
 
         return NotificationCompat.Action.Builder(
@@ -310,17 +308,16 @@ class TrackingService : Service() {
     }
 
     private fun createStopAction(): NotificationCompat.Action {
-        val intent =
-            Intent().apply {
-                component = ComponentName(this@TrackingService, TrackingService::class.java)
-                action = ACTION_STOP_TRACKING
-            }
+        val intent = Intent().apply {
+            setClass(this@TrackingService, TrackingService::class.java)
+            action = ACTION_STOP_TRACKING
+        }
         val pendingIntent =
             PendingIntent.getService(
                 this,
-                2,
+                STOP_ACTION_REQUEST_CODE,
                 intent,
-                PendingIntent.FLAG_IMMUTABLE,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT,
             )
 
         return NotificationCompat.Action.Builder(
@@ -354,6 +351,11 @@ class TrackingService : Service() {
     companion object {
         private const val CHANNEL_ID = "tracking_channel"
         private const val NOTIFICATION_ID = 1
+        
+        // Request codes únicos para PendingIntent
+        private const val MAIN_ACTIVITY_REQUEST_CODE = 100
+        private const val PAUSE_RESUME_REQUEST_CODE = 101
+        private const val STOP_ACTION_REQUEST_CODE = 102
 
         const val ACTION_START_TRACKING = "START_TRACKING"
         const val ACTION_PAUSE_TRACKING = "PAUSE_TRACKING"
