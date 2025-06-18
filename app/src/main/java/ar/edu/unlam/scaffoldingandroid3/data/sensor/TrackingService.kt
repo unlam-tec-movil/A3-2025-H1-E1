@@ -239,9 +239,11 @@ class TrackingService : Service() {
     }
 
     private fun createNotification(): Notification {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+        val intent =
+            Intent(this, MainActivity::class.java)
+                .apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
         val pendingIntent =
             PendingIntent.getActivity(
                 this,
@@ -272,10 +274,12 @@ class TrackingService : Service() {
         val actionText = if (_trackingStatus.value == TrackingStatus.ACTIVE) "Pausar" else "Reanudar"
         val action = if (_trackingStatus.value == TrackingStatus.ACTIVE) ACTION_PAUSE_TRACKING else ACTION_RESUME_TRACKING
 
-        val intent = Intent(this, TrackingService::class.java).apply { 
-            this.action = action
-            component = ComponentName(this@TrackingService, TrackingService::class.java)
-        }
+        val intent =
+            Intent(this, TrackingService::class.java)
+                .apply {
+                    this.action = action
+                    component = ComponentName(this@TrackingService, TrackingService::class.java)
+                }
         val pendingIntent =
             PendingIntent.getService(
                 this,
