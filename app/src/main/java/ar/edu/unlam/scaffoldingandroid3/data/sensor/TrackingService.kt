@@ -242,13 +242,14 @@ class TrackingService : Service() {
             Intent(this, MainActivity::class.java)
                 .apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    setPackage(packageName)
                 }
         val pendingIntent =
             PendingIntent.getActivity(
                 this,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                PendingIntent.FLAG_IMMUTABLE,
             )
 
         val statusText =
@@ -277,13 +278,14 @@ class TrackingService : Service() {
             Intent(this, TrackingService::class.java)
                 .apply {
                     this.action = action
+                    setPackage(packageName)
                 }
         val pendingIntent =
             PendingIntent.getService(
                 this,
                 1,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                PendingIntent.FLAG_IMMUTABLE,
             )
 
         return NotificationCompat.Action.Builder(
@@ -295,15 +297,17 @@ class TrackingService : Service() {
 
     private fun createStopAction(): NotificationCompat.Action {
         val intent =
-            Intent(this, TrackingService::class.java).apply {
-                action = ACTION_STOP_TRACKING
-            }
+            Intent(this, TrackingService::class.java)
+                .apply {
+                    action = ACTION_STOP_TRACKING
+                    setPackage(packageName)
+                }
         val pendingIntent =
             PendingIntent.getService(
                 this,
                 2,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                PendingIntent.FLAG_IMMUTABLE,
             )
 
         return NotificationCompat.Action.Builder(
