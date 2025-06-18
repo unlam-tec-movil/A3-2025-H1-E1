@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -238,7 +239,9 @@ class TrackingService : Service() {
     }
 
     private fun createNotification(): Notification {
-        val intent = Intent(this, MainActivity::class.java)
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
         val pendingIntent =
             PendingIntent.getActivity(
                 this,
@@ -269,7 +272,10 @@ class TrackingService : Service() {
         val actionText = if (_trackingStatus.value == TrackingStatus.ACTIVE) "Pausar" else "Reanudar"
         val action = if (_trackingStatus.value == TrackingStatus.ACTIVE) ACTION_PAUSE_TRACKING else ACTION_RESUME_TRACKING
 
-        val intent = Intent(this, TrackingService::class.java).apply { this.action = action }
+        val intent = Intent(this, TrackingService::class.java).apply { 
+            this.action = action
+            component = ComponentName(this@TrackingService, TrackingService::class.java)
+        }
         val pendingIntent =
             PendingIntent.getService(
                 this,
@@ -289,6 +295,7 @@ class TrackingService : Service() {
         val intent =
             Intent(this, TrackingService::class.java).apply {
                 action = ACTION_STOP_TRACKING
+                component = ComponentName(this@TrackingService, TrackingService::class.java)
             }
         val pendingIntent =
             PendingIntent.getService(
@@ -329,7 +336,11 @@ class TrackingService : Service() {
                 Intent(context, TrackingService::class.java).apply {
                     action = ACTION_START_TRACKING
                 }
-            context.startForegroundService(intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
         }
 
         fun pauseService(context: Context) {
