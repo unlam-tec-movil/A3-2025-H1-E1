@@ -18,11 +18,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
-
     @Provides
     @Singleton
     fun provideFusedLocationProviderClient(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): FusedLocationProviderClient {
         return LocationServices.getFusedLocationProviderClient(context)
     }
@@ -30,7 +29,7 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideSensorManager(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): SensorManager {
         return context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }

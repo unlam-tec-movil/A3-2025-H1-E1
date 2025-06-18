@@ -16,8 +16,17 @@ import ar.edu.unlam.scaffoldingandroid3.MainActivity
 import ar.edu.unlam.scaffoldingandroid3.R
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -26,9 +35,10 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class TrackingService : Service() {
-
     @Inject lateinit var locationService: LocationService
+
     @Inject lateinit var sensorManager: DeviceSensorManager
+
     @Inject lateinit var metricsCalculator: MetricsCalculator
 
     private val binder = TrackingBinder()
@@ -69,7 +79,11 @@ class TrackingService : Service() {
         createNotificationChannel()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         when (intent?.action) {
             ACTION_START_TRACKING -> startTracking()
             ACTION_PAUSE_TRACKING -> pauseTracking()
@@ -90,7 +104,7 @@ class TrackingService : Service() {
         pausedDuration = 0
 
         startForeground(NOTIFICATION_ID, createNotification())
-        
+
         // Resetear contadores
         sensorManager.resetStepCount()
         metricsCalculator.reset()
@@ -148,44 +162,46 @@ class TrackingService : Service() {
     }
 
     private fun startLocationTracking() {
-        locationJob = serviceScope.launch {
-            locationService.getLocationUpdates()
-                .catch { e ->
-                    // Manejar errores de GPS
-                }
-                .collect { location ->
-                    _currentLocation.value = location
-                    metricsCalculator.addLocationPoint(location)
-                }
-        }
+        locationJob =
+            serviceScope.launch {
+                locationService.getLocationUpdates()
+                    .catch { e ->
+                        // Manejar errores de GPS
+                    }
+                    .collect { location ->
+                        _currentLocation.value = location
+                        metricsCalculator.addLocationPoint(location)
+                    }
+            }
     }
 
     private fun startSensorTracking() {
-        sensorJobs = listOf(
-            // Tracking de pasos
-            serviceScope.launch {
-                sensorManager.getStepUpdates()
-                    .collect { steps ->
-                        _stepCount.value = steps
-                        metricsCalculator.updateStepCount(steps)
-                    }
-            },
-            // Tracking de altitud
-            serviceScope.launch {
-                sensorManager.getAltitudeUpdates()
-                    .collect { altitude ->
-                        _altitude.value = altitude
-                        metricsCalculator.updateAltitude(altitude)
-                    }
-            },
-            // Tracking de brújula
-            serviceScope.launch {
-                sensorManager.getCompassUpdates()
-                    .collect { azimuth ->
-                        _azimuth.value = azimuth
-                    }
-            }
-        )
+        sensorJobs =
+            listOf(
+                // Tracking de pasos
+                serviceScope.launch {
+                    sensorManager.getStepUpdates()
+                        .collect { steps ->
+                            _stepCount.value = steps
+                            metricsCalculator.updateStepCount(steps)
+                        }
+                },
+                // Tracking de altitud
+                serviceScope.launch {
+                    sensorManager.getAltitudeUpdates()
+                        .collect { altitude ->
+                            _altitude.value = altitude
+                            metricsCalculator.updateAltitude(altitude)
+                        }
+                },
+                // Tracking de brújula
+                serviceScope.launch {
+                    sensorManager.getCompassUpdates()
+                        .collect { azimuth ->
+                            _azimuth.value = azimuth
+                        }
+                },
+            )
     }
 
     /**
@@ -206,14 +222,15 @@ class TrackingService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Tracking de Rutas",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Notificaciones durante el tracking de rutas"
-                setShowBadge(false)
-            }
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    "Tracking de Rutas",
+                    NotificationManager.IMPORTANCE_LOW,
+                ).apply {
+                    description = "Notificaciones durante el tracking de rutas"
+                    setShowBadge(false)
+                }
 
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
@@ -222,16 +239,20 @@ class TrackingService : Service() {
 
     private fun createNotification(): Notification {
         val intent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        val statusText = when (_trackingStatus.value) {
-            TrackingStatus.ACTIVE -> "Grabando ruta..."
-            TrackingStatus.PAUSED -> "Grabación pausada"
-            TrackingStatus.COMPLETED -> "Finalizado"
-        }
+        val statusText =
+            when (_trackingStatus.value) {
+                TrackingStatus.ACTIVE -> "Grabando ruta..."
+                TrackingStatus.PAUSED -> "Grabación pausada"
+                TrackingStatus.COMPLETED -> "Finalizado"
+            }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Senderismo - Tracking Activo")
@@ -247,33 +268,40 @@ class TrackingService : Service() {
     private fun createPauseResumeAction(): NotificationCompat.Action {
         val actionText = if (_trackingStatus.value == TrackingStatus.ACTIVE) "Pausar" else "Reanudar"
         val action = if (_trackingStatus.value == TrackingStatus.ACTIVE) ACTION_PAUSE_TRACKING else ACTION_RESUME_TRACKING
-        
+
         val intent = Intent(this, TrackingService::class.java).apply { this.action = action }
-        val pendingIntent = PendingIntent.getService(
-            this, 1, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent =
+            PendingIntent.getService(
+                this,
+                1,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
         return NotificationCompat.Action.Builder(
             android.R.drawable.ic_media_pause,
             actionText,
-            pendingIntent
+            pendingIntent,
         ).build()
     }
 
     private fun createStopAction(): NotificationCompat.Action {
-        val intent = Intent(this, TrackingService::class.java).apply { 
-            action = ACTION_STOP_TRACKING 
-        }
-        val pendingIntent = PendingIntent.getService(
-            this, 2, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val intent =
+            Intent(this, TrackingService::class.java).apply {
+                action = ACTION_STOP_TRACKING
+            }
+        val pendingIntent =
+            PendingIntent.getService(
+                this,
+                2,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
         return NotificationCompat.Action.Builder(
             android.R.drawable.ic_menu_close_clear_cancel,
             "Finalizar",
-            pendingIntent
+            pendingIntent,
         ).build()
     }
 
@@ -297,30 +325,34 @@ class TrackingService : Service() {
         const val ACTION_STOP_TRACKING = "STOP_TRACKING"
 
         fun startService(context: Context) {
-            val intent = Intent(context, TrackingService::class.java).apply {
-                action = ACTION_START_TRACKING
-            }
+            val intent =
+                Intent(context, TrackingService::class.java).apply {
+                    action = ACTION_START_TRACKING
+                }
             context.startForegroundService(intent)
         }
 
         fun pauseService(context: Context) {
-            val intent = Intent(context, TrackingService::class.java).apply {
-                action = ACTION_PAUSE_TRACKING
-            }
+            val intent =
+                Intent(context, TrackingService::class.java).apply {
+                    action = ACTION_PAUSE_TRACKING
+                }
             context.startService(intent)
         }
 
         fun resumeService(context: Context) {
-            val intent = Intent(context, TrackingService::class.java).apply {
-                action = ACTION_RESUME_TRACKING
-            }
+            val intent =
+                Intent(context, TrackingService::class.java).apply {
+                    action = ACTION_RESUME_TRACKING
+                }
             context.startService(intent)
         }
 
         fun stopService(context: Context) {
-            val intent = Intent(context, TrackingService::class.java).apply {
-                action = ACTION_STOP_TRACKING
-            }
+            val intent =
+                Intent(context, TrackingService::class.java).apply {
+                    action = ACTION_STOP_TRACKING
+                }
             context.startService(intent)
         }
     }
