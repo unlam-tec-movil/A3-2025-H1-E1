@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -254,11 +255,10 @@ class TrackingService : Service() {
 
     private fun createNotification(): Notification {
         val intent =
-            Intent(this, MainActivity::class.java)
-                .apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    setPackage(packageName)
-                }
+            Intent().apply {
+                component = ComponentName(this@TrackingService, MainActivity::class.java)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
         val pendingIntent =
             PendingIntent.getActivity(
                 this,
@@ -290,11 +290,10 @@ class TrackingService : Service() {
         val action = if (_trackingStatus.value == TrackingStatus.ACTIVE) ACTION_PAUSE_TRACKING else ACTION_RESUME_TRACKING
 
         val intent =
-            Intent(this, TrackingService::class.java)
-                .apply {
-                    this.action = action
-                    setPackage(packageName)
-                }
+            Intent().apply {
+                component = ComponentName(this@TrackingService, TrackingService::class.java)
+                this.action = action
+            }
         val pendingIntent =
             PendingIntent.getService(
                 this,
@@ -312,11 +311,10 @@ class TrackingService : Service() {
 
     private fun createStopAction(): NotificationCompat.Action {
         val intent =
-            Intent(this, TrackingService::class.java)
-                .apply {
-                    action = ACTION_STOP_TRACKING
-                    setPackage(packageName)
-                }
+            Intent().apply {
+                component = ComponentName(this@TrackingService, TrackingService::class.java)
+                action = ACTION_STOP_TRACKING
+            }
         val pendingIntent =
             PendingIntent.getService(
                 this,
