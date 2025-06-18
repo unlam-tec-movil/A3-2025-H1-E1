@@ -1,5 +1,6 @@
 package ar.edu.unlam.scaffoldingandroid3.data.sensor
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,6 +8,8 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import android.location.Location
 import android.os.Binder
 import android.os.Build
@@ -103,6 +106,18 @@ class TrackingService : Service() {
         startTime = System.currentTimeMillis()
         pausedDuration = 0
 
+        // Verificar permiso POST_NOTIFICATIONS para Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Sin permiso, iniciar como servicio normal
+                return
+            }
+        }
+        
         startForeground(NOTIFICATION_ID, createNotification())
 
         // Resetear contadores
@@ -318,6 +333,17 @@ class TrackingService : Service() {
     }
 
     private fun updateNotification() {
+        // Verificar permiso POST_NOTIFICATIONS para Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return // No se puede mostrar notificación sin permiso
+            }
+        }
+        
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, createNotification())
     }
