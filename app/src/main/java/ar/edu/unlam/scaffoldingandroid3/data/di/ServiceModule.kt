@@ -1,9 +1,37 @@
 package ar.edu.unlam.scaffoldingandroid3.data.di
 
-/**
- * TODO: Módulo Hilt - Servicios Android (GPS, Cámara)
- * @Provides FusedLocationProviderClient, CameraX, SharedPreferences
- * Dependencias de Android específicas para servicios
- */
+import android.content.Context
+import android.hardware.SensorManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
-object ServiceModule
+/**
+ * Módulo Hilt para servicios Android - Sensores y Location Services
+ * Integración con Clean Architecture - capa de Data
+ */
+@Module
+@InstallIn(SingletonComponent::class)
+object ServiceModule {
+
+    @Provides
+    @Singleton
+    fun provideFusedLocationProviderClient(
+        @ApplicationContext context: Context
+    ): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSensorManager(
+        @ApplicationContext context: Context
+    ): SensorManager {
+        return context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+}
