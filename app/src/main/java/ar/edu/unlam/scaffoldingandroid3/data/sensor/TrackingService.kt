@@ -4,9 +4,7 @@ import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -16,7 +14,6 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import ar.edu.unlam.scaffoldingandroid3.MainActivity
 import ar.edu.unlam.scaffoldingandroid3.R
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
 import dagger.hilt.android.AndroidEntryPoint
@@ -254,18 +251,6 @@ class TrackingService : Service() {
     }
 
     private fun createNotification(): Notification {
-        val intent = Intent().apply {
-            setClass(this@TrackingService, MainActivity::class.java)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent =
-            PendingIntent.getActivity(
-                this,
-                MAIN_ACTIVITY_REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT,
-            )
-
         val statusText =
             when (_trackingStatus.value) {
                 TrackingStatus.ACTIVE -> "Grabando ruta..."
@@ -277,54 +262,8 @@ class TrackingService : Service() {
             .setContentTitle("Senderismo - Tracking Activo")
             .setContentText(statusText)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentIntent(pendingIntent)
             .setOngoing(true)
-            .addAction(createPauseResumeAction())
-            .addAction(createStopAction())
             .build()
-    }
-
-    private fun createPauseResumeAction(): NotificationCompat.Action {
-        val actionText = if (_trackingStatus.value == TrackingStatus.ACTIVE) "Pausar" else "Reanudar"
-        val action = if (_trackingStatus.value == TrackingStatus.ACTIVE) ACTION_PAUSE_TRACKING else ACTION_RESUME_TRACKING
-
-        val intent = Intent().apply {
-            setClass(this@TrackingService, TrackingService::class.java)
-            this.action = action
-        }
-        val pendingIntent =
-            PendingIntent.getService(
-                this,
-                PAUSE_RESUME_REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT,
-            )
-
-        return NotificationCompat.Action.Builder(
-            android.R.drawable.ic_media_pause,
-            actionText,
-            pendingIntent,
-        ).build()
-    }
-
-    private fun createStopAction(): NotificationCompat.Action {
-        val intent = Intent().apply {
-            setClass(this@TrackingService, TrackingService::class.java)
-            action = ACTION_STOP_TRACKING
-        }
-        val pendingIntent =
-            PendingIntent.getService(
-                this,
-                STOP_ACTION_REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT,
-            )
-
-        return NotificationCompat.Action.Builder(
-            android.R.drawable.ic_menu_close_clear_cancel,
-            "Finalizar",
-            pendingIntent,
-        ).build()
     }
 
     private fun updateNotification() {
@@ -351,11 +290,6 @@ class TrackingService : Service() {
     companion object {
         private const val CHANNEL_ID = "tracking_channel"
         private const val NOTIFICATION_ID = 1
-        
-        // Request codes únicos para PendingIntent
-        private const val MAIN_ACTIVITY_REQUEST_CODE = 100
-        private const val PAUSE_RESUME_REQUEST_CODE = 101
-        private const val STOP_ACTION_REQUEST_CODE = 102
 
         const val ACTION_START_TRACKING = "START_TRACKING"
         const val ACTION_PAUSE_TRACKING = "PAUSE_TRACKING"
