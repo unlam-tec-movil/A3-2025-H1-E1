@@ -9,11 +9,11 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
 import android.location.Location
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import ar.edu.unlam.scaffoldingandroid3.MainActivity
 import ar.edu.unlam.scaffoldingandroid3.R
@@ -109,15 +109,15 @@ class TrackingService : Service() {
         // Verificar permiso POST_NOTIFICATIONS para Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS,
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
                 // Sin permiso, iniciar como servicio normal
                 return
             }
         }
-        
+
         startForeground(NOTIFICATION_ID, createNotification())
 
         // Resetear contadores
@@ -336,14 +336,14 @@ class TrackingService : Service() {
         // Verificar permiso POST_NOTIFICATIONS para Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS,
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
                 return // No se puede mostrar notificación sin permiso
             }
         }
-        
+
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, createNotification())
     }
@@ -366,6 +366,7 @@ class TrackingService : Service() {
             val intent =
                 Intent(context, TrackingService::class.java).apply {
                     action = ACTION_START_TRACKING
+                    setPackage(context.packageName)
                 }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -378,6 +379,7 @@ class TrackingService : Service() {
             val intent =
                 Intent(context, TrackingService::class.java).apply {
                     action = ACTION_PAUSE_TRACKING
+                    setPackage(context.packageName)
                 }
             context.startService(intent)
         }
@@ -386,6 +388,7 @@ class TrackingService : Service() {
             val intent =
                 Intent(context, TrackingService::class.java).apply {
                     action = ACTION_RESUME_TRACKING
+                    setPackage(context.packageName)
                 }
             context.startService(intent)
         }
@@ -394,6 +397,7 @@ class TrackingService : Service() {
             val intent =
                 Intent(context, TrackingService::class.java).apply {
                     action = ACTION_STOP_TRACKING
+                    setPackage(context.packageName)
                 }
             context.startService(intent)
         }
