@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -278,7 +277,6 @@ class TrackingService : Service() {
             Intent(this, TrackingService::class.java)
                 .apply {
                     this.action = action
-                    component = ComponentName(this@TrackingService, TrackingService::class.java)
                 }
         val pendingIntent =
             PendingIntent.getService(
@@ -299,7 +297,6 @@ class TrackingService : Service() {
         val intent =
             Intent(this, TrackingService::class.java).apply {
                 action = ACTION_STOP_TRACKING
-                component = ComponentName(this@TrackingService, TrackingService::class.java)
             }
         val pendingIntent =
             PendingIntent.getService(
