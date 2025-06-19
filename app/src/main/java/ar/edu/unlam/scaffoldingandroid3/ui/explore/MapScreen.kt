@@ -38,19 +38,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.scaffoldingandroid3.R
-import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.CameraPositionState
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,11 +62,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import android.content.Context
 import android.graphics.Bitmap
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 
 /**
@@ -119,14 +112,7 @@ fun MapScreen(
     }
 
     LaunchedEffect(Unit) {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (hasPermission) {
-            viewModel.checkLocationPermission()
-        } else {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }

@@ -24,6 +24,14 @@ class MapViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState
 
+    init {
+        // Solo inicia la carga si no tenemos una ubicación actual.
+        // Esto previene que se recargue al volver de otra pantalla.
+        if (_uiState.value.currentLocation == null) {
+            checkLocationPermission()
+        }
+    }
+
     fun clearError() {
         _uiState.update { it.copy(error = null) }
     }
