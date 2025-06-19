@@ -93,12 +93,7 @@ fun MapScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
-            if (isGranted) {
-                viewModel.checkLocationPermission()
-            } else {
-                // El usuario denegó el permiso, procedemos con la ubicación por defecto
-                viewModel.checkLocationPermission()
-            }
+            viewModel.onPermissionResult(isGranted)
         }
     )
 
@@ -112,7 +107,14 @@ fun MapScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            viewModel.onPermissionResult(true)
+        } else {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }

@@ -24,11 +24,39 @@ class MapViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState
 
-    init {
-        // Solo inicia la carga si no tenemos una ubicación actual.
-        // Esto previene que se recargue al volver de otra pantalla.
-        if (_uiState.value.currentLocation == null) {
-            checkLocationPermission()
+    fun onPermissionResult(isGranted: Boolean) {
+        // Previene la re-inicialización si ya tenemos una ubicación.
+        if (_uiState.value.currentLocation != null) return
+
+        viewModelScope.launch {
+            val location = if (isGranted) getCurrentLocationUseCase() else null
+
+            if (location != null) {
+                _uiState.update {
+                    it.copy(
+                        currentLocation = location,
+                        isLocationEnabled = true
+                    )
+                }
+                fetchNearbyRoutes(location)
+            } else {
+                // Si el permiso fue denegado o la ubicación no se pudo obtener, usa la ubicación por defecto.
+                val defaultLocation = LocationPoint(
+                    latitude = -34.6037,
+                    longitude = -58.3816,
+                    accuracy = 0f,
+                    speed = null,
+                    altitude = null,
+                    timestamp = System.currentTimeMillis()
+                )
+                _uiState.update {
+                    it.copy(
+                        currentLocation = defaultLocation,
+                        isLocationEnabled = false
+                    )
+                }
+                fetchNearbyRoutes(defaultLocation)
+            }
         }
     }
 
@@ -69,38 +97,6 @@ class MapViewModel @Inject constructor(
 
     fun onMessageShown() {
         _uiState.update { it.copy(showNoResultsMessage = false) }
-    }
-
-    fun checkLocationPermission() {
-        viewModelScope.launch {
-            val location = getCurrentLocationUseCase()
-            if (location != null) {
-                _uiState.update {
-                    it.copy(
-                        currentLocation = location,
-                        isLocationEnabled = true
-                    )
-                }
-                fetchNearbyRoutes(location)
-            } else {
-                // Fallback to default location
-                val defaultLocation = LocationPoint(
-                    latitude = -34.6037,
-                    longitude = -58.3816,
-                    accuracy = 0f,
-                    speed = null,
-                    altitude = null,
-                    timestamp = System.currentTimeMillis()
-                )
-                _uiState.update {
-                    it.copy(
-                        currentLocation = defaultLocation,
-                        isLocationEnabled = false
-                    )
-                }
-                fetchNearbyRoutes(defaultLocation)
-            }
-        }
     }
 
     private fun fetchNearbyRoutes(location: LocationPoint, radii: List<Int> = listOf(15000, 20000, 25000)) {
