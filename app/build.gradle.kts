@@ -134,6 +134,10 @@ dependencies {
     // Gson converter
     implementation(libs.gson)
 
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
     // navigation
     implementation(libs.androidx.navigation.compose)
 }

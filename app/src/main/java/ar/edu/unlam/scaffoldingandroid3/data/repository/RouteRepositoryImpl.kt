@@ -3,6 +3,8 @@ package ar.edu.unlam.scaffoldingandroid3.data.repository
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toDomain
 import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toEntity
+import ar.edu.unlam.scaffoldingandroid3.data.remote.OverpassApi
+import ar.edu.unlam.scaffoldingandroid3.data.remote.mapper.toDomain
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +26,26 @@ class RouteRepositoryImpl
     @Inject
     constructor(
         private val dao: RouteDao,
+        private val overpassApi: OverpassApi,
     ) : RouteRepository {
+        override suspend fun getNearbyRoutes(latitude: Double, longitude: Double, radius: Int): Result<List<Route>> {
+            return try {
+                val query = """
+                    [out:json][timeout:60];
+                    (
+                      relation["route"="hiking"](around:$radius,$latitude,$longitude);
+                    );
+                    (._;>>;);
+                    out geom;
+                """.trimIndent()
+                val response = overpassApi.getNearbyRoutes(query)
+                Result.success(response.toDomain())
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.failure(e)
+            }
+        }
+
         override suspend fun saveRoute(route: Route) {
             val entity = route.toEntity()
             dao.insert(entity)

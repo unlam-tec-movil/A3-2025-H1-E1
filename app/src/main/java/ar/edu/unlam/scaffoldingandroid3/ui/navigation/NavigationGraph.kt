@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import ar.edu.unlam.scaffoldingandroid3.ui.explore.MapScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.history.HistoryScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.routes.MyRoutesScreen
+import ar.edu.unlam.scaffoldingandroid3.ui.routes.RouteDetailScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.tracking.TrackingScreen
 
 /**
@@ -44,10 +45,16 @@ fun NavGraph(
                     navController.navigate(Screen.Tracking.route)
                 },
                 onLoadRoutesClick = {},
+                onRouteClick = { routeId ->
+                    navController.navigate(Screen.RouteDetail.createRoute(routeId))
+                }
             )
         }
         composable(Screen.History.route) {
             HistoryScreen()
+        }
+        composable(Screen.RouteDetail.route) {
+            RouteDetailScreen()
         }
     }
 }
