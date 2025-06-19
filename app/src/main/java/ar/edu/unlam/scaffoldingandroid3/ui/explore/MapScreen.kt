@@ -38,10 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.scaffoldingandroid3.R
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
-import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapDescriptorFromVector
-import com.google.android.gms.maps.model.BitmapDescriptor
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -62,6 +63,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import android.content.Context
+import android.graphics.Bitmap
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 
 /**
  * Pantalla principal del mapa que muestra la ubicación actual y permite la interacción con rutas.
@@ -134,6 +144,9 @@ fun MapScreen(
             if (uiState.currentLocation == null) {
                 LoadingSpinner()
             } else {
+                val markerBitmap = remember { bitmapFromVector(context, R.drawable.ic_marker_background) }
+                val hikerBitmap = remember { bitmapFromVector(context, R.drawable.ic_hiking) }
+
                 cameraPositionState = rememberCameraPositionState {
                     position = CameraPosition.fromLatLngZoom(
                         LatLng(uiState.currentLocation.latitude, uiState.currentLocation.longitude),
@@ -141,7 +154,6 @@ fun MapScreen(
                     )
                 }
 
-                var hikingIcon: BitmapDescriptor? by remember { mutableStateOf(null) }
                 val mapStyleOptions = remember {
                     MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
                 }
@@ -159,9 +171,6 @@ fun MapScreen(
                     modifier = Modifier.matchParentSize(),
                     cameraPositionState = cameraPositionState!!,
                     contentPadding = PaddingValues(bottom = 80.dp),
-                    onMapLoaded = {
-                        hikingIcon = bitmapDescriptorFromVector(context, R.drawable.ic_hiking)
-                    },
                     properties = MapProperties(
                         isMyLocationEnabled = uiState.isLocationEnabled,
                         mapStyleOptions = mapStyleOptions
@@ -170,25 +179,10 @@ fun MapScreen(
                         myLocationButtonEnabled = uiState.isLocationEnabled,
                         zoomControlsEnabled = true,
                     )
-                ) {
-                    if (hikingIcon != null) {
-                        uiState.nearbyRoutes.forEach { route ->
-                            route.points.firstOrNull()?.let { startPoint ->
-                                Marker(
-                                    state = MarkerState(position = LatLng(startPoint.latitude, startPoint.longitude)),
-                                    icon = hikingIcon,
-                                    onClick = {
-                                        onRouteClick(route.id)
-                                        true
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
+                )
 
                 val currentCameraState = cameraPositionState
-                if (currentCameraState != null && currentCameraState.position.zoom > 12f) {
+                if (currentCameraState != null) {
                     val density = LocalDensity.current
                     val visibleBounds = currentCameraState.projection?.visibleRegion?.latLngBounds
 
@@ -198,13 +192,20 @@ fun MapScreen(
 
                             if (visibleBounds?.contains(routeLatLng) == true) {
                                 val screenPos = currentCameraState.projection?.toScreenLocation(routeLatLng)
-                                if (screenPos != null) {
-                                    val xDp = with(density) { screenPos.x.toDp() }
-                                    val yDp = with(density) { screenPos.y.toDp() }
+                                if (screenPos != null && markerBitmap != null && hikerBitmap != null) {
+                                    val xDp = with(density) { (screenPos.x - markerBitmap.width / 2).toDp() }
+                                    val yDp = with(density) { (screenPos.y - markerBitmap.height).toDp() }
                                     Box(
-                                        modifier = Modifier.offset(x = xDp + 16.dp, y = yDp - 40.dp)
+                                        modifier = Modifier
+                                            .offset(x = xDp, y = yDp)
                                     ) {
-                                        RouteLabel(routeName = route.name)
+                                        CustomMarkerView(
+                                            routeName = route.name,
+                                            showLabel = currentCameraState.position.zoom > 11f,
+                                            markerBitmap = markerBitmap,
+                                            hikerBitmap = hikerBitmap,
+                                            onIconClick = { onRouteClick(route.id) }
+                                        )
                                     }
                                 }
                             }
@@ -291,6 +292,41 @@ fun MapScreen(
 @Composable
 fun MapPreview() {
     MapScreen(onNewRouteClick = {}, onLoadRoutesClick = {}, onRouteClick = {})
+}
+
+@Composable
+fun CustomMarkerView(
+    routeName: String,
+    showLabel: Boolean,
+    markerBitmap: Bitmap,
+    hikerBitmap: Bitmap,
+    onIconClick: () -> Unit
+) {
+    Box(contentAlignment = Alignment.TopCenter) {
+        Image(
+            bitmap = markerBitmap.asImageBitmap(),
+            contentDescription = "Pin de la ruta",
+            modifier = Modifier.size(48.dp)
+        )
+        Image(
+            bitmap = hikerBitmap.asImageBitmap(),
+            contentDescription = "Ícono de senderismo",
+            modifier = Modifier
+                .size(24.dp)
+                .padding(top = 6.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null, // Sin efecto de ripple
+                    onClick = onIconClick
+                )
+        )
+        if (showLabel) {
+            // Usamos un offset para que el label aparezca debajo del pin
+            Box(modifier = Modifier.padding(top = 48.dp)) {
+                RouteLabel(routeName = routeName)
+            }
+        }
+    }
 }
 
 @Composable

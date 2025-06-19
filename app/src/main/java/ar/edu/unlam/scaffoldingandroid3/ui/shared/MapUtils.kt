@@ -10,6 +10,25 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 /**
+ * Convierte un recurso de drawable vectorial (Vector Drawable) a un Bitmap.
+ *
+ * @param context El contexto de la aplicación.
+ * @param vectorResId El ID del recurso del drawable vectorial.
+ * @return Un `Bitmap` o `null` si la conversión falla.
+ */
+fun bitmapFromVector(
+    context: Context,
+    @DrawableRes vectorResId: Int
+): Bitmap? {
+    return ContextCompat.getDrawable(context, vectorResId)?.run {
+        setBounds(0, 0, intrinsicWidth, intrinsicHeight)
+        val bitmap = Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
+        draw(Canvas(bitmap))
+        bitmap
+    }
+}
+
+/**
  * Convierte un recurso de drawable vectorial (Vector Drawable) a un BitmapDescriptor
  * para ser usado como ícono en un marcador de Google Maps.
  *
