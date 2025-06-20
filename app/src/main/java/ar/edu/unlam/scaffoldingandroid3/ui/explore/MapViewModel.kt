@@ -52,8 +52,8 @@ class MapViewModel @Inject constructor(
             } else {
                 // Si el permiso fue denegado o la ubicación no se pudo obtener, usa la ubicación por defecto.
                 val defaultLocation = LocationPoint(
-                    latitude = DEFAULT_LOCATION_LAT,
-                    longitude = DEFAULT_LOCATION_LON,
+                    latitude = BUENOS_AIRES_DEFAULT_LOCATION_LAT,
+                    longitude = BUENOS_AIRES_DEFAULT_LOCATION_LON,
                     accuracy = 0f,
                     speed = null,
                     altitude = null,
@@ -200,8 +200,8 @@ class MapViewModel @Inject constructor(
 
     companion object {
         private const val DEFAULT_ZOOM_LEVEL = 11f
-        private const val DEFAULT_LOCATION_LAT = -34.6037
-        private const val DEFAULT_LOCATION_LON = -58.3816
+        private const val BUENOS_AIRES_DEFAULT_LOCATION_LAT = -34.6037
+        private const val BUENOS_AIRES_DEFAULT_LOCATION_LON = -58.3816
         private const val SEARCH_AREA_DISTANCE_THRESHOLD_METERS = 1500
         private const val SEARCH_AREA_RADIUS_METERS = 50000
         private const val SEARCH_AREA_LIMIT = 10
