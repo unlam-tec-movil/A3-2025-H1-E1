@@ -7,4 +7,11 @@
     <string name="my_routes">Mis rutas</string>
     <string name="record_route_description">Iniciar grabación de nueva ruta</string>
     <string name="my_routes_description">Ver mis rutas guardadas</string>
+    <string name="map_no_results_found">No se encontraron resultados. Intenta desplazar el mapa o usar el zoom.</string>
+    <string name="map_search_in_area">Buscar en esta zona</string>
+    <string name="map_route_pin_content_description">Pin de la ruta</string>
+    <string name="map_hiker_icon_content_description">Ícono de senderismo</string>
+    <string name="error_dialog_title">Error</string>
+    <string name="history_screen_title">Mi historial de actividad</string>
+    <string name="dialog_ok_button">OK</string>
 </resources>

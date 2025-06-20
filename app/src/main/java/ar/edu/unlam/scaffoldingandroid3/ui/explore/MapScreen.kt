@@ -104,7 +104,7 @@ fun MapScreen(
 
     LaunchedEffect(uiState.showNoResultsMessage) {
         if (uiState.showNoResultsMessage) {
-            snackbarHostState.showSnackbar("No se encontraron resultados. Intenta desplazar el mapa o usar el zoom.")
+            snackbarHostState.showSnackbar(context.getString(R.string.map_no_results_found))
             viewModel.onMessageShown()
         }
     }
@@ -211,7 +211,7 @@ fun MapScreen(
                     },
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(text = "Buscar en esta zona")
+                    Text(text = stringResource(id = R.string.map_search_in_area))
                 }
             }
 
@@ -245,7 +245,7 @@ fun MapScreen(
                             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         ),
                     ) {
-                        Text(text = "Cargar ruta")
+                        Text(text = stringResource(id = R.string.load_routes))
                     }
 
                     Button(
@@ -277,12 +277,12 @@ fun CustomMarkerView(
     Box(contentAlignment = Alignment.TopCenter) {
         Image(
             bitmap = markerBitmap.asImageBitmap(),
-            contentDescription = "Pin de la ruta",
+            contentDescription = stringResource(id = R.string.map_route_pin_content_description),
             modifier = Modifier.size(48.dp)
         )
         Image(
             bitmap = hikerBitmap.asImageBitmap(),
-            contentDescription = "Ícono de senderismo",
+            contentDescription = stringResource(id = R.string.map_hiker_icon_content_description),
             modifier = Modifier
                 .size(24.dp)
                 .padding(top = 6.dp)
