@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.location.Location
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 
@@ -38,6 +39,15 @@ class MapViewModel @Inject constructor(
                         isLocationEnabled = true
                     )
                 }
+                // Mueve la cámara a la posición obtenida
+                _uiState.value.cameraPositionState.move(
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(
+                            LatLng(location.latitude, location.longitude),
+                            11f
+                        )
+                    )
+                )
                 fetchNearbyRoutes(location)
             } else {
                 // Si el permiso fue denegado o la ubicación no se pudo obtener, usa la ubicación por defecto.
@@ -55,6 +65,15 @@ class MapViewModel @Inject constructor(
                         isLocationEnabled = false
                     )
                 }
+                // Mueve la cámara a la posición por defecto
+                _uiState.value.cameraPositionState.move(
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(
+                            LatLng(defaultLocation.latitude, defaultLocation.longitude),
+                            11f
+                        )
+                    )
+                )
                 fetchNearbyRoutes(defaultLocation)
             }
         }
