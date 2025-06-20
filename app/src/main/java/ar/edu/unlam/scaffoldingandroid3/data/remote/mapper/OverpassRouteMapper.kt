@@ -1,7 +1,7 @@
 package ar.edu.unlam.scaffoldingandroid3.data.remote.mapper
 
 import android.location.Location
-import ar.edu.unlam.scaffoldingandroid3.data.remote.dto.OverpassResponse
+import ar.edu.unlam.scaffoldingandroid3.data.remote.dto.overpass.OverpassResponse
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
 fun OverpassResponse.toDomain(): List<Route> {
