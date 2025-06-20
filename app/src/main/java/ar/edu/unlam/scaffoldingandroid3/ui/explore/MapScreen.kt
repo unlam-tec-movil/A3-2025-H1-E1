@@ -1,13 +1,16 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.explore
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -15,9 +18,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -33,8 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.scaffoldingandroid3.R
@@ -57,6 +65,8 @@ import com.google.android.gms.maps.model.MapStyleOptions
  * @param onNewRouteClick Callback para iniciar la grabación de una nueva ruta
  * @param onLoadRoutesClick Callback para cargar rutas existentes
  * @param onRouteClick Callback para navegar a la pantalla de detalle de ruta
+ TODO:
+ Manejar el resultado de la foto tomada
  */
 @Composable
 fun MapScreen(
@@ -73,6 +83,23 @@ fun MapScreen(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { isGranted ->
                 viewModel.onPermissionResult(isGranted)
+            },
+        )
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        viewModel.onPhotoTaken()
+    }
+
+    val cameraPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                if (isGranted) {
+                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    cameraLauncher.launch(intent)
+                }
             },
         )
 
@@ -139,6 +166,37 @@ fun MapScreen(
             // The loading spinner is now just an overlay
             if (uiState.isLoading) {
                 LoadingSpinner()
+            }
+
+            FloatingActionButton(
+                onClick = {
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.CAMERA
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        cameraLauncher.launch(intent)
+                    } else {
+                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(
+                        bottom = 120.dp,
+                        start = MaterialTheme.dimens.paddingMedium
+                    )
+                    .size(56.dp),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_camera),
+                    contentDescription = stringResource(R.string.camera_button_content_description),
+                    modifier = Modifier.size(24.dp)
+                )
             }
 
             AnimatedVisibility(

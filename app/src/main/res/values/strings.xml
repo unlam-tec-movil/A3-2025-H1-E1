@@ -14,4 +14,6 @@
     <string name="error_dialog_title">Error</string>
     <string name="history_screen_title">Mi historial de actividad</string>
     <string name="dialog_ok_button">OK</string>
+    <string name="take_photo">Tomar foto</string>
+    <string name="camera_button_content_description">Botón para abrir la cámara</string>
 </resources>

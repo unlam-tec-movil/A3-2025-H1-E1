@@ -123,6 +123,14 @@ class MapViewModel
             _uiState.update { it.copy(showNoResultsMessage = false) }
         }
 
+        fun onPhotoTaken() {
+            _uiState.update { 
+                it.copy(
+                    error = "Foto tomada exitosamente. Funcionalidad de guardado en desarrollo."
+                )
+            }
+        }
+
         private fun fetchClosestRoutesInArea(location: LocationPoint) {
             _uiState.update { it.copy(isLoading = true, lastSearchedLocation = location) }
             viewModelScope.launch {
