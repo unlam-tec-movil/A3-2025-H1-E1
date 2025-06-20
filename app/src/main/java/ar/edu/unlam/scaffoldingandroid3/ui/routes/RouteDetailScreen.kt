@@ -5,11 +5,14 @@ import androidx.compose.runtime.Composable
 
 /**
  * TODO: Composable - Pantalla de detalle completo de ruta
- * UI: RouteDetailCard + botones favorito/compartir + comentarios
+ * UI: RouteDetailCard + botones favorito/compartir + información de ruta
  * Navegación: recibe routeId, botón "Iniciar" navega a TrackingScreen
  */
 
 @Composable
-fun RouteDetailScreen() {
+fun RouteDetailScreen(
+    routeId: String,
+    onStartClick: () -> Unit
+) {
     Text("Pantalla de Detalle de Ruta")
 }

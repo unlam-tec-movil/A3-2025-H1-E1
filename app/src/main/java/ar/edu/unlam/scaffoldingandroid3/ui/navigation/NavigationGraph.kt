@@ -3,8 +3,10 @@ package ar.edu.unlam.scaffoldingandroid3.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import ar.edu.unlam.scaffoldingandroid3.ui.explore.MapScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.history.HistoryScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.routes.MyRoutesScreen
@@ -53,8 +55,24 @@ fun NavGraph(
         composable(Screen.History.route) {
             HistoryScreen()
         }
-        composable(Screen.RouteDetail.route) {
-            RouteDetailScreen()
+        composable(
+            route = Screen.RouteDetail.route,
+            arguments = listOf(
+                navArgument("routeId") {
+                type = NavType.StringType
+                nullable = false
+                }
+            )
+        ) { backStackEntry ->
+            // Extrae el valor de "routeId" desde los argumentos
+            val routeId = backStackEntry.arguments?.getString("routeId")
+                ?: error("routeId es nulo")
+            RouteDetailScreen(
+                routeId = routeId,
+                onStartClick = {
+                    navController.navigate(Screen.Tracking.route)
+                }
+            )
         }
     }
 }
