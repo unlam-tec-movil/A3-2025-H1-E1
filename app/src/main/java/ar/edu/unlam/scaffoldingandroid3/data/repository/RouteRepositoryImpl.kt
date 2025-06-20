@@ -5,6 +5,7 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toDomain
 import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toEntity
 import ar.edu.unlam.scaffoldingandroid3.data.remote.OverpassApi
 import ar.edu.unlam.scaffoldingandroid3.data.remote.mapper.toDomain
+import ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDistanceCalculator
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +27,7 @@ import android.location.Location
 class RouteRepositoryImpl @Inject constructor(
     private val dao: RouteDao,
     private val overpassApi: OverpassApi,
+    private val distanceCalculator: RouteDistanceCalculator
 ) : RouteRepository {
     override suspend fun getNearbyRoutes(
         latitude: Double,
@@ -37,7 +39,7 @@ class RouteRepositoryImpl @Inject constructor(
             val query =
                 "[out:json];(relation[route=\"hiking\"](around:$radius,$latitude,$longitude););(._;>>;);out geom;"
             val response = overpassApi.getNearbyRoutes(query)
-            val routes = response.toDomain()
+            val routes = response.toDomain(distanceCalculator)
 
             val resultRoutes = if (limit != null && routes.isNotEmpty()) {
                 val centerLocation = Location("").apply {

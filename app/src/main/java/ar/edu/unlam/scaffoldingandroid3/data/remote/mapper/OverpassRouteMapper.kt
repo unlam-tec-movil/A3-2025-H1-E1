@@ -1,10 +1,10 @@
 package ar.edu.unlam.scaffoldingandroid3.data.remote.mapper
 
-import android.location.Location
 import ar.edu.unlam.scaffoldingandroid3.data.remote.dto.overpass.OverpassResponse
+import ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDistanceCalculator
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
-fun OverpassResponse.toDomain(): List<Route> {
+fun OverpassResponse.toDomain(calculator: RouteDistanceCalculator): List<Route> {
     // 1. Create maps for easy lookup of nodes and ways.
     val nodes = elements.filter { it.type == "node" }.associateBy { it.id }
     val ways = elements.filter { it.type == "way" }.associateBy { it.id }
@@ -56,25 +56,13 @@ fun OverpassResponse.toDomain(): List<Route> {
             return@mapNotNull null // Una ruta necesita al menos 2 puntos para tener una distancia
         }
 
-        // Calcular la distancia total
-        var totalDistance = 0.0
-        for (i in 0 until routePoints.size - 1) {
-            val startPoint = routePoints[i]
-            val endPoint = routePoints[i+1]
-            val results = FloatArray(1)
-            Location.distanceBetween(
-                startPoint.latitude, startPoint.longitude,
-                endPoint.latitude, endPoint.longitude,
-                results
-            )
-            totalDistance += results[0]
-        }
+        val distance = calculator.calculate(routePoints)
 
         Route(
             id = relation.id.toString(),
             name = relation.tags.name,
             points = routePoints,
-            distance = totalDistance,
+            distance = distance,
             duration = 0L   // Can be calculated later if needed
         )
     }
