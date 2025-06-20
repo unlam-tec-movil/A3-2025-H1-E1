@@ -7,7 +7,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class LoadingSpinnerTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -21,4 +20,4 @@ class LoadingSpinnerTest {
         // Act & Assert
         composeTestRule.onNodeWithTag("loading_spinner_indicator").assertIsDisplayed()
     }
-} 
+}
