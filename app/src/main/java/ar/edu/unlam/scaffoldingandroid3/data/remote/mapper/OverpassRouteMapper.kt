@@ -31,8 +31,8 @@ fun OverpassResponse.toDomain(calculator: RouteDistanceCalculator): List<Route> 
                         Route.Point(
                             latitude = geoPoint.lat,
                             longitude = geoPoint.lon,
-                            timestamp = 0L
-                        )
+                            timestamp = 0L,
+                        ),
                     )
                 }
                 // If not, reconstruct geometry from its nodes.
@@ -43,8 +43,8 @@ fun OverpassResponse.toDomain(calculator: RouteDistanceCalculator): List<Route> 
                                 Route.Point(
                                     latitude = node.lat,
                                     longitude = node.lon,
-                                    timestamp = 0L
-                                )
+                                    timestamp = 0L,
+                                ),
                             )
                         }
                     }
@@ -63,7 +63,7 @@ fun OverpassResponse.toDomain(calculator: RouteDistanceCalculator): List<Route> 
             name = relation.tags.name,
             points = routePoints,
             distance = distance,
-            duration = 0L   // Can be calculated later if needed
+            duration = 0L, // Can be calculated later if needed
         )
     }
-} 
+}

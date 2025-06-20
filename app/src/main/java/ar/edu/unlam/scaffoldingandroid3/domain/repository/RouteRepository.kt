@@ -23,7 +23,12 @@ interface RouteRepository {
      * @param limit Límite de resultados (opcional)
      * @return Un Result con la lista de rutas cercanas o un error.
      */
-    suspend fun getNearbyRoutes(latitude: Double, longitude: Double, radius: Int, limit: Int? = null): Result<List<Route>>
+    suspend fun getNearbyRoutes(
+        latitude: Double,
+        longitude: Double,
+        radius: Int,
+        limit: Int? = null,
+    ): Result<List<Route>>
 
     /**
      * Guarda una ruta en el repositorio.

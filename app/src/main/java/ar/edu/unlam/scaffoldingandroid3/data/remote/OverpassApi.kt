@@ -6,7 +6,6 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 interface OverpassApi {
-
     @FormUrlEncoded
     @POST("interpreter")
     suspend fun getNearbyRoutes(@Field("data") query: String): OverpassResponse

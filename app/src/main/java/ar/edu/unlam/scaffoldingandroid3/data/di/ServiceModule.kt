@@ -2,8 +2,7 @@ package ar.edu.unlam.scaffoldingandroid3.data.di
 
 import android.content.Context
 import android.hardware.SensorManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import ar.edu.unlam.scaffoldingandroid3.data.remote.OverpassApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +11,6 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
-import ar.edu.unlam.scaffoldingandroid3.data.remote.OverpassApi
 
 private const val OVERPASS_API_URL = "https://overpass-api.de/api/"
 

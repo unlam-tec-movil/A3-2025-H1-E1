@@ -7,5 +7,5 @@ data class Tags(
     @SerializedName("route") val routeType: String?,
     val from: String?,
     val to: String?,
-    val distance: String?
-) 
+    val distance: String?,
+)
