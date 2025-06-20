@@ -14,7 +14,7 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.entity.RouteEntity
  * Singleton pattern con Room.databaseBuilder
  */
 
-@Database(entities = [RouteEntity::class], version = 1)
+@Database(entities = [RouteEntity::class], version = 1, exportSchema = false)
 @TypeConverters(RouteConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun routeDao(): RouteDao

@@ -14,4 +14,8 @@ sealed class Screen(val route: String) {
     object Map : Screen("map")
 
     object History : Screen("history")
+
+    object RouteDetail : Screen("route/{routeId}") {
+        fun createRoute(routeId: String) = "route/$routeId"
+    }
 }
