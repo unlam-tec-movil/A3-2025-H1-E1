@@ -14,7 +14,10 @@ import ar.edu.unlam.scaffoldingandroid3.R
  * @param onDismiss la acción a ejecutar cuando el diálogo se cierra.
  */
 @Composable
-fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
+fun ErrorDialog(
+    errorMessage: String,
+    onDismiss: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(id = R.string.error_dialog_title)) },
@@ -23,6 +26,6 @@ fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(id = R.string.dialog_ok_button))
             }
-        }
+        },
     )
 }

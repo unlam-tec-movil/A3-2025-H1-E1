@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
  */
 fun bitmapFromVector(
     context: Context,
-    @DrawableRes vectorResId: Int
+    @DrawableRes vectorResId: Int,
 ): Bitmap? {
     return ContextCompat.getDrawable(context, vectorResId)?.run {
         setBounds(0, 0, intrinsicWidth, intrinsicHeight)
@@ -40,7 +40,7 @@ fun bitmapFromVector(
  */
 fun bitmapDescriptorFromVector(
     context: Context,
-    @DrawableRes vectorResId: Int
+    @DrawableRes vectorResId: Int,
 ): BitmapDescriptor? {
     val background = ContextCompat.getDrawable(context, R.drawable.ic_marker_background) ?: return null
     background.setBounds(0, 0, background.intrinsicWidth, background.intrinsicHeight)
@@ -60,4 +60,4 @@ fun bitmapDescriptorFromVector(
     vectorDrawable.draw(canvas)
 
     return BitmapDescriptorFactory.fromBitmap(bitmap)
-} 
+}

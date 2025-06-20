@@ -10,10 +10,12 @@ import javax.inject.Inject
  * Este caso de uso abstrae la lógica para obtener la ubicación desde el repositorio,
  * manteniendo el ViewModel agnóstico a la implementación de la capa de datos.
  */
-class GetCurrentLocationUseCase @Inject constructor(
-    private val locationRepository: LocationRepository
-) {
-    suspend operator fun invoke(): LocationPoint? {
-        return locationRepository.getLastKnownLocation()
+class GetCurrentLocationUseCase
+    @Inject
+    constructor(
+        private val locationRepository: LocationRepository,
+    ) {
+        suspend operator fun invoke(): LocationPoint? {
+            return locationRepository.getLastKnownLocation()
+        }
     }
-} 

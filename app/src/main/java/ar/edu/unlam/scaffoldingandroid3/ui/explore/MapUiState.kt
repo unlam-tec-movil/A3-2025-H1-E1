@@ -26,5 +26,5 @@ data class MapUiState(
     val lastSearchedLocation: LocationPoint? = null,
     val nearbyRoutes: List<Route> = emptyList(),
     val error: String? = null,
-    val cameraPositionState: CameraPositionState = CameraPositionState()
+    val cameraPositionState: CameraPositionState = CameraPositionState(),
 )

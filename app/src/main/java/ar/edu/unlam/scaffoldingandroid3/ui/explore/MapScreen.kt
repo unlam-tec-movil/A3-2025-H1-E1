@@ -32,11 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.scaffoldingandroid3.R
@@ -70,19 +68,23 @@ fun MapScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            viewModel.onPermissionResult(isGranted)
-        }
-    )
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                viewModel.onPermissionResult(isGranted)
+            },
+        )
 
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Hoisted, unconditional remembers
     val markerBitmap = remember { bitmapFromVector(context, R.drawable.ic_marker_background) }
     val hikerBitmap = remember { bitmapFromVector(context, R.drawable.ic_hiking) }
-    val mapStyleOptions = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style) }
+    val mapStyleOptions =
+        remember {
+            MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
+        }
 
     LaunchedEffect(uiState.showNoResultsMessage) {
         if (uiState.showNoResultsMessage) {
@@ -92,10 +94,11 @@ fun MapScreen(
     }
 
     LaunchedEffect(Unit) {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        val hasPermission =
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ) == PackageManager.PERMISSION_GRANTED
 
         if (hasPermission) {
             viewModel.onPermissionResult(true)
@@ -105,30 +108,32 @@ fun MapScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             val mapAlpha by animateFloatAsState(
                 targetValue = if (uiState.currentLocation != null) 1f else 0f,
-                label = "Map Alpha Animation"
+                label = "Map Alpha Animation",
             )
 
             // MapContent is the "dumb" composable that just displays the map and markers
             MapContent(
-                modifier = Modifier
-                    .matchParentSize()
-                    .alpha(mapAlpha),
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .alpha(mapAlpha),
                 uiState = uiState,
                 cameraPositionState = uiState.cameraPositionState,
                 mapStyleOptions = mapStyleOptions,
                 onRouteClick = onRouteClick,
                 onMapIdle = viewModel::onMapIdle,
                 markerBitmap = markerBitmap,
-                hikerBitmap = hikerBitmap
+                hikerBitmap = hikerBitmap,
             )
 
             // The loading spinner is now just an overlay
@@ -138,11 +143,12 @@ fun MapScreen(
 
             AnimatedVisibility(
                 visible = uiState.showSearchInAreaButton,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = MaterialTheme.dimens.paddingMedium),
+                modifier =
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = MaterialTheme.dimens.paddingMedium),
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
             ) {
                 Button(
                     onClick = {
@@ -150,7 +156,7 @@ fun MapScreen(
                             viewModel.searchInMapArea(newCenter)
                         }
                     },
-                    shape = RoundedCornerShape(MaterialTheme.dimens.cornerRadiusMedium)
+                    shape = RoundedCornerShape(MaterialTheme.dimens.cornerRadiusMedium),
                 ) {
                     Text(text = stringResource(id = R.string.map_search_in_area))
                 }
@@ -159,40 +165,45 @@ fun MapScreen(
             uiState.error?.let {
                 ErrorDialog(
                     errorMessage = it,
-                    onDismiss = { viewModel.clearError() }
+                    onDismiss = { viewModel.clearError() },
                 )
             }
 
             Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter),
                 color = MaterialTheme.colorScheme.surface,
                 shadowElevation = MaterialTheme.dimens.elevationLarge,
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(MaterialTheme.dimens.paddingMedium),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.dimens.paddingMedium),
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.paddingSmall),
                 ) {
                     Button(
                         onClick = onLoadRoutesClick,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(MaterialTheme.dimens.buttonHeightNormal),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .height(MaterialTheme.dimens.buttonHeightNormal),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ),
                     ) {
                         Text(text = stringResource(id = R.string.load_routes))
                     }
                     Button(
                         onClick = onNewRouteClick,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(MaterialTheme.dimens.buttonHeightNormal),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .height(MaterialTheme.dimens.buttonHeightNormal),
                     ) {
                         Text(text = stringResource(id = R.string.new_route))
                     }
@@ -209,7 +220,7 @@ private fun MapScreenPreview() {
         MapScreen(
             onNewRouteClick = {},
             onLoadRoutesClick = {},
-            onRouteClick = {}
+            onRouteClick = {},
         )
     }
 }

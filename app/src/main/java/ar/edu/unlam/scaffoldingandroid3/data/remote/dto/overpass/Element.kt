@@ -8,5 +8,5 @@ data class Element(
     val tags: Tags?,
     val nodes: List<Long>?,
     val geometry: List<Geometry>?,
-    val members: List<Member>?
-) 
+    val members: List<Member>?,
+)

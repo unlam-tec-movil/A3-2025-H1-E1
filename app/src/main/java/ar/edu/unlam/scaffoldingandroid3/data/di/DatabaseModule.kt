@@ -22,7 +22,9 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext appContext: Context): AppDatabase =
+    fun provideDatabase(
+        @ApplicationContext appContext: Context,
+    ): AppDatabase =
         Room.databaseBuilder(appContext, AppDatabase::class.java, "routes.db")
             .build()
 

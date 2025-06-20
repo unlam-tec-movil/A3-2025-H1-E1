@@ -28,7 +28,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import ar.edu.unlam.scaffoldingandroid3.R
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.LabelBackgroundColor
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
@@ -49,7 +48,7 @@ internal fun MapContent(
     onRouteClick: (String) -> Unit,
     onMapIdle: (CameraPosition) -> Unit,
     markerBitmap: Bitmap?,
-    hikerBitmap: Bitmap?
+    hikerBitmap: Bitmap?,
 ) {
     // This LaunchedEffect is tied to the lifecycle of MapContent
     LaunchedEffect(cameraPositionState) {
@@ -65,14 +64,16 @@ internal fun MapContent(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
         contentPadding = PaddingValues(bottom = MaterialTheme.dimens.mapContentPaddingBottom),
-        properties = MapProperties(
-            isMyLocationEnabled = uiState.isLocationEnabled,
-            mapStyleOptions = mapStyleOptions
-        ),
-        uiSettings = MapUiSettings(
-            myLocationButtonEnabled = uiState.isLocationEnabled,
-            zoomControlsEnabled = true,
-        )
+        properties =
+            MapProperties(
+                isMyLocationEnabled = uiState.isLocationEnabled,
+                mapStyleOptions = mapStyleOptions,
+            ),
+        uiSettings =
+            MapUiSettings(
+                myLocationButtonEnabled = uiState.isLocationEnabled,
+                zoomControlsEnabled = true,
+            ),
     )
 
     // The logic for displaying markers is now contained here
@@ -87,14 +88,14 @@ internal fun MapContent(
                 val xDp = with(density) { (screenPos.x - markerBitmap.width / 2).toDp() }
                 val yDp = with(density) { (screenPos.y - markerBitmap.height).toDp() }
                 Box(
-                    modifier = Modifier.offset(x = xDp, y = yDp)
+                    modifier = Modifier.offset(x = xDp, y = yDp),
                 ) {
                     CustomMarkerView(
                         routeName = route.name,
                         showLabel = cameraPositionState.position.zoom > 11f,
                         markerBitmap = markerBitmap,
                         hikerBitmap = hikerBitmap,
-                        onIconClick = { onRouteClick(route.id) }
+                        onIconClick = { onRouteClick(route.id) },
                     )
                 }
             }
@@ -108,58 +109,69 @@ private fun CustomMarkerView(
     showLabel: Boolean,
     markerBitmap: Bitmap,
     hikerBitmap: Bitmap,
-    onIconClick: () -> Unit
+    onIconClick: () -> Unit,
 ) {
     Box(contentAlignment = Alignment.TopCenter) {
         if (showLabel) {
-            RouteLabel(name = routeName, modifier = Modifier.offset(y = MaterialTheme.dimens.labelOffset))
+            RouteLabel(
+                name = routeName,
+                modifier = Modifier.offset(y = MaterialTheme.dimens.labelOffset),
+            )
         }
         Image(
             bitmap = markerBitmap.asImageBitmap(),
             contentDescription = stringResource(id = R.string.map_route_pin_content_description),
-            modifier = Modifier.size(MaterialTheme.dimens.markerSize)
+            modifier = Modifier.size(MaterialTheme.dimens.markerSize),
         )
         Image(
             bitmap = hikerBitmap.asImageBitmap(),
             contentDescription = stringResource(R.string.map_hiker_icon_content_description),
-            modifier = Modifier
-                .offset(y = MaterialTheme.dimens.paddingExtraSmall)
-                .size(MaterialTheme.dimens.iconSizeMedium)
-                .clickable(
-                    onClick = onIconClick,
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                )
+            modifier =
+                Modifier
+                    .offset(y = MaterialTheme.dimens.paddingExtraSmall)
+                    .size(MaterialTheme.dimens.iconSizeMedium)
+                    .clickable(
+                        onClick = onIconClick,
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                    ),
         )
     }
 }
 
 @Composable
-private fun RouteLabel(name: String, modifier: Modifier = Modifier) {
+private fun RouteLabel(
+    name: String,
+    modifier: Modifier = Modifier,
+) {
     Surface(
-        modifier = modifier
-            .widthIn(max = MaterialTheme.dimens.labelMaxWidth), // Restrict width
+        modifier =
+            modifier
+                .widthIn(max = MaterialTheme.dimens.labelMaxWidth),
         shape = RoundedCornerShape(MaterialTheme.dimens.cornerRadiusSmall),
-        color = LabelBackgroundColor, // Semi-transparent black
+        color = LabelBackgroundColor,
         contentColor = Color.White,
-        shadowElevation = MaterialTheme.dimens.elevationMedium
+        shadowElevation = MaterialTheme.dimens.elevationMedium,
     ) {
         Text(
             text = name,
-            modifier = Modifier.padding(
-                horizontal = MaterialTheme.dimens.paddingSmall,
-                vertical = MaterialTheme.dimens.paddingExtraSmall
-            ),
-            style = MaterialTheme.typography.bodySmall.copy(
-                shadow = Shadow(
-                    color = Color.Black,
-                    offset = Offset(2f, 2f),
-                    blurRadius = 4f
-                )
-            ),
+            modifier =
+                Modifier.padding(
+                    horizontal = MaterialTheme.dimens.paddingSmall,
+                    vertical = MaterialTheme.dimens.paddingExtraSmall,
+                ),
+            style =
+                MaterialTheme.typography.bodySmall.copy(
+                    shadow =
+                        Shadow(
+                            color = Color.Black,
+                            offset = Offset(2f, 2f),
+                            blurRadius = 4f,
+                        ),
+                ),
             textAlign = TextAlign.Center,
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis // Add ellipsis for long text
+            overflow = TextOverflow.Ellipsis,
         )
     }
-} 
+}
