@@ -43,6 +43,7 @@ import ar.edu.unlam.scaffoldingandroid3.R
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
+import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
 import com.google.android.gms.maps.model.MapStyleOptions
 
 /**
@@ -139,7 +140,7 @@ fun MapScreen(
                 visible = uiState.showSearchInAreaButton,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 16.dp),
+                    .padding(top = MaterialTheme.dimens.paddingMedium),
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
@@ -149,7 +150,7 @@ fun MapScreen(
                             viewModel.searchInMapArea(newCenter)
                         }
                     },
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(MaterialTheme.dimens.cornerRadiusMedium)
                 ) {
                     Text(text = stringResource(id = R.string.map_search_in_area))
                 }
@@ -166,20 +167,20 @@ fun MapScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter),
-                color = Color.White,
-                shadowElevation = 8.dp,
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = MaterialTheme.dimens.elevationLarge,
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        .padding(MaterialTheme.dimens.paddingMedium),
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.paddingSmall),
                 ) {
                     Button(
                         onClick = onLoadRoutesClick,
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp),
+                            .height(MaterialTheme.dimens.buttonHeightNormal),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -191,7 +192,7 @@ fun MapScreen(
                         onClick = onNewRouteClick,
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp),
+                            .height(MaterialTheme.dimens.buttonHeightNormal),
                     ) {
                         Text(text = stringResource(id = R.string.new_route))
                     }

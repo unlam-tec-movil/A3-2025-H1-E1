@@ -30,6 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.edu.unlam.scaffoldingandroid3.R
+import ar.edu.unlam.scaffoldingandroid3.ui.theme.LabelBackgroundColor
+import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -62,7 +64,7 @@ internal fun MapContent(
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
-        contentPadding = PaddingValues(bottom = 80.dp),
+        contentPadding = PaddingValues(bottom = MaterialTheme.dimens.mapContentPaddingBottom),
         properties = MapProperties(
             isMyLocationEnabled = uiState.isLocationEnabled,
             mapStyleOptions = mapStyleOptions
@@ -110,19 +112,19 @@ private fun CustomMarkerView(
 ) {
     Box(contentAlignment = Alignment.TopCenter) {
         if (showLabel) {
-            RouteLabel(name = routeName, modifier = Modifier.offset(y = (-50).dp))
+            RouteLabel(name = routeName, modifier = Modifier.offset(y = MaterialTheme.dimens.labelOffset))
         }
         Image(
             bitmap = markerBitmap.asImageBitmap(),
             contentDescription = stringResource(id = R.string.map_route_pin_content_description),
-            modifier = Modifier.size(width = 56.dp, height = 56.dp)
+            modifier = Modifier.size(MaterialTheme.dimens.markerSize)
         )
         Image(
             bitmap = hikerBitmap.asImageBitmap(),
             contentDescription = stringResource(R.string.map_hiker_icon_content_description),
             modifier = Modifier
-                .offset(y = 4.dp)
-                .size(24.dp)
+                .offset(y = MaterialTheme.dimens.paddingExtraSmall)
+                .size(MaterialTheme.dimens.iconSizeMedium)
                 .clickable(
                     onClick = onIconClick,
                     indication = null,
@@ -136,15 +138,18 @@ private fun CustomMarkerView(
 private fun RouteLabel(name: String, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier
-            .widthIn(max = 120.dp), // Restrict width
-        shape = RoundedCornerShape(8.dp),
-        color = Color(0xBB000000), // Semi-transparent black
+            .widthIn(max = MaterialTheme.dimens.labelMaxWidth), // Restrict width
+        shape = RoundedCornerShape(MaterialTheme.dimens.cornerRadiusSmall),
+        color = LabelBackgroundColor, // Semi-transparent black
         contentColor = Color.White,
-        shadowElevation = 4.dp
+        shadowElevation = MaterialTheme.dimens.elevationMedium
     ) {
         Text(
             text = name,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(
+                horizontal = MaterialTheme.dimens.paddingSmall,
+                vertical = MaterialTheme.dimens.paddingExtraSmall
+            ),
             style = MaterialTheme.typography.bodySmall.copy(
                 shadow = Shadow(
                     color = Color.Black,
