@@ -13,7 +13,12 @@ import javax.inject.Inject
 class GetNearbyRoutesUseCase @Inject constructor(
     private val repository: RouteRepository
 ) {
-    suspend operator fun invoke(latitude: Double, longitude: Double, radius: Int): Result<List<Route>> {
-        return repository.getNearbyRoutes(latitude, longitude, radius)
+    suspend operator fun invoke(
+        lat: Double,
+        lon: Double,
+        radius: Int,
+        limit: Int? = null
+    ): Result<List<Route>> {
+        return repository.getNearbyRoutes(lat, lon, radius, limit)
     }
 }

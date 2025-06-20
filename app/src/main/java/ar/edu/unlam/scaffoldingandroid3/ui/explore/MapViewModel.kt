@@ -92,18 +92,57 @@ class MapViewModel @Inject constructor(
             timestamp = System.currentTimeMillis()
         )
         _uiState.update { it.copy(showSearchInAreaButton = false) }
-        fetchNearbyRoutes(location, listOf(50000, 100000))
+        fetchClosestRoutesInArea(location)
     }
 
     fun onMessageShown() {
         _uiState.update { it.copy(showNoResultsMessage = false) }
     }
 
-    private fun fetchNearbyRoutes(location: LocationPoint, radii: List<Int> = listOf(15000, 20000, 25000)) {
+    private fun fetchClosestRoutesInArea(location: LocationPoint) {
+        _uiState.update { it.copy(isLoading = true, lastSearchedLocation = location) }
+        viewModelScope.launch {
+            val result = getNearbyRoutesUseCase(
+                lat = location.latitude,
+                lon = location.longitude,
+                radius = 50000, // 50km de radio
+                limit = 10
+            )
+
+            if (result.isSuccess) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        nearbyRoutes = result.getOrThrow(),
+                        showNoResultsMessage = result.getOrThrow().isEmpty()
+                    )
+                }
+            } else {
+                val error = result.exceptionOrNull()
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = error?.message ?: "Error al buscar rutas."
+                    )
+                }
+            }
+        }
+    }
+
+    private fun fetchNearbyRoutes(
+        location: LocationPoint,
+        radii: List<Int> = listOf(15000, 20000, 25000),
+        limit: Int? = null
+    ) {
         _uiState.update { it.copy(isLoading = true, lastSearchedLocation = location) }
         viewModelScope.launch {
             for (radius in radii) {
-                val result = getNearbyRoutesUseCase(location.latitude, location.longitude, radius)
+                val result = getNearbyRoutesUseCase(
+                    location.latitude,
+                    location.longitude,
+                    radius,
+                    limit
+                )
 
                 if (result.isSuccess) {
                     val routes = result.getOrThrow()
@@ -124,7 +163,12 @@ class MapViewModel @Inject constructor(
             }
             // Si después de todos los intentos no hay 3 o más rutas, mostramos lo que haya
             // y si no hay nada, activamos el mensaje.
-            val finalRoutes = getNearbyRoutesUseCase(location.latitude, location.longitude, radii.last()).getOrNull() ?: emptyList()
+            val finalRoutes = getNearbyRoutesUseCase(
+                location.latitude,
+                location.longitude,
+                radii.last(),
+                limit
+            ).getOrNull() ?: emptyList()
             _uiState.update {
                 it.copy(
                     isLoading = false,

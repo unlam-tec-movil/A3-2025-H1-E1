@@ -10,6 +10,7 @@ import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import android.location.Location
 
 /**
  * Implementación concreta del repositorio de rutas.
@@ -22,43 +23,59 @@ import javax.inject.Inject
  * @property repository Las dependencias necesarias para la implementación
  *                     (Room, Retrofit, etc.) se inyectarán aquí
  */
-class RouteRepositoryImpl
-    @Inject
-    constructor(
-        private val dao: RouteDao,
-        private val overpassApi: OverpassApi,
-    ) : RouteRepository {
-        override suspend fun getNearbyRoutes(latitude: Double, longitude: Double, radius: Int): Result<List<Route>> {
-            return try {
-                val query = """
-                    [out:json][timeout:60];
-                    (
-                      relation["route"="hiking"](around:$radius,$latitude,$longitude);
-                    );
-                    (._;>>;);
-                    out geom;
-                """.trimIndent()
-                val response = overpassApi.getNearbyRoutes(query)
-                Result.success(response.toDomain())
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Result.failure(e)
+class RouteRepositoryImpl @Inject constructor(
+    private val dao: RouteDao,
+    private val overpassApi: OverpassApi,
+) : RouteRepository {
+    override suspend fun getNearbyRoutes(
+        latitude: Double,
+        longitude: Double,
+        radius: Int,
+        limit: Int?
+    ): Result<List<Route>> {
+        return try {
+            val query =
+                "[out:json];(relation[route=\"hiking\"](around:$radius,$latitude,$longitude););(._;>>;);out geom;"
+            val response = overpassApi.getNearbyRoutes(query)
+            val routes = response.toDomain()
+
+            val resultRoutes = if (limit != null && routes.isNotEmpty()) {
+                val centerLocation = Location("").apply {
+                    this.latitude = latitude
+                    this.longitude = longitude
+                }
+                routes.sortedBy { route ->
+                    route.points.firstOrNull()?.let { startPoint ->
+                        Location("").apply {
+                            this.latitude = startPoint.latitude
+                            this.longitude = startPoint.longitude
+                        }.distanceTo(centerLocation)
+                    } ?: Float.MAX_VALUE
+                }.take(limit)
+            } else {
+                routes
             }
-        }
 
-        override suspend fun saveRoute(route: Route) {
-            val entity = route.toEntity()
-            dao.insert(entity)
-        }
-
-        override suspend fun getRoute(id: String): Route? {
-            val entity = dao.getRoute(id) ?: return null
-            return entity.toDomain()
-        }
-
-        override fun getAllRoutes(): Flow<List<Route>> = dao.getAllRoutes().map { list -> list.map { it.toDomain() } }
-
-        override suspend fun deleteRoute(id: String) {
-            dao.deleteRoute(id)
+            Result.success(resultRoutes)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
         }
     }
+
+    override suspend fun saveRoute(route: Route) {
+        val entity = route.toEntity()
+        dao.insert(entity)
+    }
+
+    override suspend fun getRoute(id: String): Route? {
+        val entity = dao.getRoute(id) ?: return null
+        return entity.toDomain()
+    }
+
+    override fun getAllRoutes(): Flow<List<Route>> = dao.getAllRoutes().map { list -> list.map { it.toDomain() } }
+
+    override suspend fun deleteRoute(id: String) {
+        dao.deleteRoute(id)
+    }
+}
