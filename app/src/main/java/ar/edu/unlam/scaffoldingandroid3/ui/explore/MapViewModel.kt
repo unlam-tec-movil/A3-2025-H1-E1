@@ -44,7 +44,7 @@ class MapViewModel @Inject constructor(
                     CameraUpdateFactory.newCameraPosition(
                         CameraPosition.fromLatLngZoom(
                             LatLng(location.latitude, location.longitude),
-                            11f
+                            DEFAULT_ZOOM_LEVEL
                         )
                     )
                 )
@@ -52,8 +52,8 @@ class MapViewModel @Inject constructor(
             } else {
                 // Si el permiso fue denegado o la ubicación no se pudo obtener, usa la ubicación por defecto.
                 val defaultLocation = LocationPoint(
-                    latitude = -34.6037,
-                    longitude = -58.3816,
+                    latitude = DEFAULT_LOCATION_LAT,
+                    longitude = DEFAULT_LOCATION_LON,
                     accuracy = 0f,
                     speed = null,
                     altitude = null,
@@ -70,7 +70,7 @@ class MapViewModel @Inject constructor(
                     CameraUpdateFactory.newCameraPosition(
                         CameraPosition.fromLatLngZoom(
                             LatLng(defaultLocation.latitude, defaultLocation.longitude),
-                            11f
+                            DEFAULT_ZOOM_LEVEL
                         )
                     )
                 )
@@ -96,7 +96,7 @@ class MapViewModel @Inject constructor(
             }
         } ?: return
 
-        if (newCenter.distanceTo(lastLocation) > 1500) { // Umbral de 1500 metros
+        if (newCenter.distanceTo(lastLocation) > SEARCH_AREA_DISTANCE_THRESHOLD_METERS) {
             _uiState.update { it.copy(showSearchInAreaButton = true) }
         }
     }
@@ -124,8 +124,8 @@ class MapViewModel @Inject constructor(
             val result = getNearbyRoutesUseCase(
                 lat = location.latitude,
                 lon = location.longitude,
-                radius = 50000, // 50km de radio
-                limit = 10
+                radius = SEARCH_AREA_RADIUS_METERS,
+                limit = SEARCH_AREA_LIMIT
             )
 
             if (result.isSuccess) {
@@ -150,7 +150,7 @@ class MapViewModel @Inject constructor(
 
     private fun fetchNearbyRoutes(
         location: LocationPoint,
-        radii: List<Int> = listOf(15000, 20000, 25000),
+        radii: List<Int> = NEARBY_SEARCH_RADII_METERS,
         limit: Int? = null
     ) {
         _uiState.update { it.copy(isLoading = true, lastSearchedLocation = location) }
@@ -165,7 +165,7 @@ class MapViewModel @Inject constructor(
 
                 if (result.isSuccess) {
                     val routes = result.getOrThrow()
-                    if (routes.size >= 3) {
+                    if (routes.size >= MINIMUM_ROUTES_TO_STOP_SEARCH) {
                         _uiState.update { it.copy(isLoading = false, nearbyRoutes = routes) }
                         return@launch
                     }
@@ -196,5 +196,16 @@ class MapViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    companion object {
+        private const val DEFAULT_ZOOM_LEVEL = 11f
+        private const val DEFAULT_LOCATION_LAT = -34.6037
+        private const val DEFAULT_LOCATION_LON = -58.3816
+        private const val SEARCH_AREA_DISTANCE_THRESHOLD_METERS = 1500
+        private const val SEARCH_AREA_RADIUS_METERS = 50000
+        private const val SEARCH_AREA_LIMIT = 10
+        private val NEARBY_SEARCH_RADII_METERS = listOf(15000, 20000, 25000)
+        private const val MINIMUM_ROUTES_TO_STOP_SEARCH = 3
     }
 }
