@@ -96,7 +96,7 @@ class MapViewModel @Inject constructor(
             }
         } ?: return
 
-        if (newCenter.distanceTo(lastLocation) > 500) { // Umbral de 500 metros
+        if (newCenter.distanceTo(lastLocation) > 1500) { // Umbral de 1500 metros
             _uiState.update { it.copy(showSearchInAreaButton = true) }
         }
     }
