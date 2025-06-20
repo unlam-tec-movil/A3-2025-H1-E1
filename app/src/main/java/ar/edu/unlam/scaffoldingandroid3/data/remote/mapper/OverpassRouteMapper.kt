@@ -63,7 +63,7 @@ fun OverpassResponse.toDomain(calculator: RouteDistanceCalculator): List<Route> 
             name = relation.tags.name,
             points = routePoints,
             distance = distance,
-            duration = 0L, // Can be calculated later if needed
+            duration = 0L,
         )
     }
 }
