@@ -4,7 +4,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import ar.edu.unlam.scaffoldingandroid3.data.local.converters.RouteConverters
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.HistoryDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
+import ar.edu.unlam.scaffoldingandroid3.data.local.entity.HistoryEntity
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.RouteEntity
 
 /**
@@ -14,8 +16,16 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.entity.RouteEntity
  * Singleton pattern con Room.databaseBuilder
  */
 
-@Database(entities = [RouteEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [
+        RouteEntity::class,
+        HistoryEntity::class
+    ], 
+    version = 1, 
+    exportSchema = false
+)
 @TypeConverters(RouteConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun routeDao(): RouteDao
+    abstract fun historyDao(): HistoryDao
 }
