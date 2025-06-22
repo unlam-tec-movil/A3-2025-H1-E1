@@ -15,24 +15,13 @@ import javax.inject.Inject
  * @property repository El repositorio de rutas inyectado por Hilt
  */
 class GetRoutesUseCase
-    @Inject
-    constructor(
-        private val repository: RouteRepository,
-    ) {
-        /**
-         * Ejecuta el caso de uso.
-         *
-         * @return Un Flow que emite la lista de rutas
-         */
-        operator fun invoke(): Flow<List<Route>> = repository.getAllRoutes()
-    }
-
-/**
- * TODO: Caso de uso
- *
- * ⚠️ CUIDADO: Podría ser "PASS-THROUGH" (PASA-MANOS)
- * Si solo llama repository.[método]() sin lógica de negocio,
- * usar Repository directo en ViewModel.
- *
- * SOLUCIÓN: ViewModel usa Repository directo para operaciones simples.
- */
+@Inject constructor(
+    private val repository: RouteRepository,
+) {
+    /**
+     * Ejecuta el caso de uso.
+     *
+     * @return Un Flow que emite la lista de rutas
+     */
+    operator fun invoke(): Flow<List<Route>> = repository.getAllRoutes()
+}
