@@ -1,13 +1,28 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,12 +38,12 @@ import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
 import coil.compose.AsyncImage
 
 /**
- * Composable - Card expandido con detalles completos de ruta
- * UI: Imagen, metadata, descripción, carrusel de fotos, botón "Iniciar"
+ *  Composable - Card expandido con detalles completos de ruta
+ *  UI: Imagen, metadata, descripción, carrusel de fotos, botón "Iniciar"
  *
- * @param route Ruta a mostrar
- * @param photos Lista de fotos asociadas a la ruta
- * @param onStartClick Acción al hacer clic en el botón "Iniciar"
+ *  @param route Ruta a mostrar
+ *  @param photos Lista de fotos asociadas a la ruta
+ *  @param onStartClick Acción al hacer clic en el botón "Iniciar"
  */
 
 @Composable
@@ -48,31 +63,31 @@ fun RouteDetailCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-        ){
-            //Imagen principal
+        ) {
+            // Imagen principal
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.LightGray),
-            ){
-                //TODO: Cargar imagen desde URI
+            ) {
+                // TODO: Cargar imagen desde URI
             }
             Spacer(modifier = Modifier.height(16.dp))
-            //Metadata de la ruta
+            // Metadata de la ruta
             Text(
                 text = route.name,
                 style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            //Descripción de la ruta
+            // Descripción de la ruta
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
-            ){
+            ) {
                 Column {
                     Text(
                         text = "Distancia: ${String.format("%.1f", route.distance / 1000)} km",
@@ -87,7 +102,7 @@ fun RouteDetailCard(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            //Carrusel de fotos
+            // Carrusel de fotos
             if (photos.isNotEmpty()) {
                 val pagerState = rememberPagerState(pageCount = { photos.size })
                 Text(
@@ -114,7 +129,7 @@ fun RouteDetailCard(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            //Botón "Iniciar"
+            // Botón "Iniciar"
             Button(
                 onClick = onStartClick,
                 modifier = Modifier
@@ -124,8 +139,8 @@ fun RouteDetailCard(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
-                )
-            ){
+                ),
+            ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = "Iniciar ruta",
@@ -152,12 +167,12 @@ fun RouteDetailCardPreview() {
             Route.Point(
                 latitude = -34.6037,
                 longitude = -58.3816,
-                timestamp = System.currentTimeMillis()
+                timestamp = System.currentTimeMillis(),
             ),
             Route.Point(
                 latitude = -34.6038,
                 longitude = -58.3817,
-                timestamp = System.currentTimeMillis() + 1000
+                timestamp = System.currentTimeMillis() + 1000,
             ),
         ),
         distance = 5200.0, // 5.2 km
@@ -191,7 +206,7 @@ fun RouteDetailCardPreview() {
                 timestamp = System.currentTimeMillis(),
             ),
             description = "Punto intermedio",
-        )
+        ),
     )
     ScaffoldingAndroid3Theme {
         Surface(
@@ -206,3 +221,4 @@ fun RouteDetailCardPreview() {
         }
     }
 }
+
