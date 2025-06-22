@@ -33,11 +33,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun RouteCard(
     modifier: Modifier = Modifier,
-    userName: String,
-    location: String,
+    id: String,
+    name: String,
     distance: String,
     duration: String,
-    onPlayClick: () -> Unit = {},
+    onPlayClick: () -> Unit,
 ) {
     Card(
         modifier =
@@ -66,12 +66,12 @@ fun RouteCard(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = userName,
+                        text = id,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                     )
                     Text(
-                        text = location,
+                        text = name,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Row {
@@ -108,3 +108,4 @@ fun RouteCard(
         }
     }
 }
+

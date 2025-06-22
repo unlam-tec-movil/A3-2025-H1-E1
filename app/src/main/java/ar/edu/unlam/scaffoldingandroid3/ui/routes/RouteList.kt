@@ -1,7 +1,9 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
 /**
  * TODO
@@ -15,19 +17,17 @@ import androidx.compose.runtime.Composable
  */
 @Composable
 fun RouteList(
-    userName: String,
-    location: String,
-    distance: String,
-    duration: String,
+    list: List<Route>,
+    onPlayClick: (String) -> Unit,
 ) {
     LazyColumn {
-        items(15) { index ->
+        items(list) { route ->
             RouteCard(
-                userName = userName + index,
-                location = location + index,
-                distance = distance + index,
-                duration = duration + index,
-                onPlayClick = {},
+                id = route.id,
+                name = route.name,
+                distance = route.distance.toString(),
+                duration = route.duration.toString(),
+                onPlayClick = { onPlayClick(route.id) },
             )
         }
     }
