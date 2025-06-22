@@ -4,9 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import ar.edu.unlam.scaffoldingandroid3.data.local.AppDatabase
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.HistoryDao
-import ar.edu.unlam.scaffoldingandroid3.data.local.dao.HistoryDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
-import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
 import dagger.Module
 import dagger.Provides
@@ -36,8 +34,8 @@ object DatabaseModule {
     fun provideRouteDao(db: AppDatabase): RouteDao = db.routeDao()
 
     @Provides
-    fun provideTrackingDao(db: AppDatabase): TrackingDao = db.trackingDao()
+    fun provideHistoryDao(db: AppDatabase): HistoryDao = db.historyDao()
 
     @Provides
-    fun provideHistoryDao(db: AppDatabase): HistoryDao = db.historyDao()
+    fun provideTrackingDao(db: AppDatabase): TrackingDao = db.trackingDao()
 }
