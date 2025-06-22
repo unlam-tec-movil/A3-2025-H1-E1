@@ -1,7 +1,20 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Photo
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
+
 /**
- * TODO: Data class - Estado UI del detalle de ruta
+ * Estado de la UI para la pantalla de detalle de ruta.
+ *
+ * @property isLoading Indica si se están cargando los datos
+ * @property route La ruta a mostrar (null si aún no se cargó)
+ * @property photos Lista de fotos asociadas a la ruta
+ * @property error Mensaje de error si algo falló (null si no hay error)
  */
 
-data class RouteDetailUiState(val isLoading: Boolean = false)
+data class RouteDetailUiState(
+    val isLoading: Boolean = false,
+    val route: Route? = null,
+    val photos: List<Photo> = emptyList(),
+    val error: String? = null,
+)
