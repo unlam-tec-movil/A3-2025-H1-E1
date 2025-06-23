@@ -21,13 +21,15 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
  */
 @Composable
 fun MyRoutesScreen(
-    viewModel: MyRoutesViewModel = hiltViewModel(), onRouteClick: (String) -> Unit
+    viewModel: MyRoutesViewModel = hiltViewModel(),
+    onRouteClick: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         if (uiState.isLoading) {
@@ -35,13 +37,16 @@ fun MyRoutesScreen(
         }
         uiState.error?.let {
             ErrorDialog(
-                errorMessage = it, onDismiss = { viewModel.clearError() })
+                errorMessage = it,
+                onDismiss = { viewModel.clearError() },
+            )
         }
         uiState.emptyMessage?.let {
             Text(text = it)
         }
         RouteList(
-            list = uiState.savedRoutes, onPlayClick = onRouteClick
+            list = uiState.savedRoutes,
+            onPlayClick = onRouteClick,
         )
     }
 }

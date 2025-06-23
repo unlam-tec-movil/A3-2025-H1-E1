@@ -15,13 +15,14 @@ import javax.inject.Inject
  * @property repository El repositorio de rutas inyectado por Hilt
  */
 class GetRoutesUseCase
-@Inject constructor(
-    private val repository: RouteRepository,
-) {
-    /**
-     * Ejecuta el caso de uso.
-     *
-     * @return Un Flow que emite la lista de rutas
-     */
-    operator fun invoke(): Flow<List<Route>> = repository.getAllRoutes()
-}
+    @Inject
+    constructor(
+        private val repository: RouteRepository,
+    ) {
+        /**
+         * Ejecuta el caso de uso.
+         *
+         * @return Un Flow que emite la lista de rutas
+         */
+        operator fun invoke(): Flow<List<Route>> = repository.getAllRoutes()
+    }

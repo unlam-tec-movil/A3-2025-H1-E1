@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun RouteCard(
     modifier: Modifier = Modifier,
-    id: String,
     name: String,
     distance: String,
     duration: String,
@@ -66,12 +65,13 @@ fun RouteCard(
                             .size(64.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.LightGray),
-                ){
-                    //TODO: Cargar imagen de la ruta con Glide
+                ) {
+                    // TODO: Cargar imagen de la ruta con Glide
                     Image(
                         imageVector = Icons.Filled.Face,
                         contentDescription = "Play",
-                        modifier = Modifier.fillMaxSize())
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
@@ -118,7 +118,6 @@ fun RouteCard(
 @Composable
 fun RouteCardPreview() {
     RouteCard(
-        id = "1",
         name = "Ruta 1",
         distance = "10 km",
         duration = "2 horas",

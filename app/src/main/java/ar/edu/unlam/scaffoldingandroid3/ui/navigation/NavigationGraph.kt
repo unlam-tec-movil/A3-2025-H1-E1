@@ -40,7 +40,7 @@ fun NavGraph(
             MyRoutesScreen(
                 onRouteClick = { routeId ->
                     navController.navigate(Screen.RouteDetail.createRoute(routeId))
-                }
+                },
             )
         }
         composable(Screen.Map.route) {

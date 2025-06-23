@@ -10,4 +10,5 @@ data class MyRoutesUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val savedRoutes: List<Route> = emptyList(),
-    val emptyMessage: String? = null)
+    val emptyMessage: String? = null,
+)
