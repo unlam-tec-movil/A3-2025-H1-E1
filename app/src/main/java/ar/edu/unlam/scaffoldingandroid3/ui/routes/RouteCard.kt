@@ -1,11 +1,13 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -24,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /**
@@ -62,14 +66,15 @@ fun RouteCard(
                             .size(64.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.LightGray),
-                )
+                ){
+                    //TODO: Cargar imagen de la ruta con Glide
+                    Image(
+                        imageVector = Icons.Filled.Face,
+                        contentDescription = "Play",
+                        modifier = Modifier.fillMaxSize())
+                }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text(
-                        text = id,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                    )
                     Text(
                         text = name,
                         style = MaterialTheme.typography.titleMedium,
@@ -93,7 +98,7 @@ fun RouteCard(
                 onClick = onPlayClick,
                 modifier =
                     Modifier
-                        .size(48.dp)
+                        .size(64.dp)
                         .background(
                             color = MaterialTheme.colorScheme.primary,
                             shape = CircleShape,
@@ -109,3 +114,14 @@ fun RouteCard(
     }
 }
 
+@Preview
+@Composable
+fun RouteCardPreview() {
+    RouteCard(
+        id = "1",
+        name = "Ruta 1",
+        distance = "10 km",
+        duration = "2 horas",
+        onPlayClick = {},
+    )
+}

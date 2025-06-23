@@ -33,7 +33,7 @@ class MyRoutesViewModel
                             it.copy(
                                 isLoading = false,
                                 error = null,
-                                emptyMessage = "No hay rutas guardadas"
+                                emptyMessage = "Aún no hay rutas guardadas"
                             )
                         }
                         return@collect
