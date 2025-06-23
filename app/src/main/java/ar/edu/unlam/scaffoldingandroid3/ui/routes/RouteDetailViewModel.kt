@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RouteDetailViewModel
-@Inject
+    @Inject
     constructor(
         private val routeRepository: RouteRepository,
         savedStateHandle: SavedStateHandle,

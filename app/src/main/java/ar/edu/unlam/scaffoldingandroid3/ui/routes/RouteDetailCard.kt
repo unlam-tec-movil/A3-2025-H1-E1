@@ -38,14 +38,13 @@ import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
 import coil.compose.AsyncImage
 
 /**
- *  Composable - Card expandido con detalles completos de ruta
- *  UI: Imagen, metadata, descripción, carrusel de fotos, botón "Iniciar"
+ * Composable - Card expandido con detalles completos de ruta
+ * UI: Imagen, metadata, descripción, carrusel de fotos, botón "Iniciar"
  *
- *  @param route Ruta a mostrar
- *  @param photos Lista de fotos asociadas a la ruta
- *  @param onStartClick Acción al hacer clic en el botón "Iniciar"
+ * @param route Ruta a mostrar
+ * @param photos Lista de fotos asociadas a la ruta
+ * @param onStartClick Acción al hacer clic en el botón "Iniciar"
  */
-
 @Composable
 fun RouteDetailCard(
     route: Route,
@@ -53,29 +52,47 @@ fun RouteDetailCard(
     onStartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Obtener API key desde recursos
+//    val context = LocalContext.current
+//    val apiKey = remember {
+//        context.getString(ar.edu.unlam.scaffoldingandroid3.R.string.google_maps_api_key)
+//    }
+//    val configuration = LocalConfiguration.current
+//    val screenWidth = configuration.screenWidthDp.dp
+//    val mapHeight = remember {
+//        (screenWidth * 0.6f)
+//    }
+
     Card(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         ) {
-            // Imagen principal
+            // Mapa de la ruta
             Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.LightGray),
             ) {
-                // TODO: Cargar imagen desde URI
+//                AsyncImage(
+//                    model = MapUtils.generateStaticMapUrl(
+//                        route = route,
+//                        apiKey = apiKey,
+//                        width = (screenWidth.value * 2).toInt(), // x2 para mejor calidad
+//                        height = (mapHeight.value * 2).toInt(),
+//                    ),
+//                    contentDescription = "Mapa de la ruta",
+//                    modifier = Modifier.fillMaxWidth(),
+//                    contentScale = ContentScale.Crop,
+//                )
             }
             Spacer(modifier = Modifier.height(16.dp))
             // Metadata de la ruta
@@ -107,7 +124,9 @@ fun RouteDetailCard(
             Spacer(modifier = Modifier.height(8.dp))
             // Carrusel de fotos
             if (photos.isNotEmpty()) {
-                val pagerState = rememberPagerState(pageCount = { photos.size })
+                val pagerState = rememberPagerState(
+                    pageCount = { photos.size },
+                )
                 Text(
                     text = "Fotos de la ruta",
                     style = MaterialTheme.typography.titleMedium,
@@ -135,10 +154,9 @@ fun RouteDetailCard(
             // Botón "Iniciar"
             Button(
                 onClick = onStartClick,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -179,10 +197,8 @@ fun RouteDetailCardPreview() {
                 timestamp = System.currentTimeMillis() + 1000,
             ),
         ),
-        // 5.2 km
-        distance = 5200.0,
-        // 30 minutos
-        duration = 1800000,
+        distance = 5200.0, // 5.2 km
+        duration = 1800000, // 30 minutos
     )
     val samplePhotos = listOf(
         Photo(
