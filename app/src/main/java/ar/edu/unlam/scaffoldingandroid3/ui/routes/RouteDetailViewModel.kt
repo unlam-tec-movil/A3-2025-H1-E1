@@ -18,58 +18,57 @@ import javax.inject.Inject
  */
 
 @HiltViewModel
-class RouteDetailViewModel @Inject constructor(
-    private val routeRepository: RouteRepository,
-    savedStateHandle: SavedStateHandle,
-) : ViewModel() {
+class RouteDetailViewModel
+@Inject
+    constructor(
+        private val routeRepository: RouteRepository,
+        savedStateHandle: SavedStateHandle,
+    ) : ViewModel() {
+        private val routeId: String = checkNotNull(savedStateHandle["routeId"])
+        private val _uiState = MutableStateFlow(RouteDetailUiState())
+        val uiState: StateFlow<RouteDetailUiState> = _uiState
 
-    private val routeId: String = checkNotNull(savedStateHandle["routeId"])
-    private val _uiState = MutableStateFlow(RouteDetailUiState())
-    val uiState: StateFlow<RouteDetailUiState> = _uiState
+        init {
+            loadRouteDetails()
+        }
 
-    init {
-        loadRouteDetails()
-    }
-
-    private fun loadRouteDetails() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            
-            try {
-                val route = routeRepository.getRoute(routeId)
-                if (route != null) {
-                    // TODO: Implement getPhotosByRoute in PhotoRepository
-                    // val photos = photoRepository.getPhotosByRoute(routeId)
-                    val photos = emptyList<Photo>() // Temporary until PhotoRepository is implemented
-                    
-                    _uiState.update { 
+        private fun loadRouteDetails() {
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = true, error = null) }
+                try {
+                    val route = routeRepository.getRoute(routeId)
+                    if (route != null) {
+                        // TODO: Implement getPhotosByRoute in PhotoRepository
+                        // val photos = photoRepository.getPhotosByRoute(routeId)
+                        val photos = emptyList<Photo>() // Temporary until PhotoRepository is implemented
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                route = route,
+                                photos = photos,
+                                error = null,
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Ruta no encontrada",
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    _uiState.update {
                         it.copy(
                             isLoading = false,
-                            route = route,
-                            photos = photos,
-                            error = null,
+                            error = e.message ?: "Error al cargar la ruta",
                         )
                     }
-                } else {
-                    _uiState.update { 
-                        it.copy(
-                            isLoading = false,
-                            error = "Ruta no encontrada",
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                _uiState.update { 
-                    it.copy(
-                        isLoading = false,
-                        error = e.message ?: "Error al cargar la ruta",
-                    )
                 }
             }
         }
-    }
 
-    fun retryLoading() {
-        loadRouteDetails()
+        fun retryLoading() {
+            loadRouteDetails()
+        }
     }
-}

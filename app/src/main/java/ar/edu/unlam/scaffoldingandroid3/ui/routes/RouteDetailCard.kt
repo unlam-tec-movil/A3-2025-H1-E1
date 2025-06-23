@@ -54,23 +54,26 @@ fun RouteDetailCard(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
         ) {
             // Imagen principal
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.LightGray),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.LightGray),
             ) {
                 // TODO: Cargar imagen desde URI
             }
@@ -132,9 +135,10 @@ fun RouteDetailCard(
             // Botón "Iniciar"
             Button(
                 onClick = onStartClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -175,8 +179,10 @@ fun RouteDetailCardPreview() {
                 timestamp = System.currentTimeMillis() + 1000,
             ),
         ),
-        distance = 5200.0, // 5.2 km
-        duration = 1800000, // 30 minutos
+        // 5.2 km
+        distance = 5200.0,
+        // 30 minutos
+        duration = 1800000,
     )
     val samplePhotos = listOf(
         Photo(
@@ -221,4 +227,3 @@ fun RouteDetailCardPreview() {
         }
     }
 }
-

@@ -59,10 +59,10 @@ fun NavGraph(
             route = Screen.RouteDetail.route,
             arguments = listOf(
                 navArgument("routeId") {
-                type = NavType.StringType
-                nullable = false
-                }
-            )
+                    type = NavType.StringType
+                    nullable = false
+                },
+            ),
         ) { backStackEntry ->
             // Extrae el valor de "routeId" desde los argumentos
             val routeId = backStackEntry.arguments?.getString("routeId")
@@ -71,7 +71,7 @@ fun NavGraph(
                 routeId = routeId,
                 onStartClick = {
                     navController.navigate(Screen.Tracking.route)
-                }
+                },
             )
         }
     }

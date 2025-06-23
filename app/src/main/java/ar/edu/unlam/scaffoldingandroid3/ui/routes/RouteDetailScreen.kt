@@ -42,9 +42,10 @@ fun RouteDetailScreen(
         color = MaterialTheme.colorScheme.background,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
             contentAlignment = Alignment.Center,
         ) {
             when {
@@ -72,40 +73,45 @@ fun RouteDetailScreen(
 @Preview(showBackground = true)
 @Composable
 fun RouteDetailScreenPreview() {
-    val sampleRoute = Route(
-        id = "1",
-        name = "Ruta por el Parque",
-        points = listOf(
-            Route.Point(
-                latitude = -34.6037,
-                longitude = -58.3816,
-                timestamp = System.currentTimeMillis()
-            ),
-            Route.Point(
-                latitude = -34.6038,
-                longitude = -58.3817,
-                timestamp = System.currentTimeMillis() + 1000
-            ),
-        ),
-        distance = 5200.0, // 5.2 km
-        duration = 1800000, // 30 minutos
-    )
-    val samplePhotos = listOf(
-        Photo(
-            id = 1,
-            uri = "https://picsum.photos/200/300",
-            timestamp = System.currentTimeMillis(),
-            location = LocationPoint(
-                accuracy = 5f,
-                speed = 0f,
-                altitude = 100.0,
-                latitude = -34.6037,
-                longitude = -58.3816,
+    val sampleRoute =
+        Route(
+            id = "1",
+            name = "Ruta por el Parque",
+            points =
+                listOf(
+                    Route.Point(
+                        latitude = -34.6037,
+                        longitude = -58.3816,
+                        timestamp = System.currentTimeMillis(),
+                    ),
+                    Route.Point(
+                        latitude = -34.6038,
+                        longitude = -58.3817,
+                        timestamp = System.currentTimeMillis() + 1000,
+                    ),
+                ),
+            // 5.2 km
+            distance = 5200.0,
+            // 30 minutos
+            duration = 1800000,
+        )
+    val samplePhotos =
+        listOf(
+            Photo(
+                id = 1,
+                uri = "https://picsum.photos/200/300",
                 timestamp = System.currentTimeMillis(),
+                location = LocationPoint(
+                    accuracy = 5f,
+                    speed = 0f,
+                    altitude = 100.0,
+                    latitude = -34.6037,
+                    longitude = -58.3816,
+                    timestamp = System.currentTimeMillis(),
+                ),
+                description = "Inicio de la ruta",
             ),
-            description = "Inicio de la ruta",
-        ),
-    )
+        )
 
     ScaffoldingAndroid3Theme {
         Surface(
