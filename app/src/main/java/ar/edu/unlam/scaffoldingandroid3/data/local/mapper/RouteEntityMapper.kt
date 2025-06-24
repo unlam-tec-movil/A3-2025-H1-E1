@@ -16,6 +16,7 @@ fun Route.toEntity(): RouteEntity {
         points = points,
         distance = distance,
         duration = duration,
+        photoUri = photoUri
     )
 }
 
@@ -26,5 +27,6 @@ fun RouteEntity.toDomain(): Route {
         points = points,
         distance = distance,
         duration = duration,
+        photoUri = photoUri
     )
 }
