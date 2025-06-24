@@ -1,6 +1,8 @@
 package ar.edu.unlam.scaffoldingandroid3.data.di
 
+import ar.edu.unlam.scaffoldingandroid3.data.repository.HistoryRepositoryImpl
 import ar.edu.unlam.scaffoldingandroid3.data.repository.RouteRepositoryImpl
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.HistoryRepository
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import dagger.Binds
 import dagger.Module
@@ -32,6 +34,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindRouteRepository(routeRepositoryImpl: RouteRepositoryImpl): RouteRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHistoryRepository(historyRepositoryImpl: HistoryRepositoryImpl): HistoryRepository
 
     @Binds
     @Singleton
