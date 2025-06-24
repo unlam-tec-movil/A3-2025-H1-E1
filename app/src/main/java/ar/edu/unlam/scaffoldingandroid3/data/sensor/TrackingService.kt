@@ -41,6 +41,11 @@ class TrackingService : Service() {
     @Inject lateinit var sensorManager: DeviceSensorManager
 
     @Inject lateinit var metricsCalculator: MetricsCalculator
+    
+    @Inject lateinit var trackingSessionRepository: ar.edu.unlam.scaffoldingandroid3.data.repository.TrackingSessionRepositoryImpl
+    
+    // Flag para evitar múltiples llamadas a startForeground
+    private var isStarted = false
 
     private val binder = TrackingBinder()
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -49,17 +54,9 @@ class TrackingService : Service() {
     private val _trackingStatus = MutableStateFlow(TrackingStatus.COMPLETED)
     val trackingStatus: StateFlow<TrackingStatus> = _trackingStatus.asStateFlow()
 
+    // Simplificado: solo location, el resto va via MetricsCalculator
     private val _currentLocation = MutableStateFlow<Location?>(null)
     val currentLocation: StateFlow<Location?> = _currentLocation.asStateFlow()
-
-    private val _stepCount = MutableStateFlow(0)
-    val stepCount: StateFlow<Int> = _stepCount.asStateFlow()
-
-    private val _altitude = MutableStateFlow(0.0)
-    val altitude: StateFlow<Double> = _altitude.asStateFlow()
-
-    private val _azimuth = MutableStateFlow(0f)
-    val azimuth: StateFlow<Float> = _azimuth.asStateFlow()
 
     // Jobs para cancelar flows cuando sea necesario
     private var locationJob: Job? = null
@@ -85,6 +82,35 @@ class TrackingService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
+        // IMPORTANTE: Llamar startForeground() INMEDIATAMENTE para evitar crash
+        // Solo para ACTION_START_TRACKING (otras acciones ya están en foreground)
+        if (intent?.action == ACTION_START_TRACKING && !isStarted) {
+            try {
+                // Verificar permisos críticos antes de startForeground
+                val hasLocationPermission = ActivityCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+                
+                if (!hasLocationPermission) {
+                    // Sin permisos de ubicación, no podemos hacer tracking
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+                
+                startForeground(NOTIFICATION_ID, createNotification())
+                isStarted = true
+            } catch (e: SecurityException) {
+                // Error de permisos
+                stopSelf()
+                return START_NOT_STICKY
+            } catch (e: Exception) {
+                // Cualquier otro error en startForeground
+                stopSelf()
+                return START_NOT_STICKY
+            }
+        }
+        
         when (intent?.action) {
             ACTION_START_TRACKING -> startTracking()
             ACTION_PAUSE_TRACKING -> pauseTracking()
@@ -103,20 +129,6 @@ class TrackingService : Service() {
         _trackingStatus.value = TrackingStatus.ACTIVE
         startTime = System.currentTimeMillis()
         pausedDuration = 0
-
-        // Verificar permiso POST_NOTIFICATIONS para Android 13+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS,
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                // Sin permiso, iniciar como servicio normal
-                return
-            }
-        }
-
-        startForeground(NOTIFICATION_ID, createNotification())
 
         // Resetear contadores
         sensorManager.resetStepCount()
@@ -139,6 +151,7 @@ class TrackingService : Service() {
         locationJob?.cancel()
         sensorJobs.forEach { it.cancel() }
         sensorManager.pauseStepTracking()
+        metricsCalculator.pauseTracking() // Pausar tracking de ruta
 
         updateNotification()
     }
@@ -153,6 +166,7 @@ class TrackingService : Service() {
         pausedDuration += System.currentTimeMillis() - pauseStartTime
 
         // Reanudar GPS y sensores
+        metricsCalculator.resumeTracking() // Reanudar tracking de ruta
         startLocationTracking()
         startSensorTracking()
         sensorManager.resumeStepTracking()
@@ -171,6 +185,7 @@ class TrackingService : Service() {
         sensorJobs.forEach { it.cancel() }
 
         stopForeground(STOP_FOREGROUND_REMOVE)
+        isStarted = false
         stopSelf()
     }
 
@@ -184,6 +199,8 @@ class TrackingService : Service() {
                     .collect { location ->
                         _currentLocation.value = location
                         metricsCalculator.addLocationPoint(location)
+                        // Actualizar métricas en repository después de cada ubicación
+                        trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
                     }
             }
     }
@@ -191,42 +208,60 @@ class TrackingService : Service() {
     private fun startSensorTracking() {
         sensorJobs =
             listOf(
-                // Tracking de pasos
+                // Tracking de pasos - solo a MetricsCalculator
                 serviceScope.launch {
                     sensorManager.getStepUpdates()
                         .collect { steps ->
-                            _stepCount.value = steps
                             metricsCalculator.updateStepCount(steps)
+                            // Actualizar métricas en repository después de cada paso
+                            trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
                         }
                 },
-                // Tracking de altitud
+                // Tracking de altitud - solo a MetricsCalculator
                 serviceScope.launch {
                     sensorManager.getAltitudeUpdates()
                         .collect { altitude ->
-                            _altitude.value = altitude
                             metricsCalculator.updateAltitude(altitude)
-                        }
-                },
-                // Tracking de brújula
-                serviceScope.launch {
-                    sensorManager.getCompassUpdates()
-                        .collect { azimuth ->
-                            _azimuth.value = azimuth
+                            // Actualizar métricas en repository después de cada altitud
+                            trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
                         }
                 },
             )
     }
 
     /**
-     * Obtiene el tiempo transcurrido excluyendo pausas
+     * Obtiene el tiempo EN MOVIMIENTO (sin pausas)
      */
-    fun getElapsedTime(): Long {
+    fun getMovementTime(): Long {
         return when (_trackingStatus.value) {
             TrackingStatus.ACTIVE -> System.currentTimeMillis() - startTime - pausedDuration
             TrackingStatus.PAUSED -> pauseStartTime - startTime - pausedDuration
-            TrackingStatus.COMPLETED -> 0L
+            TrackingStatus.COMPLETED -> {
+                // Mantener tiempo final, no resetear
+                metricsCalculator.getAdditionalStats()["totalMovementTime"] as? Long ?: 0L
+            }
         }
     }
+    
+    /**
+     * Obtiene el tiempo TOTAL (incluyendo pausas)
+     */
+    fun getTotalTime(): Long {
+        return when (_trackingStatus.value) {
+            TrackingStatus.ACTIVE -> System.currentTimeMillis() - startTime
+            TrackingStatus.PAUSED -> pauseStartTime - startTime
+            TrackingStatus.COMPLETED -> {
+                // Al completar, mantener tiempo total final
+                System.currentTimeMillis() - startTime
+            }
+        }
+    }
+    
+    /**
+     * DEPRECATED - Usar getMovementTime() o getTotalTime()
+     */
+    @Deprecated("Use getMovementTime() or getTotalTime()")
+    fun getElapsedTime(): Long = getMovementTime()
 
     /**
      * Obtiene las métricas actuales calculadas
@@ -251,16 +286,10 @@ class TrackingService : Service() {
     }
 
     private fun createNotification(): Notification {
-        val statusText =
-            when (_trackingStatus.value) {
-                TrackingStatus.ACTIVE -> "Grabando ruta..."
-                TrackingStatus.PAUSED -> "Grabación pausada"
-                TrackingStatus.COMPLETED -> "Finalizado"
-            }
-
+        // Simplificado para evitar delays en startForeground()
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Senderismo - Tracking Activo")
-            .setContentText(statusText)
+            .setContentTitle("Senderismo - Tracking")
+            .setContentText("Iniciando...")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setOngoing(true)
             .build()
@@ -285,6 +314,7 @@ class TrackingService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
+        isStarted = false
     }
 
     companion object {

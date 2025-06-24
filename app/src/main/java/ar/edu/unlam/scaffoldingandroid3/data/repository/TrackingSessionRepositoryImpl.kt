@@ -1,6 +1,9 @@
 package ar.edu.unlam.scaffoldingandroid3.data.repository
 
 import android.content.Context
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
+import ar.edu.unlam.scaffoldingandroid3.data.local.entity.PhotoEntity
+import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
 import ar.edu.unlam.scaffoldingandroid3.data.sensor.MetricsCalculator
 import ar.edu.unlam.scaffoldingandroid3.data.sensor.TrackingService
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
@@ -8,9 +11,16 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,7 +35,11 @@ class TrackingSessionRepositoryImpl
     constructor(
         @ApplicationContext private val context: Context,
         private val metricsCalculator: MetricsCalculator,
+        private val trackingDao: TrackingDao,
     ) : TrackingSessionRepository {
+        private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        private var timerJob: Job? = null
+        
         private val currentSession = MutableStateFlow<TrackingSession?>(null)
         private val trackingStatus = MutableStateFlow(TrackingStatus.COMPLETED)
         private val currentMetrics =
@@ -65,6 +79,9 @@ class TrackingSessionRepositoryImpl
 
             // Iniciar el servicio de tracking
             TrackingService.startService(context)
+            
+            // Iniciar timer para actualizar métricas cada segundo
+            startMetricsTimer()
 
             return session
         }
@@ -87,6 +104,9 @@ class TrackingSessionRepositoryImpl
 
             // Pausar el servicio
             TrackingService.pauseService(context)
+            
+            // Pausar timer
+            stopMetricsTimer()
 
             return pausedSession
         }
@@ -110,6 +130,9 @@ class TrackingSessionRepositoryImpl
 
             // Reanudar el servicio
             TrackingService.resumeService(context)
+            
+            // Reanudar timer
+            startMetricsTimer()
 
             return resumedSession
         }
@@ -134,6 +157,9 @@ class TrackingSessionRepositoryImpl
 
             // Detener el servicio
             TrackingService.stopService(context)
+            
+            // Detener timer
+            stopMetricsTimer()
 
             return finalSession
         }
@@ -161,12 +187,46 @@ class TrackingSessionRepositoryImpl
         }
 
         /**
-         * Guarda una sesión de tracking completa
+         * Guarda una sesión de tracking completa en base de datos
          */
         override suspend fun saveTrackingSession(session: TrackingSession): Long {
-            // TODO: Implementar guardado en base de datos cuando esté configurada
-            // Por ahora retornamos un ID simulado
-            return System.currentTimeMillis()
+            return try {
+                // Convertir TrackingSession a Entity
+                val sessionEntity = TrackingSessionEntity(
+                    routeName = session.routeName,
+                    startTime = session.startTime,
+                    endTime = session.endTime,
+                    totalDuration = formatTime(session.endTime - session.startTime),
+                    movingDuration = formatTime(session.endTime - session.startTime), // Simplificado
+                    totalDistance = session.metrics.currentDistance,
+                    totalSteps = 0, // Se actualiza desde MetricsCalculator si necesario
+                    averageSpeed = session.metrics.averageSpeed,
+                    maxSpeed = session.metrics.maxSpeed,
+                    minAltitude = session.metrics.currentElevation, // Simplificado
+                    maxAltitude = session.metrics.currentElevation + 50, // Simplificado
+                    createdAt = System.currentTimeMillis()
+                )
+                
+                // Guardar sesión en BD y obtener ID
+                val sessionId = trackingDao.insertTrackingSession(sessionEntity)
+                
+                // TODO: Guardar fotos asociadas si las hay
+                // Las fotos se guardarían aquí usando sessionId
+                
+                sessionId
+            } catch (e: Exception) {
+                throw Exception("Error al guardar sesión de tracking: ${e.message}")
+            }
+        }
+        
+        /**
+         * Formatea tiempo en milisegundos a HH:MM:SS
+         */
+        private fun formatTime(millis: Long): String {
+            val seconds = (millis / 1000) % 60
+            val minutes = (millis / (1000 * 60)) % 60
+            val hours = millis / (1000 * 60 * 60)
+            return "%02d:%02d:%02d".format(hours, minutes, seconds)
         }
 
         /**
@@ -200,5 +260,48 @@ class TrackingSessionRepositoryImpl
             currentSession.value?.let { session ->
                 currentSession.value = session.copy(metrics = metrics)
             }
+        }
+        
+        /**
+         * Inicia el timer para actualizar métricas cada segundo
+         */
+        private fun startMetricsTimer() {
+            stopMetricsTimer() // Cancelar timer anterior si existe
+            
+            timerJob = repositoryScope.launch {
+                while (trackingStatus.value == TrackingStatus.ACTIVE) {
+                    try {
+                        // Solo emitir métricas del MetricsCalculator sin modificarlas
+                        // El tiempo ya está siendo calculado correctamente en MetricsCalculator
+                        val updatedMetrics = metricsCalculator.getCurrentMetrics()
+                        currentMetrics.value = updatedMetrics
+                        
+                        // Actualizar sesión con las métricas actuales (sin recalcular tiempo)
+                        currentSession.value?.let { session ->
+                            currentSession.value = session.copy(metrics = updatedMetrics)
+                        }
+                        
+                        delay(1000L) // Actualizar cada segundo
+                    } catch (e: Exception) {
+                        // Manejar errores silenciosamente
+                        break
+                    }
+                }
+            }
+        }
+        
+        /**
+         * Detiene el timer de métricas
+         */
+        private fun stopMetricsTimer() {
+            timerJob?.cancel()
+            timerJob = null
+        }
+        
+        /**
+         * Cleanup cuando se destruye el repositorio
+         */
+        fun cleanup() {
+            repositoryScope.cancel()
         }
     }

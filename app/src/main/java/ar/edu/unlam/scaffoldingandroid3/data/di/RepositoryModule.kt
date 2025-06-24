@@ -56,4 +56,10 @@ abstract class RepositoryModule {
     abstract fun bindSensorRepository(
         sensorRepositoryImpl: ar.edu.unlam.scaffoldingandroid3.data.repository.SensorRepositoryImpl,
     ): ar.edu.unlam.scaffoldingandroid3.domain.repository.SensorRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCameraRepository(
+        cameraRepositoryImpl: ar.edu.unlam.scaffoldingandroid3.data.repository.CameraRepositoryImpl,
+    ): ar.edu.unlam.scaffoldingandroid3.domain.repository.CameraRepository
 }

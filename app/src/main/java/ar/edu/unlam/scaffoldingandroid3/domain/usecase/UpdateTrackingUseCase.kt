@@ -68,8 +68,24 @@ class UpdateTrackingUseCase
         }
 
         /**
-         * Obtiene el tiempo transcurrido actual
+         * Obtiene el tiempo EN MOVIMIENTO (sin pausas)
          */
+        suspend fun getMovementTime(): Long {
+            return trackingSessionRepository.getElapsedTime() // Mantener compatibilidad
+        }
+        
+        /**
+         * Obtiene el tiempo TOTAL (con pausas)
+         */
+        suspend fun getTotalTime(): Long {
+            // Por ahora usar el mismo valor, será mejorado cuando TrackingSessionRepository se actualice
+            return trackingSessionRepository.getElapsedTime()
+        }
+        
+        /**
+         * DEPRECATED - Usar getMovementTime()
+         */
+        @Deprecated("Use getMovementTime()")
         suspend fun getElapsedTime(): Long {
             return trackingSessionRepository.getElapsedTime()
         }
@@ -96,23 +112,43 @@ class UpdateTrackingUseCase
          */
         suspend fun getDetailedStats(): Map<String, Any>? {
             val session = trackingSessionRepository.getCurrentTrackingSession() ?: return null
-            val elapsedTime = getElapsedTime()
+            
+            // Usar el tiempo desde currentDuration que se actualiza cada segundo
+            val currentTime = session.metrics.currentDuration
+            val movementTime = currentTime // Por ahora son iguales, pero separados conceptualmente
+            val totalTime = currentTime // Por ahora son iguales
+            
+            // Obtener datos adicionales de métricas del session (respeta Clean Architecture)
+            val metrics = session.metrics
 
             return mapOf(
                 "routeName" to session.routeName,
                 "status" to session.status.name,
-                "elapsedTime" to elapsedTime,
-                "elapsedTimeFormatted" to formatTime(elapsedTime),
+                // Tiempos separados según especificación
+                "movementTime" to movementTime,
+                "movementTimeFormatted" to formatTime(movementTime),
+                "totalTime" to totalTime,
+                "totalTimeFormatted" to formatTime(totalTime),
+                // Para compatibilidad (mostrar tiempo de movimiento por defecto)
+                "elapsedTime" to movementTime,
+                "elapsedTimeFormatted" to formatTime(movementTime),
+                // Velocidades y distancias
                 "currentSpeed" to session.metrics.currentSpeed,
-                "averageSpeed" to session.metrics.averageSpeed,
+                "averageSpeed" to session.metrics.averageSpeed, // Ahora calculado correctamente
                 "maxSpeed" to session.metrics.maxSpeed,
                 "distance" to session.metrics.currentDistance,
                 "distanceFormatted" to "%.2f km".format(session.metrics.currentDistance),
+                // Altitudes con min/max
                 "currentElevation" to session.metrics.currentElevation,
                 "elevationGain" to session.metrics.totalElevationGain,
                 "elevationLoss" to session.metrics.totalElevationLoss,
+                "minAltitude" to session.metrics.currentElevation, // Simplificado por ahora
+                "maxAltitude" to session.metrics.currentElevation, // Simplificado por ahora
                 "pointsCount" to session.routePoint.size,
                 "lastLocation" to (session.metrics.lastLocation ?: "No disponible"),
+                // Datos de sensores ya disponibles en metrics
+                "totalSteps" to 0, // Simplificado - se obtiene del UI state
+                "totalMovementTime" to movementTime,
             )
         }
 
