@@ -9,6 +9,8 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.History
 
 interface HistoryRepository {
     suspend fun getHistory(): List<History>
+
     suspend fun saveCompletedActivity(history: History)
+
     suspend fun deleteHistory(historyId: Long)
 }

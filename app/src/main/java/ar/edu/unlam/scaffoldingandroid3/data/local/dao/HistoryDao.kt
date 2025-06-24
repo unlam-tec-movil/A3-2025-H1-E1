@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.HistoryEntity
-import kotlinx.coroutines.flow.Flow
 
 /**
  * DAO Room - Operaciones para historial de actividades
@@ -16,19 +15,21 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HistoryDao {
-    
     @Query("SELECT * FROM history ORDER BY date DESC")
     suspend fun getAllHistory(): List<HistoryEntity>
-    
+
     @Query("SELECT * FROM history WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
-    suspend fun getHistoryByDateRange(startDate: String, endDate: String): List<HistoryEntity>
-    
+    suspend fun getHistoryByDateRange(
+        startDate: String,
+        endDate: String,
+    ): List<HistoryEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHistory(history: HistoryEntity)
-    
+
     @Delete
     suspend fun deleteHistory(history: HistoryEntity)
-    
+
     @Query("DELETE FROM history WHERE id = :historyId")
     suspend fun deleteHistory(historyId: Long)
 }

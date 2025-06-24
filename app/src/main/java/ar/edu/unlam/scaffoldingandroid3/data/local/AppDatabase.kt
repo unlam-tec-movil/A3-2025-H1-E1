@@ -19,13 +19,14 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.entity.RouteEntity
 @Database(
     entities = [
         RouteEntity::class,
-        HistoryEntity::class
-    ], 
-    version = 1, 
-    exportSchema = false
+        HistoryEntity::class,
+    ],
+    version = 1,
+    exportSchema = false,
 )
 @TypeConverters(RouteConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun routeDao(): RouteDao
+
     abstract fun historyDao(): HistoryDao
 }

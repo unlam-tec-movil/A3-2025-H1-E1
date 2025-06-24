@@ -5,7 +5,6 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toDomain
 import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toEntity
 import ar.edu.unlam.scaffoldingandroid3.domain.model.History
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.HistoryRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -16,22 +15,23 @@ import javax.inject.Inject
  * Para pantalla "Tu historial de actividad"
  */
 
-class HistoryRepositoryImpl @Inject constructor(
-    private val historyDao: HistoryDao
-) : HistoryRepository {
+class HistoryRepositoryImpl
+    @Inject
+    constructor(
+        private val historyDao: HistoryDao,
+    ) : HistoryRepository {
+        override suspend fun getHistory(): List<History> {
+            return historyDao.getAllHistory().map { historyEntity ->
+                historyEntity.toDomain()
+            }
+        }
 
-    override suspend fun getHistory(): List<History> {
-        return historyDao.getAllHistory().map { historyEntity ->
-            historyEntity.toDomain()
+        override suspend fun saveCompletedActivity(history: History) {
+            val historyEntity = history.toEntity()
+            historyDao.insertHistory(historyEntity)
+        }
+
+        override suspend fun deleteHistory(historyId: Long) {
+            historyDao.deleteHistory(historyId)
         }
     }
-
-    override suspend fun saveCompletedActivity(history: History) {
-        val historyEntity = history.toEntity()
-        historyDao.insertHistory(historyEntity)
-    }
-
-    override suspend fun deleteHistory(historyId: Long) {
-        historyDao.deleteHistory(historyId)
-    }
-}

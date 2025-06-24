@@ -14,13 +14,13 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.History
 @Composable
 fun HistoryList(
     historyList: List<History>,
-    onDeleteItem: (Long) -> Unit
+    onDeleteItem: (Long) -> Unit,
 ) {
     LazyColumn {
         items(historyList) { history ->
             HistoryCard(
                 history = history,
-                onDeleteClick = { onDeleteItem(history.id) }
+                onDeleteClick = { onDeleteItem(history.id) },
             )
         }
     }

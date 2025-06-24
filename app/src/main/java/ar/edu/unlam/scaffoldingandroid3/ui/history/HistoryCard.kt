@@ -36,14 +36,16 @@ fun HistoryCard(
     onDeleteClick: () -> Unit = {},
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(8.dp),
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -51,10 +53,11 @@ fun HistoryCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray),
+                    modifier =
+                        Modifier
+                            .size(64.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.LightGray),
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
@@ -82,12 +85,12 @@ fun HistoryCard(
                     }
                 }
             }
-            
+
             IconButton(onClick = onDeleteClick) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Eliminar actividad",
-                    tint = Color.Red
+                    tint = Color.Red,
                 )
             }
         }

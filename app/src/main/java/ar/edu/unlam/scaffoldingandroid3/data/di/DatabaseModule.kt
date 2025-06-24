@@ -31,7 +31,7 @@ object DatabaseModule {
 
     @Provides
     fun provideRouteDao(db: AppDatabase): RouteDao = db.routeDao()
-    
+
     @Provides
     fun provideHistoryDao(db: AppDatabase): HistoryDao = db.historyDao()
 }

@@ -10,5 +10,5 @@ data class HistoryUiState(
     val isLoading: Boolean = false,
     val historyList: List<History> = emptyList(),
     val error: String? = null,
-    val isEmpty: Boolean = false
+    val isEmpty: Boolean = false,
 )

@@ -23,15 +23,14 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
  * eso se implemente
  */
 @Composable
-fun HistoryScreen(
-    viewModel: HistoryViewModel = hiltViewModel()
-) {
+fun HistoryScreen(viewModel: HistoryViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         when {
@@ -41,13 +40,13 @@ fun HistoryScreen(
             uiState.error != null -> {
                 ErrorDialog(
                     errorMessage = uiState.error!!,
-                    onDismiss = { viewModel.clearError() }
+                    onDismiss = { viewModel.clearError() },
                 )
             }
             uiState.isEmpty -> {
                 Text(
                     text = stringResource(id = R.string.history_empty_message),
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 )
             }
             else -> {
@@ -55,7 +54,7 @@ fun HistoryScreen(
                     historyList = uiState.historyList,
                     onDeleteItem = { historyId ->
                         viewModel.deleteHistoryItem(historyId)
-                    }
+                    },
                 )
             }
         }

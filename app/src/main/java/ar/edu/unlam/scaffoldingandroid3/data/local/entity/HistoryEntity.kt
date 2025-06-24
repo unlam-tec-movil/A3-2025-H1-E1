@@ -17,5 +17,5 @@ data class HistoryEntity(
     val date: String,
     val metricsJson: String,
     val photosJson: String,
-    val routePointsJson: String
+    val routePointsJson: String,
 )

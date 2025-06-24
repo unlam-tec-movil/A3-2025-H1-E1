@@ -23,7 +23,7 @@ fun History.toEntity(): HistoryEntity {
         date = date,
         metricsJson = gson.toJson(metrics),
         photosJson = gson.toJson(photos),
-        routePointsJson = gson.toJson(routePoint)
+        routePointsJson = gson.toJson(routePoint),
     )
 }
 
@@ -34,6 +34,6 @@ fun HistoryEntity.toDomain(): History {
         date = date,
         metrics = gson.fromJson(metricsJson, TrackingMetrics::class.java),
         photos = gson.fromJson(photosJson, object : TypeToken<List<Photo>>() {}.type),
-        routePoint = gson.fromJson(routePointsJson, object : TypeToken<List<LocationPoint>>() {}.type)
+        routePoint = gson.fromJson(routePointsJson, object : TypeToken<List<LocationPoint>>() {}.type),
     )
 }
