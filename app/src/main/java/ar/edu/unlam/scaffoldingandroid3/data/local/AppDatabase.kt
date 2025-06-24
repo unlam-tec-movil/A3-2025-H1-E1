@@ -7,9 +7,12 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.converters.RouteConverters
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.HistoryDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.HistoryEntity
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.PhotoEntity
+import ar.edu.unlam.scaffoldingandroid3.data.local.entity.PhotoEntity
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.RouteEntity
+import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
 
 /**
@@ -29,7 +32,6 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
     version = 1, 
     exportSchema = false
 )
-
 @TypeConverters(RouteConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun routeDao(): RouteDao
