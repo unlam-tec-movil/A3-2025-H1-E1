@@ -120,7 +120,6 @@ class MetricsCalculator
 
             lastLocation = locationPoint
             lastLocationTime = currentTime
-            routePoints.add(locationPoint)
         }
 
         /**
@@ -148,6 +147,7 @@ class MetricsCalculator
          */
         fun updateStepCount(steps: Int) {
             totalSteps = steps
+            android.util.Log.d("MetricsCalculator", "Step count updated: $totalSteps")
         }
 
         /**
@@ -183,6 +183,7 @@ class MetricsCalculator
                 currentElevation = currentElevation,
                 totalElevationGain = totalElevationGain,
                 totalElevationLoss = totalElevationLoss,
+                totalSteps = totalSteps,
                 lastLocation = lastLocation,
             )
         }

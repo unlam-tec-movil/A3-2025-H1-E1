@@ -4,6 +4,7 @@ import android.content.Context
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.PhotoEntity
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
+import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.TrackingSessionEntityMapper.toEntity
 import ar.edu.unlam.scaffoldingandroid3.data.sensor.MetricsCalculator
 import ar.edu.unlam.scaffoldingandroid3.data.sensor.TrackingService
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
@@ -53,6 +54,7 @@ class TrackingSessionRepositoryImpl
                     currentElevation = 0.0,
                     totalElevationGain = 0.0,
                     totalElevationLoss = 0.0,
+                    totalSteps = 0,
                     lastLocation = null,
                 ),
             )
@@ -191,21 +193,8 @@ class TrackingSessionRepositoryImpl
          */
         override suspend fun saveTrackingSession(session: TrackingSession): Long {
             return try {
-                // Convertir TrackingSession a Entity
-                val sessionEntity = TrackingSessionEntity(
-                    routeName = session.routeName,
-                    startTime = session.startTime,
-                    endTime = session.endTime,
-                    totalDuration = formatTime(session.endTime - session.startTime),
-                    movingDuration = formatTime(session.endTime - session.startTime), // Simplificado
-                    totalDistance = session.metrics.currentDistance,
-                    totalSteps = 0, // Se actualiza desde MetricsCalculator si necesario
-                    averageSpeed = session.metrics.averageSpeed,
-                    maxSpeed = session.metrics.maxSpeed,
-                    minAltitude = session.metrics.currentElevation, // Simplificado
-                    maxAltitude = session.metrics.currentElevation + 50, // Simplificado
-                    createdAt = System.currentTimeMillis()
-                )
+                // Usar mapper para Clean Architecture
+                val sessionEntity = session.toEntity()
                 
                 // Guardar sesión en BD y obtener ID
                 val sessionId = trackingDao.insertTrackingSession(sessionEntity)
@@ -253,7 +242,7 @@ class TrackingSessionRepositoryImpl
         /**
          * Actualiza las métricas en tiempo real (llamado desde servicio)
          */
-        fun updateMetrics(metrics: TrackingMetrics) {
+        override fun updateMetrics(metrics: TrackingMetrics) {
             currentMetrics.value = metrics
 
             // Actualizar sesión actual con nuevas métricas
@@ -298,6 +287,13 @@ class TrackingSessionRepositoryImpl
             timerJob = null
         }
         
+        /**
+         * Obtiene los puntos de la ruta en tiempo real para dibujar en el mapa
+         */
+        override suspend fun getCurrentRoutePoints(): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint> {
+            return metricsCalculator.getCurrentRoutePoints()
+        }
+
         /**
          * Cleanup cuando se destruye el repositorio
          */

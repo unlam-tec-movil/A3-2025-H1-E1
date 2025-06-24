@@ -189,7 +189,7 @@ class DeviceSensorManager
             
             if (isPeak && isReasonableMagnitude) {
                 lastStepTime = currentTime
-                Log.d("StepDetection", "Step detected: magnitude=$avgMagnitude (conservative algorithm)")
+                Log.d("StepDetection", "Step detected: magnitude=$avgMagnitude, total steps=$stepCount (conservative algorithm)")
                 return 1
             }
             

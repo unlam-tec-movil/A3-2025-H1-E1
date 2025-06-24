@@ -60,4 +60,14 @@ interface TrackingSessionRepository {
      * Obtiene el tiempo transcurrido de la sesión actual
      */
     suspend fun getElapsedTime(): Long
+
+    /**
+     * Obtiene los puntos de la ruta en tiempo real para dibujar en el mapa
+     */
+    suspend fun getCurrentRoutePoints(): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint>
+
+    /**
+     * Actualiza las métricas en tiempo real (llamado desde servicio)
+     */
+    fun updateMetrics(metrics: TrackingMetrics)
 }

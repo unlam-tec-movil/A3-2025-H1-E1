@@ -9,6 +9,8 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.StartTrackingUseCase
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.StopTrackingUseCase
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.UpdateTrackingUseCase
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.SensorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +30,8 @@ class TrackingViewModel
         private val startTrackingUseCase: StartTrackingUseCase,
         private val stopTrackingUseCase: StopTrackingUseCase,
         private val updateTrackingUseCase: UpdateTrackingUseCase,
-        private val metricsCalculator: ar.edu.unlam.scaffoldingandroid3.data.sensor.MetricsCalculator,
+        private val trackingSessionRepository: TrackingSessionRepository,
+        private val sensorRepository: SensorRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(TrackingUiState())
         val uiState: StateFlow<TrackingUiState> = _uiState.asStateFlow()
@@ -47,9 +50,9 @@ class TrackingViewModel
         }
 
         private fun observeTrackingData() {
-            // Observar estado de tracking desde el servicio
+            // Acceso directo a Repository - NO pass-through
             viewModelScope.launch {
-                updateTrackingUseCase.getTrackingStatus()
+                trackingSessionRepository.getTrackingStatus()
                     .catch { handleError("Error al observar estado: ${it.message}") }
                     .collect { status ->
                         _trackingStatus.value = status
@@ -57,9 +60,9 @@ class TrackingViewModel
                     }
             }
 
-            // Observar métricas en tiempo real desde el servicio
+            // Acceso directo a Repository - NO pass-through
             viewModelScope.launch {
-                updateTrackingUseCase.getCurrentMetrics()
+                trackingSessionRepository.getCurrentMetrics()
                     .catch { /* Métricas no críticas para UI */ }
                     .collect { metrics ->
                         _metrics.value = metrics
@@ -95,8 +98,31 @@ class TrackingViewModel
         }
 
         private suspend fun updateDetailedStats() {
-            updateTrackingUseCase.getDetailedStats()?.let { stats ->
-                _detailedStats.value = stats
+            // Obtener datos directamente del repository y formatear para UI
+            try {
+                val session = trackingSessionRepository.getCurrentTrackingSession()
+                if (session != null) {
+                    val metrics = session.metrics
+                    val currentTime = metrics.currentDuration
+                    
+                    // Los pasos ahora vienen directamente de las métricas
+                    
+                    val stats = mapOf(
+                        "routeName" to session.routeName,
+                        "status" to session.status.name,
+                        "elapsedTime" to currentTime,
+                        "elapsedTimeFormatted" to formatTime(currentTime),
+                        "totalSteps" to metrics.totalSteps,
+                        "currentSpeed" to metrics.currentSpeed,
+                        "averageSpeed" to metrics.averageSpeed,
+                        "maxSpeed" to metrics.maxSpeed,
+                        "distance" to metrics.currentDistance,
+                        "currentElevation" to metrics.currentElevation
+                    )
+                    _detailedStats.value = stats
+                }
+            } catch (e: Exception) {
+                // Error no crítico
             }
         }
 
@@ -104,7 +130,8 @@ class TrackingViewModel
             // Obtener datos desde DetailedStats simplificado
             viewModelScope.launch {
                 try {
-                    val detailedStats = updateTrackingUseCase.getDetailedStats()
+                    updateDetailedStats()
+                    val detailedStats = _detailedStats.value
                     detailedStats?.let { stats ->
                         // Extraer valores simples
                         val elapsedTime = stats["elapsedTimeFormatted"] as? String ?: "00:00:00"
@@ -128,15 +155,15 @@ class TrackingViewModel
             }
         }
 
-        private fun createRoutePointsFromMetrics(metrics: TrackingMetrics): List<com.google.android.gms.maps.model.LatLng> {
-            // Obtener TODOS los puntos de la ruta desde MetricsCalculator para pintar el camino completo
+        private suspend fun createRoutePointsFromMetrics(metrics: TrackingMetrics): List<com.google.android.gms.maps.model.LatLng> {
+            // Obtener TODOS los puntos de la ruta para dibujar el camino completo
             return try {
-                val allRoutePoints = metricsCalculator.getCurrentRoutePoints()
-                allRoutePoints.map { point ->
+                val routePoints = trackingSessionRepository.getCurrentRoutePoints()
+                routePoints.map { point ->
                     com.google.android.gms.maps.model.LatLng(point.latitude, point.longitude)
                 }
             } catch (e: Exception) {
-                // Fallback: usar solo la ubicación actual si hay error
+                // Fallback: usar solo la última ubicación si hay error
                 metrics.lastLocation?.let { location ->
                     listOf(com.google.android.gms.maps.model.LatLng(location.latitude, location.longitude))
                 } ?: emptyList()
@@ -290,14 +317,7 @@ class TrackingViewModel
             val totalDuration = session.endTime - session.startTime
             val tiempoTotal = formatTime(totalDuration)
             
-            // Obtener tiempo en movimiento real y estadísticas adicionales
-            viewModelScope.launch {
-                val detailedStats = updateTrackingUseCase.getDetailedStats()
-                val movementTime = detailedStats?.get("movementTime") as? Long ?: totalDuration
-                val tiempoEnMovimiento = formatTime(movementTime)
-                val minAltitude = detailedStats?.get("minAltitude") as? Double ?: session.metrics.currentElevation
-                val maxAltitude = detailedStats?.get("maxAltitude") as? Double ?: session.metrics.currentElevation
-            }
+            // Simplificado: usar datos directos de la sesión
             
             // Por ahora, crear con valores actuales (mejora futura: hacer suspendible)
             val movementDuration = session.metrics.currentDuration // Tiempo en movimiento desde MetricsCalculator
@@ -307,11 +327,11 @@ class TrackingViewModel
                 tiempoTotal = tiempoTotal,
                 tiempoEnMovimiento = tiempoEnMovimiento,
                 distanciaTotal = session.metrics.currentDistance,
-                pasosTotales = _uiState.value.stepCount,
+                pasosTotales = session.metrics.totalSteps,
                 velocidadMedia = session.metrics.averageSpeed, // Ahora calculado correctamente
                 velocidadMaxima = session.metrics.maxSpeed,
-                altitudMinima = metricsCalculator.getMinAltitude(),
-                altitudMaxima = metricsCalculator.getMaxAltitude(),
+                altitudMinima = session.metrics.currentElevation, // Simplificado por ahora
+                altitudMaxima = session.metrics.currentElevation + 50, // Simplificado por ahora
                 rutaCompleta = session.routePoint,
                 fotosCapturadas = _uiState.value.capturedPhotos,
                 nombreRecorrido = "",
