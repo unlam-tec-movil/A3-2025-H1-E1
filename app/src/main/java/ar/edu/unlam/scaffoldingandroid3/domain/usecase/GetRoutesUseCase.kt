@@ -26,13 +26,3 @@ class GetRoutesUseCase
          */
         operator fun invoke(): Flow<List<Route>> = repository.getAllRoutes()
     }
-
-/**
- * TODO: Caso de uso
- *
- * ⚠️ CUIDADO: Podría ser "PASS-THROUGH" (PASA-MANOS)
- * Si solo llama repository.[método]() sin lógica de negocio,
- * usar Repository directo en ViewModel.
- *
- * SOLUCIÓN: ViewModel usa Repository directo para operaciones simples.
- */
