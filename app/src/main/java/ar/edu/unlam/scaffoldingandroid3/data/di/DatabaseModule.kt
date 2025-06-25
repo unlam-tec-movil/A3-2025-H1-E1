@@ -28,6 +28,7 @@ object DatabaseModule {
         @ApplicationContext appContext: Context,
     ): AppDatabase =
         Room.databaseBuilder(appContext, AppDatabase::class.java, "routes.db")
+            .fallbackToDestructiveMigration(true)
             .build()
 
     @Provides
