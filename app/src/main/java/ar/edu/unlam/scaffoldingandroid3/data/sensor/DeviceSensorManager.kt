@@ -26,11 +26,10 @@ class DeviceSensorManager
     ) {
         private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-        // --- SENSORES CORRECTOS ---
         private val stepCounterSensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
         private val barometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
 
-        // --- ESTADO INTERNO PARA EL CONTEO DE PASOS ---
+        // Estado interno para el conteo de pasos
         private var initialSteps = -1L // Usamos -1 para saber que aún no hemos capturado el valor inicial
         private var sessionSteps = 0 // Pasos calculados para la sesión actual
 
@@ -105,7 +104,7 @@ class DeviceSensorManager
             }.distinctUntilChanged()
 
         /**
-         * Altitud básica desde barómetro (sin cambios, ya estaba bien)
+         * Altitud básica desde barómetro
          */
         fun getAltitudeUpdates(): Flow<Double> =
             callbackFlow {
@@ -134,7 +133,7 @@ class DeviceSensorManager
 
         /**
          * Resetea las variables de conteo para una nueva sesión de tracking.
-         * Esta función es CRUCIAL y es llamada por el TrackingService.
+         * Esta función es llamada por el TrackingService.
          */
         fun resetStepCount() {
             initialSteps = -1L
