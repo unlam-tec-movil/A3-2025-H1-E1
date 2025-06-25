@@ -6,35 +6,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
-import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
-import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
 
 /**
  * Composable - Pantalla de detalle completo de ruta
  * Muestra información detallada de una ruta específica y permite iniciar su seguimiento.
  *
- * @param routeId Identificador de la ruta a mostrar
+ * @param route ruta a mostrar
  * @param onStartClick Callback para iniciar el seguimiento de la ruta
- * @param viewModel ViewModel que maneja la lógica de la pantalla
  */
 
 @Composable
 fun RouteDetailScreen(
-    routeId: String,
+    route: Route,
     onStartClick: () -> Unit,
-    viewModel: RouteDetailViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
@@ -46,23 +37,10 @@ fun RouteDetailScreen(
                     .padding(16.dp),
             contentAlignment = Alignment.Center,
         ) {
-            when {
-                uiState.isLoading -> {
-                    LoadingSpinner()
-                }
-                uiState.error != null -> {
-                    ErrorDialog(
-                        errorMessage = uiState.error!!,
-                        onDismiss = { viewModel.clearError() },
-                    )
-                }
-                uiState.route != null -> {
-                    RouteDetailCard(
-                        route = uiState.route!!,
-                        onStartClick = onStartClick,
-                    )
-                }
-            }
+            RouteDetailCard(
+                route = route,
+                onStartClick = onStartClick,
+            )
         }
     }
 }
@@ -92,24 +70,6 @@ fun RouteDetailScreenPreview() {
             // 30 minutos
             duration = 1800000,
         )
-//    val samplePhotos =
-//        listOf(
-//            Photo(
-//                id = 1,
-//                uri = "https://picsum.photos/200/300",
-//                timestamp = System.currentTimeMillis(),
-//                location =
-//                    LocationPoint(
-//                        accuracy = 5f,
-//                        speed = 0f,
-//                        altitude = 100.0,
-//                        latitude = -34.6037,
-//                        longitude = -58.3816,
-//                        timestamp = System.currentTimeMillis(),
-//                    ),
-//                description = "Inicio de la ruta",
-//            ),
-//        )
 
     ScaffoldingAndroid3Theme {
         Surface(
@@ -118,7 +78,6 @@ fun RouteDetailScreenPreview() {
         ) {
             RouteDetailCard(
                 route = sampleRoute,
-//                photos = samplePhotos,
                 onStartClick = {},
             )
         }

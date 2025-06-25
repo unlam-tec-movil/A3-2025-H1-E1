@@ -9,7 +9,7 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 @Composable
 fun RouteList(
     list: List<Route>,
-    onPlayClick: (String) -> Unit,
+    onPlayClick: (Route) -> Unit,
 ) {
     LazyColumn {
         items(list) { route ->
@@ -17,7 +17,7 @@ fun RouteList(
                 name = route.name,
                 distance = route.distance.toString(),
                 duration = route.duration.toString(),
-                onPlayClick = { onPlayClick(route.id) },
+                onPlayClick = { onPlayClick(route) },
             )
         }
     }

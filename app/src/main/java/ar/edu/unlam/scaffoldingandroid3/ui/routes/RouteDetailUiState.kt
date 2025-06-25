@@ -7,13 +7,11 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
  *
  * @property isLoading Indica si se están cargando los datos
  * @property route La ruta a mostrar (null si aún no se cargó)
- * @property photos Lista de fotos asociadas a la ruta
  * @property error Mensaje de error si algo falló (null si no hay error)
  */
 
 data class RouteDetailUiState(
     val isLoading: Boolean = false,
     val route: Route? = null,
-//    val photos: List<Photo> = emptyList(),
     val error: String? = null,
 )
