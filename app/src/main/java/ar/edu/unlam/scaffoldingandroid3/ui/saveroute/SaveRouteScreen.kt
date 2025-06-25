@@ -1,5 +1,13 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.saveroute
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,20 +41,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.fadeIn
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
@@ -87,7 +87,8 @@ fun SaveRouteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { }, // Sin título
+                // Sin título
+                title = { },
                 navigationIcon = {
                     IconButton(onClick = {
                         viewModel.discardRoute()
@@ -132,25 +133,25 @@ fun SaveRouteScreen(
                         onAddPhoto = { /* TODO: Implementar agregar foto */ },
                     )
                 } ?: run {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(32.dp),
-                        contentAlignment = Alignment.Center,
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
                     ) {
-                        CircularProgressIndicator()
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(32.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
-            }
-                
+
                 // Botón hacia abajo
                 Box(modifier = Modifier.weight(1f))
-                
+
                 // Botón guardar
                 Button(
                     onClick = {
@@ -174,12 +175,13 @@ fun SaveRouteScreen(
                     }
                 }
             }
-            
+
             // Confetti de celebración - pasa por encima de todo el contenido
             ConfettiAnimation(
                 modifier = Modifier.fillMaxSize(),
                 particleCount = 80,
-                duration = 4000     // Duración
+                // Duración
+                duration = 4000,
             )
         }
     }
@@ -372,29 +374,34 @@ private fun DiscardRouteDialog(
 @Composable
 private fun AnimatedStatsSection(trackingResult: TrackingResult) {
     val visible = remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(800)
         visible.value = true
     }
-    
+
     AnimatedVisibility(
         visible = visible.value,
-        enter = slideInHorizontally(
-            initialOffsetX = { -it },
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-        ) + scaleIn(
-            initialScale = 0.7f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-        ) + fadeIn(
-            animationSpec = tween(800)
-        )
+        enter =
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec =
+                    spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow,
+                    ),
+            ) +
+                scaleIn(
+                    initialScale = 0.7f,
+                    animationSpec =
+                        spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow,
+                        ),
+                ) +
+                fadeIn(
+                    animationSpec = tween(800),
+                ),
     ) {
         StatsSection(trackingResult)
     }
@@ -411,29 +418,34 @@ private fun AnimatedNameInputSection(
     errorMessage: String?,
 ) {
     val visible = remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(1400) // Delay más escalonado
         visible.value = true
     }
-    
+
     AnimatedVisibility(
         visible = visible.value,
-        enter = slideInHorizontally(
-            initialOffsetX = { -it },
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-        ) + scaleIn(
-            initialScale = 0.6f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-        ) + fadeIn(
-            animationSpec = tween(900)
-        )
+        enter =
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec =
+                    spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow,
+                    ),
+            ) +
+                scaleIn(
+                    initialScale = 0.6f,
+                    animationSpec =
+                        spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessLow,
+                        ),
+                ) +
+                fadeIn(
+                    animationSpec = tween(900),
+                ),
     ) {
         NameInputSection(
             routeName = routeName,
@@ -453,29 +465,34 @@ private fun AnimatedPhotosSection(
     onAddPhoto: () -> Unit,
 ) {
     val visible = remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(2100) // Delay más largo
         visible.value = true
     }
-    
+
     AnimatedVisibility(
         visible = visible.value,
-        enter = slideInHorizontally(
-            initialOffsetX = { -it },
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessVeryLow
-            )
-        ) + scaleIn(
-            initialScale = 0.5f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessVeryLow
-            )
-        ) + fadeIn(
-            animationSpec = tween(1000)
-        )
+        enter =
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec =
+                    spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessVeryLow,
+                    ),
+            ) +
+                scaleIn(
+                    initialScale = 0.5f,
+                    animationSpec =
+                        spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessVeryLow,
+                        ),
+                ) +
+                fadeIn(
+                    animationSpec = tween(1000),
+                ),
     ) {
         PhotosSection(
             photos = photos,

@@ -3,11 +3,11 @@ package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -291,15 +291,16 @@ fun TrackingMapScreen(
                 }
             }
         }
-        
+
         // Botón flechita solo visible cuando hay panel de estadísticas
         if (uiState.screenState != TrackingScreenState.PREPARATION) {
             FixedArrowButton(
                 isExpanded = uiState.screenState == TrackingScreenState.EXPANDED_STATS,
                 onClick = onExpandStats,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 24.dp, bottom = 120.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 24.dp, bottom = 120.dp),
             )
         }
     }
@@ -376,9 +377,10 @@ fun ActiveTrackingMap(
             com.google.maps.android.compose.MapProperties(
                 isMyLocationEnabled = hasLocationPermission,
             ),
-        uiSettings = com.google.maps.android.compose.MapUiSettings(
-            zoomControlsEnabled = showZoomControls,
-        ),
+        uiSettings =
+            com.google.maps.android.compose.MapUiSettings(
+                zoomControlsEnabled = showZoomControls,
+            ),
     ) {
         // Dibujar polyline de la ruta en tiempo real
         if (routePoints.size >= 2) {
@@ -399,7 +401,6 @@ fun ActiveTrackingMap(
     }
 }
 
-
 @Composable
 fun TrackingPanel(
     metrics: ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics,
@@ -413,22 +414,25 @@ fun TrackingPanel(
 ) {
     // Control de aparición inicial del panel (solo una vez)
     var hasAppeared by remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(100)
         hasAppeared = true
     }
-    
+
     // Animación de aparición inicial del panel COMPLETO (solo cuando aparece por primera vez)
     AnimatedVisibility(
         visible = hasAppeared,
-        enter = slideInVertically(
-            initialOffsetY = { it }, // Desde abajo
-            animationSpec = tween(
-                durationMillis = 500,
-                easing = FastOutSlowInEasing
-            )
-        ) + fadeIn(animationSpec = tween(500))
+        enter =
+            slideInVertically(
+                // Desde abajo
+                initialOffsetY = { it },
+                animationSpec =
+                    tween(
+                        durationMillis = 500,
+                        easing = FastOutSlowInEasing,
+                    ),
+            ) + fadeIn(animationSpec = tween(500)),
     ) {
         TrackingPanelContent(
             metrics = metrics,
@@ -438,7 +442,7 @@ fun TrackingPanel(
             onResumeClick = onResumeClick,
             onStopClick = onStopClick,
             onExpandClick = onExpandClick,
-            isExpanded = isExpanded
+            isExpanded = isExpanded,
         )
     }
 }
@@ -454,7 +458,6 @@ private fun TrackingPanelContent(
     onExpandClick: () -> Unit,
     isExpanded: Boolean,
 ) {
-
     Card(
         modifier =
             Modifier
@@ -480,9 +483,11 @@ private fun TrackingPanelContent(
                         }
                     }
                 },
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Sin sombra
+        // Sin sombra
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent), // Fondo transparente
+        // Fondo transparente
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
         Box {
             Column(
@@ -492,17 +497,30 @@ private fun TrackingPanelContent(
                 // Estadísticas adicionales con efecto cajón suave
                 AnimatedVisibility(
                     visible = isExpanded,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it }, // Entra desde arriba
-                        animationSpec = tween(400, easing = FastOutSlowInEasing)
-                    ) + fadeIn(animationSpec = tween(400)),
-                    exit = slideOutVertically(
-                        targetOffsetY = { it }, // Sale hacia ABAJO con caída suave
-                        animationSpec = tween(
-                            durationMillis = 450, // Ligeramente más lento
-                            easing = androidx.compose.animation.core.CubicBezierEasing(0.25f, 0.46f, 0.45f, 0.94f) // Ease out suave
-                        )
-                    ) + fadeOut(animationSpec = tween(400))
+                    enter =
+                        slideInVertically(
+                            // Entra desde arriba
+                            initialOffsetY = { -it },
+                            animationSpec = tween(400, easing = FastOutSlowInEasing),
+                        ) + fadeIn(animationSpec = tween(400)),
+                    exit =
+                        slideOutVertically(
+                            // Sale hacia ABAJO con caída suave
+                            targetOffsetY = { it },
+                            animationSpec =
+                                tween(
+                                    // Ligeramente más lento
+                                    durationMillis = 450,
+                                    // Ease out suave
+                                    easing =
+                                        androidx.compose.animation.core.CubicBezierEasing(
+                                            0.25f,
+                                            0.46f,
+                                            0.45f,
+                                            0.94f,
+                                        ),
+                                ),
+                        ) + fadeOut(animationSpec = tween(400)),
                 ) {
                     // Estadísticas adicionales (Velocidad, Altitud)
                     Row(
@@ -554,7 +572,7 @@ private fun TrackingPanelContent(
                     AnimatedVisibility(
                         visible = isExpanded,
                         enter = fadeIn(animationSpec = tween(400)),
-                        exit = fadeOut(animationSpec = tween(350))
+                        exit = fadeOut(animationSpec = tween(350)),
                     ) {
                         Column {
                             Text(
@@ -629,9 +647,6 @@ private fun TrackingPanelContent(
     }
 }
 
-
-
-
 @Composable
 fun MetricCard(
     title: String,
@@ -663,8 +678,6 @@ fun MetricCard(
         }
     }
 }
-
-
 
 @Composable
 private fun FloatingNavigationButton(
@@ -714,8 +727,6 @@ private fun DiscardTrackingDialog(
     )
 }
 
-
-
 /**
  * Formatea distancia dinámicamente: metros si < 1km, kilómetros si >= 1km
  * Comportamiento profesional como Strava/Nike Run
@@ -738,16 +749,17 @@ private fun formatDistance(distanceKm: Double): String {
 private fun FixedArrowButton(
     isExpanded: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Animación simple de rotación con spring elegante
     val arrowRotation by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "fixed_arrow_rotation"
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium,
+            ),
+        label = "fixed_arrow_rotation",
     )
 
     Surface(
@@ -756,21 +768,22 @@ private fun FixedArrowButton(
         shape = RoundedCornerShape(22.dp),
         color = Color(0xFF2196F3).copy(alpha = 0.9f),
         shadowElevation = 3.dp,
-        tonalElevation = 1.dp
+        tonalElevation = 1.dp,
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowUp,
                 contentDescription = if (isExpanded) "Contraer" else "Expandir",
                 tint = Color.White,
-                modifier = Modifier
-                    .size(24.dp)
-                    .graphicsLayer {
-                        rotationZ = arrowRotation // Rotación suave con spring
-                    }
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .graphicsLayer {
+                            rotationZ = arrowRotation // Rotación suave con spring
+                        },
             )
         }
     }

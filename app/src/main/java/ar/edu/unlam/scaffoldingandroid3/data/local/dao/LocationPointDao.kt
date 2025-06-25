@@ -11,7 +11,6 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.entity.LocationPointEntity
  */
 @Dao
 interface LocationPointDao {
-    
     /**
      * Inserta múltiples puntos GPS (batch insert para performance)
      */

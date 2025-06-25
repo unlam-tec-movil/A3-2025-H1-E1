@@ -253,7 +253,6 @@ class TrackingService : Service() {
         }
     }
 
-
     /**
      * DEPRECATED - Usar getMovementTime()
      */

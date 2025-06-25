@@ -7,7 +7,6 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
  * Mapper - Conversión entre Domain y Data Layer
  */
 object LocationPointEntityMapper {
-
     /**
      * Convierte LocationPoint (domain) a LocationPointEntity (data)
      */
@@ -19,7 +18,7 @@ object LocationPointEntityMapper {
             altitude = this.altitude,
             accuracy = this.accuracy,
             speed = this.speed,
-            timestamp = this.timestamp
+            timestamp = this.timestamp,
         )
     }
 
@@ -31,9 +30,10 @@ object LocationPointEntityMapper {
             latitude = this.latitude,
             longitude = this.longitude,
             altitude = this.altitude,
-            accuracy = this.accuracy ?: 0.0f, // Default si es null
+            // Default si es null
+            accuracy = this.accuracy ?: 0.0f,
             speed = this.speed,
-            timestamp = this.timestamp
+            timestamp = this.timestamp,
         )
     }
 

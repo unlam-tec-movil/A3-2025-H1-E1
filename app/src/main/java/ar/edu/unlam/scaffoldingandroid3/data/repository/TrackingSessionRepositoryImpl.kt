@@ -312,7 +312,9 @@ class TrackingSessionRepositoryImpl
         /**
          * Obtiene los puntos GPS de una sesión guardada
          */
-        override suspend fun getLocationPointsBySession(sessionId: Long): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint> {
+        override suspend fun getLocationPointsBySession(
+            sessionId: Long,
+        ): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint> {
             return try {
                 val locationPointEntities = locationPointDao.getLocationPointsBySession(sessionId)
                 locationPointEntities.toDomainList()

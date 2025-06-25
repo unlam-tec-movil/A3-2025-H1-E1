@@ -25,17 +25,13 @@ data class TrackingUiState(
     val canResume: Boolean = false,
     val canStop: Boolean = false,
     val error: String? = null,
-
     val elapsedTime: String = "00:00:00",
     val routePoints: List<com.google.android.gms.maps.model.LatLng> = emptyList(),
     val photoCount: Int = 0,
     val currentLocation: com.google.android.gms.maps.model.LatLng? = null,
-
     val stepCount: Int = 0,
     val currentAltitude: Double = 0.0,
     val sensorErrors: List<String> = emptyList(),
-
     val capturedPhotos: List<TrackingPhoto> = emptyList(),
-
     val showDiscardDialog: Boolean = false,
 )
