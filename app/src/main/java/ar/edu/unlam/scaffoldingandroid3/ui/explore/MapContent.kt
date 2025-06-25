@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import ar.edu.unlam.scaffoldingandroid3.R
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.LabelBackgroundColor
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
 import com.google.android.gms.maps.model.CameraPosition
@@ -45,7 +46,7 @@ internal fun MapContent(
     uiState: MapUiState,
     cameraPositionState: CameraPositionState,
     mapStyleOptions: MapStyleOptions?,
-    onRouteClick: (String) -> Unit,
+    onRouteClick: (Route) -> Unit,
     onMapIdle: (CameraPosition) -> Unit,
     markerBitmap: Bitmap?,
     hikerBitmap: Bitmap?,
@@ -95,7 +96,7 @@ internal fun MapContent(
                         showLabel = cameraPositionState.position.zoom > 11f,
                         markerBitmap = markerBitmap,
                         hikerBitmap = hikerBitmap,
-                        onIconClick = { onRouteClick(route.id) },
+                        onIconClick = { onRouteClick(route) },
                     )
                 }
             }

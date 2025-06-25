@@ -11,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import ar.edu.unlam.scaffoldingandroid3.ui.navigation.Screen
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 
@@ -22,7 +24,7 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 @Composable
 fun MyRoutesScreen(
     viewModel: MyRoutesViewModel = hiltViewModel(),
-    onRouteClick: (String) -> Unit,
+    navController: NavHostController,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Box(
@@ -46,7 +48,11 @@ fun MyRoutesScreen(
         }
         RouteList(
             list = uiState.savedRoutes,
-            onPlayClick = onRouteClick,
+            onPlayClick = { selectedRoute ->
+                navController.navigate(Screen.RouteDetail.route)
+                navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
+                    selectedRoute
+            },
         )
     }
 }

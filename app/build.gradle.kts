@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.daggerHiltAndroid)
     alias(libs.plugins.kover)
+    id("kotlin-parcelize")
 }
 
 // Leer la API key desde local.properties

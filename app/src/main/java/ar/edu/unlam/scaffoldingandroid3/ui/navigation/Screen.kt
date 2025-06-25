@@ -2,7 +2,7 @@ package ar.edu.unlam.scaffoldingandroid3.ui.navigation
 
 /**
  * TODO: Sealed class - Destinos de navegación
- * Objects: PhotoPreview, RouteDetail
+ * Objects: PhotoPreview
  * Incluir argumentos necesarios (routeId, photoId, etc.)
  */
 

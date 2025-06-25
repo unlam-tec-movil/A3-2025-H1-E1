@@ -1,5 +1,9 @@
 package ar.edu.unlam.scaffoldingandroid3.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
+
 /**
  * Modelo de dominio que representa una ruta en la aplicación.
  *
@@ -13,14 +17,15 @@ package ar.edu.unlam.scaffoldingandroid3.domain.model
  * @property distance Distancia total de la ruta en metros
  * @property duration Duración total de la ruta en milisegundos
  */
+@Parcelize
 data class Route(
     val id: String,
     val name: String,
-    val points: List<Point>,
+    val points: @RawValue List<Point>,
     val distance: Double,
     val duration: Long,
     val photoUri: String = "",
-) {
+) : Parcelable {
     /**
      * Representa un punto específico en la ruta.
      *
@@ -28,9 +33,10 @@ data class Route(
      * @property longitude Longitud del punto
      * @property timestamp Momento en que se registró el punto
      */
+    @Parcelize
     data class Point(
         val latitude: Double,
         val longitude: Double,
         val timestamp: Long,
-    )
+    ) : Parcelable
 }

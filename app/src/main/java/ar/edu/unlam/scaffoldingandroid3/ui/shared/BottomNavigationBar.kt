@@ -134,22 +134,21 @@ private fun NavigationItem(
                     .clip(RoundedCornerShape(12.dp))
                     .background(containerColor)
                     .clickable {
-                        // Navega evitando múltiples instancias y restaurando estado
+                        /* Navega evitando múltiples instancias y restaurando estado
+                           TODO: Investigar funcionamiento en casos de uso al estar grabando ruta
+                                 por que el popUpTo elimina el stack de las pantallas intermedias*/
                         if (currentRoute != route) {
                             navController.navigate(route) {
-                                // 1) Pop hasta la pantalla de inicio del grafo (MapScreen)
+                                /*PopUp hasta la pantalla de inicio del grafo (MapScreen) y
+                                  guarda el estado del mapa */
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true
-                                    inclusive = false // Guarda el estado del mapa
+                                    inclusive = false
                                 }
-                                // 2) Evita apilar varias instancias
+                                // launchSingleTop Evita apilar varias instancias
                                 launchSingleTop = true
-                                /* 3) No restaura el estado guardado
-                                Tener en cuenta que "restoreState = false" hace que se elimine el estado
-                                de la pantalla superpuesta, esto hace que se pierda la instancia
-                                de TrackingScreen()
-                                TODO: Investigar funcionamiento en casos de uso al grabar ruta */
-                                restoreState = false
+                                // restoreState Restaura el estado guardado del mapa
+                                restoreState = true
                             }
                         }
                     },

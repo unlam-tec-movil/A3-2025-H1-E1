@@ -3,11 +3,12 @@ package ar.edu.unlam.scaffoldingandroid3.ui.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.explore.MapScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.history.HistoryScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.routes.MyRoutesScreen
@@ -17,7 +18,6 @@ import ar.edu.unlam.scaffoldingandroid3.ui.tracking.TrackingScreen
 
 /**
  * Composable - NavHost principal de la app
- * TODO: Configurar rutas: photo, route_detail
  * -Usar BottomNavigation + NavigationActions
  * -Separar UI vs navegación: las pantallas (Screens) no conocen al NavController, sólo reciben
  * el callback de navegación como lambdas.
@@ -48,24 +48,34 @@ fun NavGraph(
         }
         composable(Screen.MyRoutes.route) {
             MyRoutesScreen(
-                onRouteClick = { routeId ->
-                    navController.navigate(Screen.RouteDetail.createRoute(routeId))
-                },
+                navController = navController,
             )
         }
         composable(Screen.Map.route) {
             MapScreen(
-                onNewRouteClick = {
-                    navController.navigate(Screen.Tracking.route)
-                },
-                onLoadRoutesClick = {},
-                onRouteClick = { routeId ->
-                    navController.navigate(Screen.RouteDetail.createRoute(routeId))
-                },
+                navController = navController,
             )
         }
         composable(Screen.History.route) {
             HistoryScreen()
+        }
+        composable(Screen.RouteDetail.route) { backStackEntry ->
+            // 1) Leemos desde el savedStateHandle de ESTA entrada
+            val route: Route? = backStackEntry.savedStateHandle["route"]
+
+            if (route != null) {
+                RouteDetailScreen(
+                    route = route,
+                    onStartClick = {
+                        navController.navigate(Screen.Tracking.route)
+                    },
+                )
+            } else {
+                // 2) Fallback: si no llega nada, volvemos atrás
+                LaunchedEffect(Unit) {
+                    navController.navigateUp()
+                }
+            }
         }
         composable(Screen.SaveRoute.route) {
             SaveRouteScreen(
@@ -88,9 +98,6 @@ fun NavGraph(
                     }
                 },
             )
-        }
-        composable(Screen.RouteDetail.route) {
-            RouteDetailScreen()
         }
     }
 }
