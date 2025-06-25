@@ -1,6 +1,8 @@
 package ar.edu.unlam.scaffoldingandroid3.data.di
 
+import ar.edu.unlam.scaffoldingandroid3.data.repository.HistoryRepositoryImpl
 import ar.edu.unlam.scaffoldingandroid3.data.repository.RouteRepositoryImpl
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.HistoryRepository
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import dagger.Binds
 import dagger.Module
@@ -35,6 +37,10 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
+    abstract fun bindHistoryRepository(historyRepositoryImpl: HistoryRepositoryImpl): HistoryRepository
+
+    @Binds
+    @Singleton
     abstract fun bindLocationRepository(
         locationRepositoryImpl: ar.edu.unlam.scaffoldingandroid3.data.repository.LocationRepositoryImpl,
     ): ar.edu.unlam.scaffoldingandroid3.domain.repository.LocationRepository
@@ -50,4 +56,10 @@ abstract class RepositoryModule {
     abstract fun bindSensorRepository(
         sensorRepositoryImpl: ar.edu.unlam.scaffoldingandroid3.data.repository.SensorRepositoryImpl,
     ): ar.edu.unlam.scaffoldingandroid3.domain.repository.SensorRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCameraRepository(
+        cameraRepositoryImpl: ar.edu.unlam.scaffoldingandroid3.data.repository.CameraRepositoryImpl,
+    ): ar.edu.unlam.scaffoldingandroid3.domain.repository.CameraRepository
 }

@@ -29,8 +29,12 @@ class StartTrackingUseCase
             return try {
                 // 1. Verificar permisos de ubicación
                 if (!locationRepository.hasLocationPermissions()) {
-                    return Result.failure(Exception("Permisos de ubicación no otorgados"))
+                    return Result.failure(Exception("Permisos de ubicación no otorgados. Ve a Configuración → Apps → Permisos → Ubicación"))
                 }
+
+                // 1.1 NOTA: Para tracking activo no necesitamos permiso de background
+                // El foreground service mantiene la ubicación mientras la app está en uso
+                // Solo verificamos que tenga al menos "While using app"
 
                 // 2. Verificar si ya hay una sesión activa
                 if (trackingSessionRepository.hasActiveSession()) {
@@ -58,8 +62,12 @@ class StartTrackingUseCase
                 val session = trackingSessionRepository.startTrackingSession(routeName)
 
                 Result.success(session)
+            } catch (e: SecurityException) {
+                Result.failure(Exception("Permisos insuficientes para iniciar tracking: ${e.message}"))
+            } catch (e: IllegalStateException) {
+                Result.failure(Exception("Error del servicio de tracking: ${e.message}"))
             } catch (e: Exception) {
-                Result.failure(e)
+                Result.failure(Exception("Error inesperado al iniciar tracking: ${e.message}"))
             }
         }
 

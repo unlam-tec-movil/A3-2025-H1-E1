@@ -19,6 +19,7 @@ data class Route(
     val points: List<Point>,
     val distance: Double,
     val duration: Long,
+    val photoUri: String = "",
 ) {
     /**
      * Representa un punto específico en la ruta.
