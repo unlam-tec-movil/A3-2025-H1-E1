@@ -2,9 +2,9 @@ package ar.edu.unlam.scaffoldingandroid3
 
 import android.os.Build
 import android.os.Bundle
-import androidx.annotation.RequiresApi
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
