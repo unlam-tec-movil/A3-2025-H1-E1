@@ -26,7 +26,7 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
         TrackingSessionEntity::class,
         PhotoEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 @TypeConverters(RouteConverters::class)
