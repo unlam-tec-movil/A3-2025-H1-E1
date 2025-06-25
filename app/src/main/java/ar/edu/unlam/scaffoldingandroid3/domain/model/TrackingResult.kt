@@ -4,10 +4,8 @@ package ar.edu.unlam.scaffoldingandroid3.domain.model
  * Resultado final de tracking para guardar - Modelo de dominio
  */
 data class TrackingResult(
-    // Tiempo total con pausas
-    val tiempoTotal: String,
-    // Tiempo sin pausas
-    val tiempoEnMovimiento: String,
+    // Tiempo de actividad (sin pausas)
+    val duracion: String,
     // km totales
     val distanciaTotal: Double,
     // pasos totales

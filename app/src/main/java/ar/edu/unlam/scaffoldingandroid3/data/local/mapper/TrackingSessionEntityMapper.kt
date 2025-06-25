@@ -7,7 +7,6 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
 
 /**
  * Mapper para conversión TrackingSession (domain) ↔ TrackingSessionEntity (data)
- * Implementación sencilla y funcional para Clean Architecture
  */
 object TrackingSessionEntityMapper {
     /**
@@ -22,12 +21,11 @@ object TrackingSessionEntityMapper {
             totalDuration = formatDuration(this.endTime - this.startTime),
             movingDuration = formatDuration(this.metrics.currentDuration),
             totalDistance = this.metrics.currentDistance,
-            // Se actualiza desde sensores si es necesario
-            totalSteps = 0,
+            totalSteps = this.metrics.totalSteps,
             averageSpeed = this.metrics.averageSpeed,
             maxSpeed = this.metrics.maxSpeed,
-            minAltitude = this.metrics.currentElevation,
-            maxAltitude = this.metrics.currentElevation,
+            minAltitude = this.metrics.minElevation,
+            maxAltitude = this.metrics.maxElevation,
             createdAt = System.currentTimeMillis(),
         )
     }
@@ -49,7 +47,10 @@ object TrackingSessionEntityMapper {
                     // No se persiste velocidad actual
                     currentSpeed = 0.0,
                     currentElevation = this.maxAltitude,
+                    minElevation = this.minAltitude,
+                    maxElevation = this.maxAltitude,
                     currentDuration = parseDuration(this.movingDuration),
+                    totalSteps = this.totalSteps,
                 ),
             // Sessions guardadas están completas
             status = TrackingStatus.COMPLETED,
