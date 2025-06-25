@@ -21,21 +21,19 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,7 +51,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -81,9 +78,10 @@ fun TrackingScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Crear el estado del permiso que queremos solicitar
-    val activityRecognitionPermissionState = rememberPermissionState(
-        android.Manifest.permission.ACTIVITY_RECOGNITION
-    )
+    val activityRecognitionPermissionState =
+        rememberPermissionState(
+            android.Manifest.permission.ACTIVITY_RECOGNITION,
+        )
 
     // Usar LaunchedEffect para solicitar el permiso una vez cuando la pantalla se carga
     LaunchedEffect(Unit) {
@@ -99,7 +97,7 @@ fun TrackingScreen(
             viewModel.clearError()
         }
     }
-    
+
     // Dialog de confirmación para descartar tracking
     if (uiState.showDiscardDialog) {
         DiscardTrackingDialog(
@@ -108,45 +106,45 @@ fun TrackingScreen(
                 viewModel.discardTracking()
                 onNavigationBack()
             },
-            onDismiss = { viewModel.hideDiscardDialog() }
+            onDismiss = { viewModel.hideDiscardDialog() },
         )
     }
 
     // Sin Scaffold ni AppBar - diseño completamente minimalista
     Box(modifier = Modifier.fillMaxSize()) {
-            // Pantalla única con mapa y botones dinámicos
-            TrackingMapScreen(
-                metrics = metrics,
-                detailedStats = detailedStats,
-                uiState = uiState,
-                onNavigationBack = onNavigationBack,
-                onStartClick = { viewModel.startTracking("Ruta ${System.currentTimeMillis()}") },
-                onPauseClick = viewModel::pauseTracking,
-                onResumeClick = viewModel::resumeTracking,
-                onStopClick = {
-                    viewModel.stopTracking { trackingResult ->
-                        onTrackingCompleted(trackingResult)
-                    }
-                },
-                isPermissionGranted = activityRecognitionPermissionState.status.isGranted,
-                onExpandStats = viewModel::toggleStatsExpansion,
-                onCapturePhoto = viewModel::capturePhoto,
-            )
-
-            // Loading overlay
-            if (uiState.isLoading) {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.5f)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        // Pantalla única con mapa y botones dinámicos
+        TrackingMapScreen(
+            metrics = metrics,
+            detailedStats = detailedStats,
+            uiState = uiState,
+            onNavigationBack = onNavigationBack,
+            onStartClick = { viewModel.startTracking("Ruta ${System.currentTimeMillis()}") },
+            onPauseClick = viewModel::pauseTracking,
+            onResumeClick = viewModel::resumeTracking,
+            onStopClick = {
+                viewModel.stopTracking { trackingResult ->
+                    onTrackingCompleted(trackingResult)
                 }
+            },
+            isPermissionGranted = activityRecognitionPermissionState.status.isGranted,
+            onExpandStats = viewModel::toggleStatsExpansion,
+            onCapturePhoto = viewModel::capturePhoto,
+        )
+
+        // Loading overlay
+        if (uiState.isLoading) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
     }
+}
 
 @Composable
 fun TrackingMapScreen(
@@ -173,9 +171,10 @@ fun TrackingMapScreen(
         // Botón de navegación flotante minimalista (siempre visible)
         FloatingNavigationButton(
             onNavigationBack = onNavigationBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp),
         )
 
         // Botón de cámara debajo de la flecha de navegación (solo durante grabación)
@@ -226,22 +225,24 @@ fun TrackingMapScreen(
                 TrackingScreenState.PREPARATION -> {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         // Solo botón "Iniciar recorrido"
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.Center,
                         ) {
                             Button(
                                 onClick = onStartClick,
                                 // Tu lógica aquí ya es correcta
                                 enabled = !uiState.isLoading && isPermissionGranted,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp),
                                 colors =
                                     ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.primary,
@@ -259,11 +260,14 @@ fun TrackingMapScreen(
                         // Mostrar un texto de ayuda si el permiso fue denegado.
                         if (!isPermissionGranted) {
                             Text(
-                                text = "Se necesita permiso de 'Actividad Física' para contar los pasos. La app funcionará, pero los pasos no se medirán.",
+                                text =
+                                    "Se necesita permiso de 'Actividad Física' para contar los pasos. " +
+                                        "La app funcionará, pero los pasos no se medirán.",
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant, // Un color sutil
-                                textAlign = TextAlign.Center
+                                // Un color sutil
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
                             )
                         }
                     }
@@ -432,7 +436,7 @@ fun TrackingPanel(
                         onDragEnd = {
                             // Al terminar el drag, cambiar estado
                             onExpandClick()
-                        }
+                        },
                     ) { change, dragAmount ->
                         // Detectar dirección del drag
                         val threshold = 50f
@@ -472,66 +476,66 @@ fun TrackingPanel(
                 }
 
                 // Botones de control
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                // Botón Pause/Resume
-                if (uiState.canPause) {
-                    Button(
-                        onClick = onPauseClick,
-                        modifier = Modifier.weight(1f),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                            ),
-                    ) {
-                        Text("⏸️")
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Pausar")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    // Botón Pause/Resume
+                    if (uiState.canPause) {
+                        Button(
+                            onClick = onPauseClick,
+                            modifier = Modifier.weight(1f),
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                ),
+                        ) {
+                            Text("⏸️")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Pausar")
+                        }
+                    } else if (uiState.canResume) {
+                        Button(
+                            onClick = onResumeClick,
+                            modifier = Modifier.weight(1f),
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                ),
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = null)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Reanudar")
+                        }
                     }
-                } else if (uiState.canResume) {
-                    Button(
-                        onClick = onResumeClick,
-                        modifier = Modifier.weight(1f),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                            ),
-                    ) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = null)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Reanudar")
-                    }
-                }
 
-                // Botón Stop
-                if (uiState.canStop) {
-                    Button(
-                        onClick = onStopClick,
-                        modifier = Modifier.weight(1f),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error,
-                            ),
-                    ) {
-                        Text("⏹️")
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Detener")
+                    // Botón Stop
+                    if (uiState.canStop) {
+                        Button(
+                            onClick = onStopClick,
+                            modifier = Modifier.weight(1f),
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.error,
+                                ),
+                        ) {
+                            Text("⏹️")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Detener")
+                        }
                     }
                 }
             }
-            }
-            
+
             // Flecha expandir/contraer en esquina superior derecha
             IconButton(
                 onClick = onExpandClick,
-                modifier = Modifier.align(Alignment.TopEnd)
+                modifier = Modifier.align(Alignment.TopEnd),
             ) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
                     contentDescription = if (isExpanded) "Contraer" else "Expandir",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 )
             }
         }
@@ -555,7 +559,7 @@ fun CompactMetricsContent(
             modifier = Modifier.weight(1f),
         )
         CompactMetricCard(
-            title = "Distancia", 
+            title = "Distancia",
             value = "%.2f km".format(metrics.currentDistance),
             modifier = Modifier.weight(1f),
         )
@@ -606,7 +610,7 @@ fun ExpandedStatsContent(
         // Primera fila: Vel. Actual, Vel. Máx, Altitud
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MetricCard(
                 title = "Vel. Actual",
@@ -628,7 +632,7 @@ fun ExpandedStatsContent(
         // Segunda fila: Tiempo Activo, Distancia, Pasos
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MetricCard(
                 title = "Tiempo Activo",
@@ -715,19 +719,22 @@ fun CompactMetricCard(
             ),
     ) {
         Column(
-            modifier = Modifier.padding(6.dp), // Padding compacto
+            // Padding compacto
+            modifier = Modifier.padding(6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.labelSmall, // Título pequeño
+                // Título pequeño
+                style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyMedium, // Valor moderado
+                // Valor moderado
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -751,19 +758,22 @@ fun EnhancedMetricCard(
             ),
     ) {
         Column(
-            modifier = Modifier.padding(12.dp), // Más padding que la card normal
+            // Más padding que la card normal
+            modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium, // Título ligeramente más grande
+                // Título ligeramente más grande
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineSmall, // Valor mucho más grande
+                // Valor mucho más grande
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -775,24 +785,25 @@ fun EnhancedMetricCard(
 @Composable
 private fun FloatingNavigationButton(
     onNavigationBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         onClick = onNavigationBack,
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-        shadowElevation = 4.dp
+        shadowElevation = 4.dp,
     ) {
         Box(
             modifier = Modifier.padding(12.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Volver",
                 tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(28.dp) // Flecha más grande
+                // Flecha más grande
+                modifier = Modifier.size(28.dp),
             )
         }
     }
@@ -801,7 +812,7 @@ private fun FloatingNavigationButton(
 @Composable
 private fun DiscardTrackingDialog(
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -816,7 +827,6 @@ private fun DiscardTrackingDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cancelar")
             }
-        }
+        },
     )
 }
-

@@ -24,14 +24,16 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
         RouteEntity::class,
         HistoryEntity::class,
         TrackingSessionEntity::class,
-        PhotoEntity::class
-    ], 
-    version = 1, 
-    exportSchema = false
+        PhotoEntity::class,
+    ],
+    version = 1,
+    exportSchema = false,
 )
 @TypeConverters(RouteConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun routeDao(): RouteDao
+
     abstract fun trackingDao(): TrackingDao
+
     abstract fun historyDao(): HistoryDao
 }

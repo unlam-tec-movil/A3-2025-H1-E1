@@ -17,7 +17,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -95,7 +94,7 @@ class LocationService
                     stopLocationUpdates()
                 }
             } // Remover distinctUntilChanged para máxima fluidez
-            // Google Maps no filtra tanto - necesitamos todas las actualizaciones
+        // Google Maps no filtra tanto - necesitamos todas las actualizaciones
 
         /**
          * Obtiene la última ubicación conocida

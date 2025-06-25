@@ -1,9 +1,9 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,7 +14,6 @@ import ar.edu.unlam.scaffoldingandroid3.ui.routes.MyRoutesScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.routes.RouteDetailScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.saveroute.SaveRouteScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.tracking.TrackingScreen
-import androidx.hilt.navigation.compose.hiltViewModel
 
 /**
  * Composable - NavHost principal de la app
@@ -24,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
  * el callback de navegación como lambdas.
  */
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -43,7 +43,7 @@ fun NavGraph(
                 onTrackingCompleted = { trackingResult ->
                     // Navegar directamente - SaveRouteScreen obtendrá datos del repository
                     navController.navigate(Screen.SaveRoute.route)
-                }
+                },
             )
         }
         composable(Screen.MyRoutes.route) {
@@ -83,7 +83,7 @@ fun NavGraph(
                     navController.navigate(Screen.Map.route) {
                         popUpTo(Screen.Map.route) { inclusive = false }
                     }
-                }
+                },
             )
         }
         composable(Screen.RouteDetail.route) {

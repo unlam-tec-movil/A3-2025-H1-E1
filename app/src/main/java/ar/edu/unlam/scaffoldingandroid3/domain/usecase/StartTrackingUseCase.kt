@@ -31,7 +31,7 @@ class StartTrackingUseCase
                 if (!locationRepository.hasLocationPermissions()) {
                     return Result.failure(Exception("Permisos de ubicación no otorgados. Ve a Configuración → Apps → Permisos → Ubicación"))
                 }
-                
+
                 // 1.1 NOTA: Para tracking activo no necesitamos permiso de background
                 // El foreground service mantiene la ubicación mientras la app está en uso
                 // Solo verificamos que tenga al menos "While using app"

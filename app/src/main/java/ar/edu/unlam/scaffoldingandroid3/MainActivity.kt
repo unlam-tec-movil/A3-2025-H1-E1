@@ -1,6 +1,8 @@
 package ar.edu.unlam.scaffoldingandroid3
 
+import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
  * Utiliza @AndroidEntryPoint para permitir la inyección de dependencias
  * de Hilt en la actividad y sus componentes.
  */
+@RequiresApi(Build.VERSION_CODES.Q)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

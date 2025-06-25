@@ -4,16 +4,28 @@ package ar.edu.unlam.scaffoldingandroid3.domain.model
  * Resultado final de tracking para guardar - Modelo de dominio
  */
 data class TrackingResult(
-    val tiempoTotal: String, // Tiempo total con pausas
-    val tiempoEnMovimiento: String, // Tiempo sin pausas
-    val distanciaTotal: Double, // km totales
-    val pasosTotales: Int, // pasos totales
-    val velocidadMedia: Double, // km/h promedio
-    val velocidadMaxima: Double, // km/h máxima
-    val altitudMinima: Double, // metros, punto más bajo
-    val altitudMaxima: Double, // metros, punto más alto
-    val rutaCompleta: List<LocationPoint>, // todos los puntos GPS
-    val fotosCapturadas: List<TrackingPhoto>, // todas las fotos
-    var nombreRecorrido: String = "", // ingresado por usuario
-    val fechaCreacion: Long, // timestamp de creación
+    // Tiempo total con pausas
+    val tiempoTotal: String,
+    // Tiempo sin pausas
+    val tiempoEnMovimiento: String,
+    // km totales
+    val distanciaTotal: Double,
+    // pasos totales
+    val pasosTotales: Int,
+    // km/h promedio
+    val velocidadMedia: Double,
+    // km/h máxima
+    val velocidadMaxima: Double,
+    // metros, punto más bajo
+    val altitudMinima: Double,
+    // metros, punto más alto
+    val altitudMaxima: Double,
+    // todos los puntos GPS
+    val rutaCompleta: List<LocationPoint>,
+    // todas las fotos
+    val fotosCapturadas: List<TrackingPhoto>,
+    // ingresado por usuario
+    var nombreRecorrido: String = "",
+    // timestamp de creación
+    val fechaCreacion: Long,
 )

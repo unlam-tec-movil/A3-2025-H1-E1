@@ -41,9 +41,9 @@ class TrackingService : Service() {
     @Inject lateinit var sensorManager: DeviceSensorManager
 
     @Inject lateinit var metricsCalculator: MetricsCalculator
-    
+
     @Inject lateinit var trackingSessionRepository: ar.edu.unlam.scaffoldingandroid3.data.repository.TrackingSessionRepositoryImpl
-    
+
     // Flag para evitar múltiples llamadas a startForeground
     private var isStarted = false
 
@@ -87,17 +87,18 @@ class TrackingService : Service() {
         if (intent?.action == ACTION_START_TRACKING && !isStarted) {
             try {
                 // Verificar permisos críticos antes de startForeground
-                val hasLocationPermission = ActivityCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-                
+                val hasLocationPermission =
+                    ActivityCompat.checkSelfPermission(
+                        this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    ) == PackageManager.PERMISSION_GRANTED
+
                 if (!hasLocationPermission) {
                     // Sin permisos de ubicación, no podemos hacer tracking
                     stopSelf()
                     return START_NOT_STICKY
                 }
-                
+
                 startForeground(NOTIFICATION_ID, createNotification())
                 isStarted = true
             } catch (e: SecurityException) {
@@ -110,7 +111,7 @@ class TrackingService : Service() {
                 return START_NOT_STICKY
             }
         }
-        
+
         when (intent?.action) {
             ACTION_START_TRACKING -> startTracking()
             ACTION_PAUSE_TRACKING -> pauseTracking()
@@ -131,8 +132,8 @@ class TrackingService : Service() {
         pausedDuration = 0
 
         // Resetear TODO para nueva sesión (esto es CORRECTO al iniciar nueva sesión)
-        sensorManager.resetStepCount()  // Resetear pasos para nueva sesión
-        metricsCalculator.reset()        // Resetear métricas para nueva sesión
+        sensorManager.resetStepCount() // Resetear pasos para nueva sesión
+        metricsCalculator.reset() // Resetear métricas para nueva sesión
 
         startLocationTracking()
         startSensorTracking()
@@ -252,7 +253,7 @@ class TrackingService : Service() {
             }
         }
     }
-    
+
     /**
      * Obtiene el tiempo TOTAL (incluyendo pausas)
      */
@@ -266,7 +267,7 @@ class TrackingService : Service() {
             }
         }
     }
-    
+
     /**
      * DEPRECATED - Usar getMovementTime() o getTotalTime()
      */

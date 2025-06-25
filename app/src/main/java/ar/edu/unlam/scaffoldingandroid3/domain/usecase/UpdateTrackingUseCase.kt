@@ -65,7 +65,7 @@ class UpdateTrackingUseCase
         }
 
         /**
-         * Verifica si se puede reanudar el tracking - LÓGICA DE NEGOCIO  
+         * Verifica si se puede reanudar el tracking - LÓGICA DE NEGOCIO
          * Validación de estado necesaria antes de reanudar
          */
         suspend fun canResumeTracking(): Boolean {

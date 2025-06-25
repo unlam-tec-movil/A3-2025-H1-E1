@@ -16,10 +16,10 @@ import androidx.room.PrimaryKey
             entity = TrackingSessionEntity::class,
             parentColumns = ["id"],
             childColumns = ["sessionId"],
-            onDelete = ForeignKey.CASCADE
-        )
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
-    indices = [Index(value = ["sessionId"])]
+    indices = [Index(value = ["sessionId"])],
 )
 data class PhotoEntity(
     @PrimaryKey(autoGenerate = true)

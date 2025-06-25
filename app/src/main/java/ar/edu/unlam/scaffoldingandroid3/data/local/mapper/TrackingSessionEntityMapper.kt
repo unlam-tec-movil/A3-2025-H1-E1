@@ -1,7 +1,6 @@
 package ar.edu.unlam.scaffoldingandroid3.data.local.mapper
 
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
-import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
@@ -11,7 +10,6 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
  * Implementación sencilla y funcional para Clean Architecture
  */
 object TrackingSessionEntityMapper {
-
     /**
      * Convierte TrackingSession (domain) a TrackingSessionEntity (data)
      */
@@ -24,12 +22,13 @@ object TrackingSessionEntityMapper {
             totalDuration = formatDuration(this.endTime - this.startTime),
             movingDuration = formatDuration(this.metrics.currentDuration),
             totalDistance = this.metrics.currentDistance,
-            totalSteps = 0, // Se actualiza desde sensores si es necesario
+            // Se actualiza desde sensores si es necesario
+            totalSteps = 0,
             averageSpeed = this.metrics.averageSpeed,
             maxSpeed = this.metrics.maxSpeed,
             minAltitude = this.metrics.currentElevation,
             maxAltitude = this.metrics.currentElevation,
-            createdAt = System.currentTimeMillis()
+            createdAt = System.currentTimeMillis(),
         )
     }
 
@@ -42,16 +41,20 @@ object TrackingSessionEntityMapper {
             routeName = this.routeName,
             startTime = this.startTime,
             endTime = this.endTime,
-            metrics = TrackingMetrics(
-                currentDistance = this.totalDistance,
-                averageSpeed = this.averageSpeed,
-                maxSpeed = this.maxSpeed,
-                currentSpeed = 0.0, // No se persiste velocidad actual
-                currentElevation = this.maxAltitude,
-                currentDuration = parseDuration(this.movingDuration)
-            ),
-            status = TrackingStatus.COMPLETED, // Sessions guardadas están completas
-            routePoint = emptyList() // Los puntos se manejan por separado
+            metrics =
+                TrackingMetrics(
+                    currentDistance = this.totalDistance,
+                    averageSpeed = this.averageSpeed,
+                    maxSpeed = this.maxSpeed,
+                    // No se persiste velocidad actual
+                    currentSpeed = 0.0,
+                    currentElevation = this.maxAltitude,
+                    currentDuration = parseDuration(this.movingDuration),
+                ),
+            // Sessions guardadas están completas
+            status = TrackingStatus.COMPLETED,
+            // Los puntos se manejan por separado
+            routePoint = emptyList(),
         )
     }
 

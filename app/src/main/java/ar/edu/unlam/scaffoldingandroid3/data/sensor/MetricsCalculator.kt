@@ -29,16 +29,16 @@ class MetricsCalculator
 
         // Lista de puntos de la ruta
         private val routePoints = mutableListOf<LocationPoint>()
-        
+
         // Historial de altitudes para min/max
         private val altitudeHistory = mutableListOf<Double>()
-        
+
         // Variables para cálculo correcto de velocidad media
         private var totalMovementTime = 0L // tiempo EN MOVIMIENTO sin pausas (milisegundos)
-        
+
         // Control de pausas para evitar líneas falsas en el mapa
         private var isPaused = false
-        
+
         // Tiempo de inicio para cronómetro de UI (independiente del GPS)
         private var startTime: Long = 0L
         private var pausedDuration: Long = 0L
@@ -50,7 +50,7 @@ class MetricsCalculator
         fun addLocationPoint(location: Location) {
             // No agregar puntos si está pausado
             if (isPaused) return
-            
+
             val currentTime = System.currentTimeMillis()
 
             // Crear punto de dominio
@@ -83,22 +83,21 @@ class MetricsCalculator
                 val speedThreshold = 100.0 // Filtrar saltos GPS > 100 km/h
                 val minDistance = 0.005 // Reducido: 5m para mejor detalle de ruta
                 val maxTimeDiff = 10.0 // Reducido: 10 segundos para actualizaciones más frecuentes
-                
+
                 val instantSpeed = if (timeDiff > 0) (distance / timeDiff) * 3600.0 else 0.0
                 val hasGoodAccuracy = location.accuracy <= accuracyThreshold
                 val isReasonableSpeed = instantSpeed <= speedThreshold
                 val hasSignificantMovement = distance >= minDistance
                 val hasTimedOut = timeDiff >= maxTimeDiff
-                
+
                 // Lógica mejorada: aceptar puntos buenos aunque tengan poca distancia
                 val shouldAddPoint = hasGoodAccuracy && isReasonableSpeed && (hasSignificantMovement || hasTimedOut)
-                
+
                 if (shouldAddPoint) {
                     totalDistance += distance
-                    
+
                     // Agregar punto a la ruta
                     routePoints.add(locationPoint)
-                    
 
                     // Calcular velocidad instantánea
                     if (timeDiff > 0) {
@@ -106,7 +105,7 @@ class MetricsCalculator
                         if (currentSpeed > maxSpeed) {
                             maxSpeed = currentSpeed
                         }
-                        
+
                         // Acumular tiempo de movimiento para velocidad media correcta
                         totalMovementTime += (currentTime - lastLocationTime)
                     }
@@ -132,7 +131,7 @@ class MetricsCalculator
 
             currentElevation = altitude
             lastAltitude = altitude
-            
+
             // Agregar al historial para cálculos min/max
             altitudeHistory.add(altitude)
         }
@@ -149,32 +148,34 @@ class MetricsCalculator
          */
         fun getCurrentMetrics(): TrackingMetrics {
             // Calcular velocidad media correcta: distancia / tiempo en movimiento
-            val averageSpeed = if (totalDistance > 0 && totalMovementTime > 0) {
-                (totalDistance / (totalMovementTime / 3600000.0)) // convertir ms a horas
-            } else {
-                0.0
-            }
-            
-            // Tiempo para cronómetro UI: tiempo continuo desde el inicio excluyendo pausas
-            val elapsedTimeForUI = if (startTime > 0) {
-                if (isPaused) {
-                    // Durante pausa: tiempo hasta que se pausó
-                    pauseStartTime - startTime - pausedDuration
+            val averageSpeed =
+                if (totalDistance > 0 && totalMovementTime > 0) {
+                    (totalDistance / (totalMovementTime / 3600000.0)) // convertir ms a horas
                 } else {
-                    // Activo: tiempo actual menos tiempo pausado
-                    System.currentTimeMillis() - startTime - pausedDuration
+                    0.0
                 }
-            } else {
-                0L
-            }
-            
-            
+
+            // Tiempo para cronómetro UI: tiempo continuo desde el inicio excluyendo pausas
+            val elapsedTimeForUI =
+                if (startTime > 0) {
+                    if (isPaused) {
+                        // Durante pausa: tiempo hasta que se pausó
+                        pauseStartTime - startTime - pausedDuration
+                    } else {
+                        // Activo: tiempo actual menos tiempo pausado
+                        System.currentTimeMillis() - startTime - pausedDuration
+                    }
+                } else {
+                    0L
+                }
+
             return TrackingMetrics(
                 currentSpeed = currentSpeed,
                 averageSpeed = averageSpeed,
                 maxSpeed = maxSpeed,
                 currentDistance = totalDistance,
-                currentDuration = elapsedTimeForUI, // Tiempo continuo para UI
+                // Tiempo continuo para UI
+                currentDuration = elapsedTimeForUI,
                 currentElevation = currentElevation,
                 totalElevationGain = totalElevationGain,
                 totalElevationLoss = totalElevationLoss,
@@ -182,7 +183,7 @@ class MetricsCalculator
                 lastLocation = lastLocation,
             )
         }
-        
+
         /**
          * Obtiene los puntos de la ruta en tiempo real para pintar el camino
          */
@@ -205,14 +206,14 @@ class MetricsCalculator
                 "totalMovementTime" to totalMovementTime,
             )
         }
-        
+
         /**
          * Obtiene la altitud mínima registrada
          */
         fun getMinAltitude(): Double {
             return altitudeHistory.minOrNull() ?: currentElevation
         }
-        
+
         /**
          * Obtiene la altitud máxima registrada
          */
@@ -239,7 +240,7 @@ class MetricsCalculator
                 lastLocationTime = 0L
             }
         }
-        
+
         /**
          * Reanuda el tracking (vuelve a agregar puntos)
          */
@@ -252,7 +253,7 @@ class MetricsCalculator
                 // Esto crea el gap visual correcto según especificaciones
             }
         }
-        
+
         /**
          * Resetea todas las métricas
          */
@@ -261,7 +262,7 @@ class MetricsCalculator
             maxSpeed = 0.0
             currentSpeed = 0.0
             currentElevation = 0.0
-            totalSteps = 0  // SÍ resetear al iniciar nueva sesión
+            totalSteps = 0 // SÍ resetear al iniciar nueva sesión
             totalElevationGain = 0.0
             totalElevationLoss = 0.0
             lastLocation = null

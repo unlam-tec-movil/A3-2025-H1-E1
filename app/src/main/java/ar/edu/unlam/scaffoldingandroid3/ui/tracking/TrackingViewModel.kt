@@ -3,14 +3,14 @@ package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
+import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
-import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.SensorRepository
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.StartTrackingUseCase
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.StopTrackingUseCase
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.UpdateTrackingUseCase
-import ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
-import ar.edu.unlam.scaffoldingandroid3.domain.repository.SensorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -104,21 +104,22 @@ class TrackingViewModel
                 if (session != null) {
                     val metrics = session.metrics
                     val currentTime = metrics.currentDuration
-                    
+
                     // Los pasos ahora vienen directamente de las métricas
-                    
-                    val stats = mapOf(
-                        "routeName" to session.routeName,
-                        "status" to session.status.name,
-                        "elapsedTime" to currentTime,
-                        "elapsedTimeFormatted" to formatTime(currentTime),
-                        "totalSteps" to metrics.totalSteps,
-                        "currentSpeed" to metrics.currentSpeed,
-                        "averageSpeed" to metrics.averageSpeed,
-                        "maxSpeed" to metrics.maxSpeed,
-                        "distance" to metrics.currentDistance,
-                        "currentElevation" to metrics.currentElevation
-                    )
+
+                    val stats =
+                        mapOf(
+                            "routeName" to session.routeName,
+                            "status" to session.status.name,
+                            "elapsedTime" to currentTime,
+                            "elapsedTimeFormatted" to formatTime(currentTime),
+                            "totalSteps" to metrics.totalSteps,
+                            "currentSpeed" to metrics.currentSpeed,
+                            "averageSpeed" to metrics.averageSpeed,
+                            "maxSpeed" to metrics.maxSpeed,
+                            "distance" to metrics.currentDistance,
+                            "currentElevation" to metrics.currentElevation,
+                        )
                     _detailedStats.value = stats
                 }
             } catch (e: Exception) {
@@ -132,25 +133,26 @@ class TrackingViewModel
                 try {
                     updateDetailedStats() // Para stats avanzadas
                     val detailedStats = _detailedStats.value
-                    
+
                     // Extraer tiempo formateado de detailedStats
                     val elapsedTime = detailedStats["elapsedTimeFormatted"] as? String ?: "00:00:00"
-                    
+
                     // Obtener pasos DIRECTAMENTE de métricas (más confiable)
                     val steps = metrics.totalSteps
-                    
+
                     val routePoints = createRoutePointsFromMetrics(metrics)
                     val currentLocation = createCurrentLocationFromMetrics(metrics)
 
-                    _uiState.value = _uiState.value.copy(
-                        elapsedTime = elapsedTime,
-                        stepCount = steps, // Ahora usa directamente metrics.totalSteps
-                        currentAltitude = metrics.currentElevation,
-                        routePoints = routePoints,
-                        currentLocation = currentLocation,
-                        photoCount = _uiState.value.capturedPhotos.size,
-                    )
-                    
+                    _uiState.value =
+                        _uiState.value.copy(
+                            elapsedTime = elapsedTime,
+                            // Ahora usa directamente metrics.totalSteps
+                            stepCount = steps,
+                            currentAltitude = metrics.currentElevation,
+                            routePoints = routePoints,
+                            currentLocation = currentLocation,
+                            photoCount = _uiState.value.capturedPhotos.size,
+                        )
                 } catch (e: Exception) {
                     // Error updating UI from metrics
                 }
@@ -196,18 +198,22 @@ class TrackingViewModel
                             )
                     }
                     .onFailure { error ->
-                        val errorMessage = when {
-                            error.message?.contains("Permisos de ubicación") == true -> 
-                                "⚠️ Permisos de ubicación requeridos\n\nOtorga el permiso 'Mientras usas la app' y mantén la app abierta durante el tracking"
-                            error.message?.contains("segundo plano") == true -> 
-                                "⚠️ Para tracking continuo, ve a:\nConfiguración → Apps → ScaffoldingAndroid3 → Permisos → Ubicación → 'Permitir todo el tiempo'"
-                            error.message?.contains("GPS") == true -> 
-                                "⚠️ GPS deshabilitado\n\nActiva la ubicación en Configuración del dispositivo"
-                            error.message?.contains("notificación") == true -> 
-                                "⚠️ Permisos de notificación requeridos\n\nVe a: Configuración → Apps → ScaffoldingAndroid3 → Permisos → Notificaciones → Permitir"
-                            else -> error.message ?: "Error al iniciar tracking"
-                        }
-                        
+                        val errorMessage =
+                            when {
+                                error.message?.contains("Permisos de ubicación") == true ->
+                                    "⚠️ Permisos de ubicación requeridos\n\n" +
+                                        "Otorga el permiso 'Mientras usas la app' y mantén la app abierta durante el tracking"
+                                error.message?.contains("segundo plano") == true ->
+                                    "⚠️ Para tracking continuo, ve a:\n" +
+                                        "Configuración → Apps → ScaffoldingAndroid3 → Permisos → Ubicación → 'Permitir todo el tiempo'"
+                                error.message?.contains("GPS") == true ->
+                                    "⚠️ GPS deshabilitado\n\nActiva la ubicación en Configuración del dispositivo"
+                                error.message?.contains("notificación") == true ->
+                                    "⚠️ Permisos de notificación requeridos\n\n" +
+                                        "Ve a: Configuración → Apps → ScaffoldingAndroid3 → Permisos → Notificaciones → Permitir"
+                                else -> error.message ?: "Error al iniciar tracking"
+                            }
+
                         _uiState.value =
                             _uiState.value.copy(
                                 isLoading = false,
@@ -300,47 +306,53 @@ class TrackingViewModel
             // TEMPORALMENTE DESHABILITADO para debug de crash
             // La funcionalidad de cámara se implementará después de solucionar el crash
             handleError("Funcionalidad de cámara temporalmente deshabilitada")
-            
+
             // Simular captura de foto para testing
-            val fakePhoto = ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto(
-                uri = "fake://photo_${System.currentTimeMillis()}",
-                orderInRoute = _uiState.value.capturedPhotos.size
-            )
-            
+            val fakePhoto =
+                ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto(
+                    uri = "fake://photo_${System.currentTimeMillis()}",
+                    orderInRoute = _uiState.value.capturedPhotos.size,
+                )
+
             val currentPhotos = _uiState.value.capturedPhotos.toMutableList()
             currentPhotos.add(fakePhoto)
-            _uiState.value = _uiState.value.copy(
-                capturedPhotos = currentPhotos,
-                photoCount = currentPhotos.size
-            )
+            _uiState.value =
+                _uiState.value.copy(
+                    capturedPhotos = currentPhotos,
+                    photoCount = currentPhotos.size,
+                )
         }
-        
+
         private fun createTrackingResult(session: TrackingSession): TrackingResult {
             val totalDuration = session.endTime - session.startTime
             val tiempoTotal = formatTime(totalDuration)
-            
+
             // Simplificado: usar datos directos de la sesión
-            
+
             // Por ahora, crear con valores actuales (mejora futura: hacer suspendible)
-            val movementDuration = session.metrics.currentDuration // Tiempo en movimiento desde MetricsCalculator
+            // Tiempo en movimiento desde MetricsCalculator
+            val movementDuration = session.metrics.currentDuration
             val tiempoEnMovimiento = formatTime(movementDuration)
-            
+
             return TrackingResult(
                 tiempoTotal = tiempoTotal,
                 tiempoEnMovimiento = tiempoEnMovimiento,
                 distanciaTotal = session.metrics.currentDistance,
                 pasosTotales = session.metrics.totalSteps,
-                velocidadMedia = session.metrics.averageSpeed, // Ahora calculado correctamente
+                // Ahora calculado correctamente
+                velocidadMedia = session.metrics.averageSpeed,
                 velocidadMaxima = session.metrics.maxSpeed,
-                altitudMinima = session.metrics.currentElevation, // Simplificado por ahora
-                altitudMaxima = session.metrics.currentElevation + 50, // Simplificado por ahora
+                // Simplificado por ahora
+                altitudMinima = session.metrics.currentElevation,
+                // Simplificado por ahora
+                altitudMaxima = session.metrics.currentElevation + 50,
                 rutaCompleta = session.routePoint,
                 fotosCapturadas = _uiState.value.capturedPhotos,
                 nombreRecorrido = "",
-                fechaCreacion = System.currentTimeMillis()
+                fechaCreacion = System.currentTimeMillis(),
             )
         }
-        
+
         private fun formatTime(millis: Long): String {
             val seconds = (millis / 1000) % 60
             val minutes = (millis / (1000 * 60)) % 60
@@ -351,11 +363,11 @@ class TrackingViewModel
         fun showDiscardDialog() {
             _uiState.value = _uiState.value.copy(showDiscardDialog = true)
         }
-        
+
         fun hideDiscardDialog() {
             _uiState.value = _uiState.value.copy(showDiscardDialog = false)
         }
-        
+
         fun discardTracking() {
             // Detener tracking y limpiar estado
             viewModelScope.launch {

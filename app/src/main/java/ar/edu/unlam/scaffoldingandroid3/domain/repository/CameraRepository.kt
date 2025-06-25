@@ -12,20 +12,20 @@ interface CameraRepository {
      * Devuelve la URI de la imagen capturada
      */
     suspend fun capturePhoto(): Result<String>
-    
+
     /**
      * Crea una TrackingPhoto simplificada (sin metadatos GPS)
      */
     suspend fun createTrackingPhoto(
         imageUri: String,
-        orderInRoute: Int
+        orderInRoute: Int,
     ): TrackingPhoto
-    
+
     /**
      * Verifica si el permiso de cámara está concedido
      */
     fun hasCameraPermission(): Boolean
-    
+
     /**
      * Solicita permiso de cámara
      */
