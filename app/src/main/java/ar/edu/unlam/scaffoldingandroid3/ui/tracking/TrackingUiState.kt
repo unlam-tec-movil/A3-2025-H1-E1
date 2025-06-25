@@ -25,17 +25,13 @@ data class TrackingUiState(
     val canResume: Boolean = false,
     val canStop: Boolean = false,
     val error: String? = null,
-    // Nuevos campos para Fase 1 y 2
     val elapsedTime: String = "00:00:00",
     val routePoints: List<com.google.android.gms.maps.model.LatLng> = emptyList(),
     val photoCount: Int = 0,
     val currentLocation: com.google.android.gms.maps.model.LatLng? = null,
-    // Fase 2 - Sensores
     val stepCount: Int = 0,
     val currentAltitude: Double = 0.0,
     val sensorErrors: List<String> = emptyList(),
-    // Fase 3 - Cámara
     val capturedPhotos: List<TrackingPhoto> = emptyList(),
-    // Dialog de confirmación
     val showDiscardDialog: Boolean = false,
 )

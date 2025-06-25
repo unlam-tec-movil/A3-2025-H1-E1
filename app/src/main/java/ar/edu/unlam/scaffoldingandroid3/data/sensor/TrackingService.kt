@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -255,23 +254,9 @@ class TrackingService : Service() {
     }
 
     /**
-     * Obtiene el tiempo TOTAL (incluyendo pausas)
+     * DEPRECATED - Usar getMovementTime()
      */
-    fun getTotalTime(): Long {
-        return when (_trackingStatus.value) {
-            TrackingStatus.ACTIVE -> System.currentTimeMillis() - startTime
-            TrackingStatus.PAUSED -> pauseStartTime - startTime
-            TrackingStatus.COMPLETED -> {
-                // Al completar, mantener tiempo total final
-                System.currentTimeMillis() - startTime
-            }
-        }
-    }
-
-    /**
-     * DEPRECATED - Usar getMovementTime() o getTotalTime()
-     */
-    @Deprecated("Use getMovementTime() or getTotalTime()")
+    @Deprecated("Use getMovementTime()")
     fun getElapsedTime(): Long = getMovementTime()
 
     /**

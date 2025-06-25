@@ -105,8 +105,6 @@ class TrackingViewModel
                     val metrics = session.metrics
                     val currentTime = metrics.currentDuration
 
-                    // Los pasos ahora vienen directamente de las métricas
-
                     val stats =
                         mapOf(
                             "routeName" to session.routeName,
@@ -128,7 +126,6 @@ class TrackingViewModel
         }
 
         private fun updateUiFromMetrics(metrics: TrackingMetrics) {
-            // Acceso DIRECTO a métricas - más eficiente y confiable
             viewModelScope.launch {
                 try {
                     updateDetailedStats() // Para stats avanzadas
@@ -137,7 +134,7 @@ class TrackingViewModel
                     // Extraer tiempo formateado de detailedStats
                     val elapsedTime = detailedStats["elapsedTimeFormatted"] as? String ?: "00:00:00"
 
-                    // Obtener pasos DIRECTAMENTE de métricas (más confiable)
+                    // Obtener pasos DIRECTAMENTE de métricas
                     val steps = metrics.totalSteps
 
                     val routePoints = createRoutePointsFromMetrics(metrics)
@@ -146,7 +143,7 @@ class TrackingViewModel
                     _uiState.value =
                         _uiState.value.copy(
                             elapsedTime = elapsedTime,
-                            // Ahora usa directamente metrics.totalSteps
+                            // Usa directamente metrics.totalSteps
                             stepCount = steps,
                             currentAltitude = metrics.currentElevation,
                             routePoints = routePoints,
@@ -324,19 +321,11 @@ class TrackingViewModel
         }
 
         private fun createTrackingResult(session: TrackingSession): TrackingResult {
-            val totalDuration = session.endTime - session.startTime
-            val tiempoTotal = formatTime(totalDuration)
-
-            // Simplificado: usar datos directos de la sesión
-
-            // Por ahora, crear con valores actuales (mejora futura: hacer suspendible)
-            // Tiempo en movimiento desde MetricsCalculator
-            val movementDuration = session.metrics.currentDuration
-            val tiempoEnMovimiento = formatTime(movementDuration)
+            // Usar solo tiempo de movimiento (sin pausas)
+            val duracion = formatTime(session.metrics.currentDuration)
 
             return TrackingResult(
-                tiempoTotal = tiempoTotal,
-                tiempoEnMovimiento = tiempoEnMovimiento,
+                duracion = duracion,
                 distanciaTotal = session.metrics.currentDistance,
                 pasosTotales = session.metrics.totalSteps,
                 // Ahora calculado correctamente
@@ -369,10 +358,9 @@ class TrackingViewModel
         }
 
         fun discardTracking() {
-            // Detener tracking y limpiar estado
             viewModelScope.launch {
                 stopTrackingUseCase.execute()
-                _uiState.value = TrackingUiState() // Reset a estado inicial
+                _uiState.value = TrackingUiState()
             }
         }
 

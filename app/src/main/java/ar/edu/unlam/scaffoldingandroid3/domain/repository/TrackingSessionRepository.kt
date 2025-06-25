@@ -70,4 +70,14 @@ interface TrackingSessionRepository {
      * Actualiza las métricas en tiempo real (llamado desde servicio)
      */
     fun updateMetrics(metrics: TrackingMetrics)
+
+    /**
+     * Limpia la sesión completada después de guardar
+     */
+    suspend fun clearCompletedSession()
+
+    /**
+     * Obtiene los puntos GPS de una sesión guardada
+     */
+    suspend fun getLocationPointsBySession(sessionId: Long): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint>
 }
