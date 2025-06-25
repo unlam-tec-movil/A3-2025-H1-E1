@@ -3,7 +3,6 @@ package ar.edu.unlam.scaffoldingandroid3.data.local.mapper
 import ar.edu.unlam.scaffoldingandroid3.data.local.entity.HistoryEntity
 import ar.edu.unlam.scaffoldingandroid3.domain.model.History
 import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
-import ar.edu.unlam.scaffoldingandroid3.domain.model.Photo
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -22,7 +21,7 @@ fun History.toEntity(): HistoryEntity {
         routeName = routeName,
         date = date,
         metricsJson = gson.toJson(metrics),
-        photosJson = gson.toJson(photos),
+        photoUri = photoUri,
         routePointsJson = gson.toJson(routePoint),
     )
 }
@@ -33,7 +32,7 @@ fun HistoryEntity.toDomain(): History {
         routeName = routeName,
         date = date,
         metrics = gson.fromJson(metricsJson, TrackingMetrics::class.java),
-        photos = gson.fromJson(photosJson, object : TypeToken<List<Photo>>() {}.type),
+        photoUri = photoUri,
         routePoint = gson.fromJson(routePointsJson, object : TypeToken<List<LocationPoint>>() {}.type),
     )
 }
