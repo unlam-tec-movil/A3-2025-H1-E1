@@ -31,8 +31,6 @@ class SensorRepositoryImpl
             return sensorManager.getAltitudeUpdates()
         }
 
-        // Compass removido por simplicidad
-
         /**
          * Inicia el tracking de sensores
          */
@@ -76,8 +74,6 @@ class SensorRepositoryImpl
             return sensorManager.getCurrentStepCount()
         }
 
-        // Funciones simplificadas removidas
-
         /**
          * Verifica disponibilidad de sensores
          */
@@ -88,6 +84,4 @@ class SensorRepositoryImpl
         override fun isBarometerAvailable(): Boolean {
             return sensorManager.isBarometerAvailable()
         }
-
-        // Funciones no necesarias removidas
     }

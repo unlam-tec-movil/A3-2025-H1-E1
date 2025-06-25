@@ -11,7 +11,6 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.entity.TrackingSessionEntity
 
 /**
  * DAO para operaciones de base de datos de tracking
- * Compatible con Clean Architecture
  */
 @Dao
 interface TrackingDao {

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import ar.edu.unlam.scaffoldingandroid3.data.local.AppDatabase
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.HistoryDao
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.LocationPointDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
 import dagger.Module
@@ -39,4 +40,7 @@ object DatabaseModule {
 
     @Provides
     fun provideTrackingDao(db: AppDatabase): TrackingDao = db.trackingDao()
+
+    @Provides
+    fun provideLocationPointDao(db: AppDatabase): LocationPointDao = db.locationPointDao()
 }
