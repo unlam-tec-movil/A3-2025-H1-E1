@@ -33,17 +33,19 @@ class SaveTrackingResultUseCase
                                 currentDistance = trackingResult.distanciaTotal,
                                 averageSpeed = trackingResult.velocidadMedia,
                                 maxSpeed = trackingResult.velocidadMaxima,
-                                // Usar la altitud máxima
+                                // Usar la altitud máxima como actual
                                 currentElevation = trackingResult.altitudMaxima,
-                                totalElevationGain = trackingResult.altitudMaxima - trackingResult.altitudMinima,
+                                // Mapear altitudes min/max correctamente
+                                minElevation = trackingResult.altitudMinima,
+                                maxElevation = trackingResult.altitudMaxima,
                                 // No relevante para sesión completada
                                 currentSpeed = 0.0,
-                                // Se calculará en el repository
-                                currentDuration = 0L,
-                                // Simplificado por ahora
-                                totalElevationLoss = 0.0,
+                                // Convertir duración de string a milisegundos
+                                currentDuration = parseDurationStringToMillis(trackingResult.duracion),
                                 // No disponible en resultado final
                                 lastLocation = null,
+                                // Mapear pasos totales correctamente
+                                totalSteps = trackingResult.pasosTotales,
                             ),
                     )
 
@@ -53,6 +55,25 @@ class SaveTrackingResultUseCase
                 Result.success(sessionId)
             } catch (e: Exception) {
                 Result.failure(e)
+            }
+        }
+
+        /**
+         * Convierte string de duración HH:MM:SS a milisegundos
+         */
+        private fun parseDurationStringToMillis(duration: String): Long {
+            return try {
+                val parts = duration.split(":")
+                if (parts.size == 3) {
+                    val hours = parts[0].toLong()
+                    val minutes = parts[1].toLong()
+                    val seconds = parts[2].toLong()
+                    (hours * 3600 + minutes * 60 + seconds) * 1000
+                } else {
+                    0L
+                }
+            } catch (e: Exception) {
+                0L
             }
         }
     }

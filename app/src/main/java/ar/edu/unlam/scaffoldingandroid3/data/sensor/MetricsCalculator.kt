@@ -23,8 +23,6 @@ class MetricsCalculator
 
         // Variables para sensores
         private var totalSteps = 0
-        private var totalElevationGain = 0.0
-        private var totalElevationLoss = 0.0
         private var lastAltitude: Double? = null
 
         // Lista de puntos de la ruta
@@ -120,15 +118,6 @@ class MetricsCalculator
          * Actualiza altitud del barómetro
          */
         fun updateAltitude(altitude: Double) {
-            lastAltitude?.let { prev ->
-                val change = altitude - prev
-                if (change > 0.5) {
-                    totalElevationGain += change
-                } else if (change < -0.5) {
-                    totalElevationLoss += kotlin.math.abs(change)
-                }
-            }
-
             currentElevation = altitude
             lastAltitude = altitude
 
@@ -177,8 +166,8 @@ class MetricsCalculator
                 // Tiempo continuo para UI
                 currentDuration = elapsedTimeForUI,
                 currentElevation = currentElevation,
-                totalElevationGain = totalElevationGain,
-                totalElevationLoss = totalElevationLoss,
+                minElevation = getMinAltitude(),
+                maxElevation = getMaxAltitude(),
                 totalSteps = totalSteps,
                 lastLocation = lastLocation,
             )
@@ -199,8 +188,6 @@ class MetricsCalculator
                 "totalSteps" to totalSteps,
                 "totalDistance" to totalDistance,
                 "maxSpeed" to maxSpeed,
-                "elevationGain" to totalElevationGain,
-                "elevationLoss" to totalElevationLoss,
                 "minAltitude" to getMinAltitude(),
                 "maxAltitude" to getMaxAltitude(),
                 "totalMovementTime" to totalMovementTime,
@@ -263,8 +250,6 @@ class MetricsCalculator
             currentSpeed = 0.0
             currentElevation = 0.0
             totalSteps = 0 // SÍ resetear al iniciar nueva sesión
-            totalElevationGain = 0.0
-            totalElevationLoss = 0.0
             lastLocation = null
             lastAltitude = null
             lastLocationTime = 0L

@@ -24,8 +24,8 @@ object TrackingSessionEntityMapper {
             totalSteps = this.metrics.totalSteps,
             averageSpeed = this.metrics.averageSpeed,
             maxSpeed = this.metrics.maxSpeed,
-            minAltitude = this.metrics.currentElevation,
-            maxAltitude = this.metrics.currentElevation,
+            minAltitude = this.metrics.minElevation,
+            maxAltitude = this.metrics.maxElevation,
             createdAt = System.currentTimeMillis(),
         )
     }
@@ -47,7 +47,10 @@ object TrackingSessionEntityMapper {
                     // No se persiste velocidad actual
                     currentSpeed = 0.0,
                     currentElevation = this.maxAltitude,
+                    minElevation = this.minAltitude,
+                    maxElevation = this.maxAltitude,
                     currentDuration = parseDuration(this.movingDuration),
+                    totalSteps = this.totalSteps,
                 ),
             // Sessions guardadas están completas
             status = TrackingStatus.COMPLETED,

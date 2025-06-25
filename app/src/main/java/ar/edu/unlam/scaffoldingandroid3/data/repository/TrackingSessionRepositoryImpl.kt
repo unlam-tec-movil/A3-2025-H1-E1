@@ -54,8 +54,6 @@ class TrackingSessionRepositoryImpl
                     currentDistance = 0.0,
                     currentDuration = 0L,
                     currentElevation = 0.0,
-                    totalElevationGain = 0.0,
-                    totalElevationLoss = 0.0,
                     totalSteps = 0,
                     lastLocation = null,
                 ),

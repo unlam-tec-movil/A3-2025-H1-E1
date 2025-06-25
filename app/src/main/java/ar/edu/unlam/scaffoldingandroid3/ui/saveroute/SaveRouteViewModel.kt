@@ -61,8 +61,8 @@ class SaveRouteViewModel
                 pasosTotales = session.metrics.totalSteps,
                 velocidadMedia = session.metrics.averageSpeed,
                 velocidadMaxima = session.metrics.maxSpeed,
-                altitudMinima = session.metrics.currentElevation,
-                altitudMaxima = session.metrics.currentElevation,
+                altitudMinima = session.metrics.minElevation,
+                altitudMaxima = session.metrics.maxElevation,
                 rutaCompleta = session.routePoint,
                 // Se obtendrán del UI state
                 fotosCapturadas = emptyList(),

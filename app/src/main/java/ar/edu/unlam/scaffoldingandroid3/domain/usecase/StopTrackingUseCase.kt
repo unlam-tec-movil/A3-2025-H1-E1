@@ -75,8 +75,6 @@ class StopTrackingUseCase
                 "distance" to session.metrics.currentDistance,
                 "averageSpeed" to session.metrics.averageSpeed,
                 "maxSpeed" to session.metrics.maxSpeed,
-                "elevationGain" to session.metrics.totalElevationGain,
-                "elevationLoss" to session.metrics.totalElevationLoss,
             )
         }
     }
