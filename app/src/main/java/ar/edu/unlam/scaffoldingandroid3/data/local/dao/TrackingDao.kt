@@ -26,6 +26,18 @@ interface TrackingDao {
     @Query("SELECT * FROM tracking_sessions WHERE id = :sessionId")
     suspend fun getTrackingSessionById(sessionId: Long): TrackingSessionEntity?
     
+    @Update
+    suspend fun updateTrackingSession(session: TrackingSessionEntity)
+    
+    @Query("SELECT * FROM tracking_sessions WHERE endTime = 0 LIMIT 1")
+    suspend fun getActiveSession(): TrackingSessionEntity?
+    
+    @Query("UPDATE tracking_sessions SET endTime = :endTime WHERE id = :id")
+    suspend fun updateSessionEndTime(id: Long, endTime: Long)
+    
     @Delete
     suspend fun deleteTrackingSession(session: TrackingSessionEntity)
+    
+    @Query("DELETE FROM tracking_sessions WHERE id = :sessionId")
+    suspend fun deleteTrackingSessionById(sessionId: Long)
 }

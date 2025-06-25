@@ -7,7 +7,6 @@ import javax.inject.Inject
 /**
  * Use Case para guardar resultados de tracking en base de datos
  * Compatible con Clean Architecture: ViewModel → UseCase → Repository
- * Requerimiento TRACKING_REQUIREMENTS.md líneas 254-259
  */
 class SaveTrackingResultUseCase @Inject constructor(
     private val trackingSessionRepository: TrackingSessionRepository

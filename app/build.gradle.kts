@@ -140,4 +140,7 @@ dependencies {
 
     // navigation
     implementation(libs.androidx.navigation.compose)
+
+    // Accompanist
+    implementation(libs.accompanist.permissions)
 }

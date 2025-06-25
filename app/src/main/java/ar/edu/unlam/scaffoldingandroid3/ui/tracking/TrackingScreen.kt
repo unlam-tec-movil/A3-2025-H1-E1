@@ -1,5 +1,7 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +55,9 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -62,7 +67,8 @@ import kotlin.coroutines.resumeWithException
  * PREPARATION → RECORDING → EXPANDED_STATS
  * Integra: GPS, Acelerómetro, Barómetro, Magnetómetro
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.Q)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TrackingScreen(
     onNavigationBack: () -> Unit,
@@ -74,7 +80,17 @@ fun TrackingScreen(
     val detailedStats by viewModel.detailedStats.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // No auto-iniciar tracking, que el usuario decida
+    // Crear el estado del permiso que queremos solicitar
+    val activityRecognitionPermissionState = rememberPermissionState(
+        android.Manifest.permission.ACTIVITY_RECOGNITION
+    )
+
+    // Usar LaunchedEffect para solicitar el permiso una vez cuando la pantalla se carga
+    LaunchedEffect(Unit) {
+        if (!activityRecognitionPermissionState.status.isGranted) {
+            activityRecognitionPermissionState.launchPermissionRequest()
+        }
+    }
 
     // Manejo de errores
     LaunchedEffect(uiState.error) {
@@ -110,9 +126,9 @@ fun TrackingScreen(
                 onStopClick = {
                     viewModel.stopTracking { trackingResult ->
                         onTrackingCompleted(trackingResult)
-                        onNavigationBack()
                     }
                 },
+                isPermissionGranted = activityRecognitionPermissionState.status.isGranted,
                 onExpandStats = viewModel::toggleStatsExpansion,
                 onCapturePhoto = viewModel::capturePhoto,
             )
@@ -138,6 +154,7 @@ fun TrackingMapScreen(
     detailedStats: Map<String, Any>,
     uiState: TrackingUiState,
     onNavigationBack: () -> Unit,
+    isPermissionGranted: Boolean,
     onStartClick: () -> Unit,
     onPauseClick: () -> Unit,
     onResumeClick: () -> Unit,
@@ -207,39 +224,52 @@ fun TrackingMapScreen(
         ) {
             when (uiState.screenState) {
                 TrackingScreenState.PREPARATION -> {
-                    // Solo botón "Iniciar recorrido"
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                        horizontalArrangement = Arrangement.Center,
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Button(
-                            onClick = onStartClick,
-                            enabled = !uiState.isLoading,
-                            modifier =
-                                Modifier
+                        // Solo botón "Iniciar recorrido"
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            Button(
+                                onClick = onStartClick,
+                                // Tu lógica aquí ya es correcta
+                                enabled = !uiState.isLoading && isPermissionGranted,
+                                modifier = Modifier
                                     .fillMaxWidth()
                                     .height(56.dp),
-                            colors =
-                                ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                ),
-                        ) {
-                            if (uiState.isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.padding(end = 8.dp),
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                )
+                                colors =
+                                    ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                    ),
+                            ) {
+                                if (uiState.isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.padding(end = 8.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                    )
+                                }
+                                Text("Iniciar recorrido")
                             }
-                            Text("Iniciar recorrido")
+                        }
+                        // Mostrar un texto de ayuda si el permiso fue denegado.
+                        if (!isPermissionGranted) {
+                            Text(
+                                text = "Se necesita permiso de 'Actividad Física' para contar los pasos. La app funcionará, pero los pasos no se medirán.",
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant, // Un color sutil
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                 }
 
                 TrackingScreenState.RECORDING -> {
-                    // Panel de métricas básicas con botones pause/stop
                     TrackingPanel(
                         metrics = metrics,
                         uiState = uiState,
@@ -252,7 +282,6 @@ fun TrackingMapScreen(
                 }
 
                 TrackingScreenState.EXPANDED_STATS -> {
-                    // Panel expandido de estadísticas
                     TrackingPanel(
                         metrics = metrics,
                         uiState = uiState,

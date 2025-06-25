@@ -78,12 +78,11 @@ class MetricsCalculator
                 val distance = results[0] / 1000.0 // convertir a km
                 val timeDiff = (currentTime - lastLocationTime) / 1000.0 // segundos
 
-                // FILTRADO MEJORADO para tracking suave tipo Google Maps
-                // 1. Filtrar por precisión GPS
-                val accuracyThreshold = 15.0f // Solo usar puntos con precisión < 15m
+                // FILTRADO OPTIMIZADO para tracking suave + mejor dibujado de ruta
+                val accuracyThreshold = 20.0f // Relajado: 20m para mejor cobertura
                 val speedThreshold = 100.0 // Filtrar saltos GPS > 100 km/h
-                val minDistance = 0.010 // Mínimo 10 metros (vs 5m anterior)
-                val maxTimeDiff = 15.0 // Máximo 15 segundos sin actualizar
+                val minDistance = 0.005 // Reducido: 5m para mejor detalle de ruta
+                val maxTimeDiff = 10.0 // Reducido: 10 segundos para actualizaciones más frecuentes
                 
                 val instantSpeed = if (timeDiff > 0) (distance / timeDiff) * 3600.0 else 0.0
                 val hasGoodAccuracy = location.accuracy <= accuracyThreshold
@@ -91,21 +90,17 @@ class MetricsCalculator
                 val hasSignificantMovement = distance >= minDistance
                 val hasTimedOut = timeDiff >= maxTimeDiff
                 
-                if (hasGoodAccuracy && isReasonableSpeed && (hasSignificantMovement || hasTimedOut)) {
+                // Lógica mejorada: aceptar puntos buenos aunque tengan poca distancia
+                val shouldAddPoint = hasGoodAccuracy && isReasonableSpeed && (hasSignificantMovement || hasTimedOut)
+                
+                if (shouldAddPoint) {
                     totalDistance += distance
                     
                     // Agregar punto a la ruta
                     routePoints.add(locationPoint)
                     
-                    // Log para debugging (remover en producción)
-                    android.util.Log.d("GPS_Tracking", 
-                        "Point added: dist=${String.format("%.1f", distance*1000)}m, " +
-                        "speed=${String.format("%.1f", instantSpeed)} km/h, " +
-                        "accuracy=${location.accuracy}m"
-                    )
 
                     // Calcular velocidad instantánea
-                    val timeDiff = (currentTime - lastLocationTime) / 1000.0
                     if (timeDiff > 0) {
                         currentSpeed = (distance / timeDiff) * 3600.0 // km/h
                         if (currentSpeed > maxSpeed) {
@@ -147,7 +142,6 @@ class MetricsCalculator
          */
         fun updateStepCount(steps: Int) {
             totalSteps = steps
-            android.util.Log.d("MetricsCalculator", "Step count updated: $totalSteps")
         }
 
         /**
@@ -173,6 +167,7 @@ class MetricsCalculator
             } else {
                 0L
             }
+            
             
             return TrackingMetrics(
                 currentSpeed = currentSpeed,
@@ -266,7 +261,7 @@ class MetricsCalculator
             maxSpeed = 0.0
             currentSpeed = 0.0
             currentElevation = 0.0
-            totalSteps = 0
+            totalSteps = 0  // SÍ resetear al iniciar nueva sesión
             totalElevationGain = 0.0
             totalElevationLoss = 0.0
             lastLocation = null

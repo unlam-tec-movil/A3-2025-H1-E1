@@ -127,30 +127,32 @@ class TrackingViewModel
         }
 
         private fun updateUiFromMetrics(metrics: TrackingMetrics) {
-            // Obtener datos desde DetailedStats simplificado
+            // Acceso DIRECTO a métricas - más eficiente y confiable
             viewModelScope.launch {
                 try {
-                    updateDetailedStats()
+                    updateDetailedStats() // Para stats avanzadas
                     val detailedStats = _detailedStats.value
-                    detailedStats?.let { stats ->
-                        // Extraer valores simples
-                        val elapsedTime = stats["elapsedTimeFormatted"] as? String ?: "00:00:00"
-                        val steps = (stats["totalSteps"] as? Int) ?: 0
-                        val routePoints = createRoutePointsFromMetrics(metrics)
-                        val currentLocation = createCurrentLocationFromMetrics(metrics)
+                    
+                    // Extraer tiempo formateado de detailedStats
+                    val elapsedTime = detailedStats["elapsedTimeFormatted"] as? String ?: "00:00:00"
+                    
+                    // Obtener pasos DIRECTAMENTE de métricas (más confiable)
+                    val steps = metrics.totalSteps
+                    
+                    val routePoints = createRoutePointsFromMetrics(metrics)
+                    val currentLocation = createCurrentLocationFromMetrics(metrics)
 
-                        _uiState.value =
-                            _uiState.value.copy(
-                                elapsedTime = elapsedTime,
-                                stepCount = steps,
-                                currentAltitude = metrics.currentElevation,
-                                routePoints = routePoints,
-                                currentLocation = currentLocation,
-                                photoCount = _uiState.value.capturedPhotos.size,
-                            )
-                    }
+                    _uiState.value = _uiState.value.copy(
+                        elapsedTime = elapsedTime,
+                        stepCount = steps, // Ahora usa directamente metrics.totalSteps
+                        currentAltitude = metrics.currentElevation,
+                        routePoints = routePoints,
+                        currentLocation = currentLocation,
+                        photoCount = _uiState.value.capturedPhotos.size,
+                    )
+                    
                 } catch (e: Exception) {
-                    // Error no crítico
+                    // Error updating UI from metrics
                 }
             }
         }

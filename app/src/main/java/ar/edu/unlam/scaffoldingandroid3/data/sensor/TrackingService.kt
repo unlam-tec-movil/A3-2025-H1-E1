@@ -130,9 +130,9 @@ class TrackingService : Service() {
         startTime = System.currentTimeMillis()
         pausedDuration = 0
 
-        // Resetear contadores
-        sensorManager.resetStepCount()
-        metricsCalculator.reset()
+        // Resetear TODO para nueva sesión (esto es CORRECTO al iniciar nueva sesión)
+        sensorManager.resetStepCount()  // Resetear pasos para nueva sesión
+        metricsCalculator.reset()        // Resetear métricas para nueva sesión
 
         startLocationTracking()
         startSensorTracking()
@@ -192,16 +192,18 @@ class TrackingService : Service() {
     private fun startLocationTracking() {
         locationJob =
             serviceScope.launch {
-                locationService.getLocationUpdates()
-                    .catch { e ->
-                        // Manejar errores de GPS
-                    }
-                    .collect { location ->
-                        _currentLocation.value = location
-                        metricsCalculator.addLocationPoint(location)
-                        // Actualizar métricas en repository después de cada ubicación
-                        trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
-                    }
+                try {
+                    locationService.getLocationUpdates()
+                        .catch { /* GPS Error */ }
+                        .collect { location ->
+                            _currentLocation.value = location
+                            metricsCalculator.addLocationPoint(location)
+                            // Actualizar métricas en repository después de cada ubicación
+                            trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
+                        }
+                } catch (e: Exception) {
+                    // Error in location tracking
+                }
             }
     }
 
@@ -210,21 +212,29 @@ class TrackingService : Service() {
             listOf(
                 // Tracking de pasos - solo a MetricsCalculator
                 serviceScope.launch {
-                    sensorManager.getStepUpdates()
-                        .collect { steps ->
-                            metricsCalculator.updateStepCount(steps)
-                            // Actualizar métricas en repository después de cada paso
-                            trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
-                        }
+                    try {
+                        sensorManager.getStepUpdates()
+                            .collect { steps ->
+                                metricsCalculator.updateStepCount(steps)
+                                // Actualizar métricas en repository después de cada paso
+                                trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
+                            }
+                    } catch (e: Exception) {
+                        // Error in step tracking
+                    }
                 },
                 // Tracking de altitud - solo a MetricsCalculator
                 serviceScope.launch {
-                    sensorManager.getAltitudeUpdates()
-                        .collect { altitude ->
-                            metricsCalculator.updateAltitude(altitude)
-                            // Actualizar métricas en repository después de cada altitud
-                            trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
-                        }
+                    try {
+                        sensorManager.getAltitudeUpdates()
+                            .collect { altitude ->
+                                metricsCalculator.updateAltitude(altitude)
+                                // Actualizar métricas en repository después de cada altitud
+                                trackingSessionRepository.updateMetrics(metricsCalculator.getCurrentMetrics())
+                            }
+                    } catch (e: Exception) {
+                        // Error in altitude tracking
+                    }
                 },
             )
     }

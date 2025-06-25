@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 /**
  * Entity Room - Tabla de sesiones de tracking completadas
- * Compatible con Clean Architecture y TRACKING_REQUIREMENTS.md
+ * Compatible con Clean Architecture
  */
 @Entity(tableName = "tracking_sessions")
 data class TrackingSessionEntity(

@@ -2,7 +2,6 @@ package ar.edu.unlam.scaffoldingandroid3.domain.model
 
 /**
  * Resultado final de tracking para guardar - Modelo de dominio
- * Compatible con TRACKING_REQUIREMENTS.md líneas 347-361
  */
 data class TrackingResult(
     val tiempoTotal: String, // Tiempo total con pausas

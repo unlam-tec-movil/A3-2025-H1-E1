@@ -1,17 +1,16 @@
 package ar.edu.unlam.scaffoldingandroid3.domain.usecase
 
-import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Caso de uso - Actualizar tracking con métricas en tiempo real
- * Gestiona pausar/reanudar y proporciona métricas actualizadas
- * Compatible con CU-011, CU-012, CU-013: pausar, reanudar, ver estadísticas
+ * Caso de uso - Operaciones de tracking con LÓGICA DE NEGOCIO
+ * Solo contiene pausar/reanudar que requieren validación de estado
+ * Compatible con CU-011, CU-012: pausar, reanudar
  *
- * Respeta Clean Architecture: Use Case → Repository → Service
+ * NOTA: Operaciones simples como getCurrentMetrics(), getTrackingStatus()
+ * se acceden directamente desde ViewModel → Repository (no pass-through)
  */
 class UpdateTrackingUseCase
     @Inject
@@ -52,46 +51,13 @@ class UpdateTrackingUseCase
             }
         }
 
-        /**
-         * Obtiene las métricas en tiempo real
-         * Compatible con CU-013: Ver estadísticas durante grabación
-         */
-        fun getCurrentMetrics(): Flow<TrackingMetrics> {
-            return trackingSessionRepository.getCurrentMetrics()
-        }
+        // ELIMINADOS: getCurrentMetrics(), getTrackingStatus(), getMovementTime(), etc.
+        // Son pass-through sin lógica de negocio
+        // ViewModel debe acceder directamente al Repository para estas operaciones
 
         /**
-         * Obtiene el estado actual del tracking
-         */
-        fun getTrackingStatus(): Flow<TrackingStatus> {
-            return trackingSessionRepository.getTrackingStatus()
-        }
-
-        /**
-         * Obtiene el tiempo EN MOVIMIENTO (sin pausas)
-         */
-        suspend fun getMovementTime(): Long {
-            return trackingSessionRepository.getElapsedTime() // Mantener compatibilidad
-        }
-        
-        /**
-         * Obtiene el tiempo TOTAL (con pausas)
-         */
-        suspend fun getTotalTime(): Long {
-            // Por ahora usar el mismo valor, será mejorado cuando TrackingSessionRepository se actualice
-            return trackingSessionRepository.getElapsedTime()
-        }
-        
-        /**
-         * DEPRECATED - Usar getMovementTime()
-         */
-        @Deprecated("Use getMovementTime()")
-        suspend fun getElapsedTime(): Long {
-            return trackingSessionRepository.getElapsedTime()
-        }
-
-        /**
-         * Verifica si se puede pausar el tracking
+         * Verifica si se puede pausar el tracking - LÓGICA DE NEGOCIO
+         * Validación de estado necesaria antes de pausar
          */
         suspend fun canPauseTracking(): Boolean {
             val session = trackingSessionRepository.getCurrentTrackingSession()
@@ -99,68 +65,15 @@ class UpdateTrackingUseCase
         }
 
         /**
-         * Verifica si se puede reanudar el tracking
+         * Verifica si se puede reanudar el tracking - LÓGICA DE NEGOCIO  
+         * Validación de estado necesaria antes de reanudar
          */
         suspend fun canResumeTracking(): Boolean {
             val session = trackingSessionRepository.getCurrentTrackingSession()
             return session?.status == TrackingStatus.PAUSED
         }
 
-        /**
-         * Obtiene estadísticas completas actuales
-         * Compatible con CU-013: estadísticas detalladas
-         */
-        suspend fun getDetailedStats(): Map<String, Any>? {
-            val session = trackingSessionRepository.getCurrentTrackingSession() ?: return null
-            
-            // Usar el tiempo desde currentDuration que se actualiza cada segundo
-            val currentTime = session.metrics.currentDuration
-            val movementTime = currentTime // Por ahora son iguales, pero separados conceptualmente
-            val totalTime = currentTime // Por ahora son iguales
-            
-            // Obtener datos adicionales de métricas del session (respeta Clean Architecture)
-            val metrics = session.metrics
-
-            return mapOf(
-                "routeName" to session.routeName,
-                "status" to session.status.name,
-                // Tiempos separados según especificación
-                "movementTime" to movementTime,
-                "movementTimeFormatted" to formatTime(movementTime),
-                "totalTime" to totalTime,
-                "totalTimeFormatted" to formatTime(totalTime),
-                // Para compatibilidad (mostrar tiempo de movimiento por defecto)
-                "elapsedTime" to movementTime,
-                "elapsedTimeFormatted" to formatTime(movementTime),
-                // Velocidades y distancias
-                "currentSpeed" to session.metrics.currentSpeed,
-                "averageSpeed" to session.metrics.averageSpeed, // Ahora calculado correctamente
-                "maxSpeed" to session.metrics.maxSpeed,
-                "distance" to session.metrics.currentDistance,
-                "distanceFormatted" to "%.2f km".format(session.metrics.currentDistance),
-                // Altitudes con min/max
-                "currentElevation" to session.metrics.currentElevation,
-                "elevationGain" to session.metrics.totalElevationGain,
-                "elevationLoss" to session.metrics.totalElevationLoss,
-                "minAltitude" to session.metrics.currentElevation, // Simplificado por ahora
-                "maxAltitude" to session.metrics.currentElevation, // Simplificado por ahora
-                "pointsCount" to session.routePoint.size,
-                "lastLocation" to (session.metrics.lastLocation ?: "No disponible"),
-                // Datos de sensores ya disponibles en metrics
-                "totalSteps" to 0, // Simplificado - se obtiene del UI state
-                "totalMovementTime" to movementTime,
-            )
-        }
-
-        /**
-         * Formatea tiempo en milisegundos a HH:MM:SS
-         */
-        private fun formatTime(milliseconds: Long): String {
-            val seconds = milliseconds / 1000
-            val hours = seconds / 3600
-            val minutes = (seconds % 3600) / 60
-            val secs = seconds % 60
-
-            return String.format("%02d:%02d:%02d", hours, minutes, secs)
-        }
+        // ELIMINADO: getDetailedStats() - es pass-through complejo
+        // ViewModel puede acceder directamente a Repository.getDetailedStats()
+        // o Repository.getCurrentTrackingSession() y procesar los datos directamente
     }

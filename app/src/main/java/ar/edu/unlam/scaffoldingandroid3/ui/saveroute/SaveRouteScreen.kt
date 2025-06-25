@@ -22,18 +22,17 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 
 /**
  * Pantalla para guardar el recorrido completado
- * Compatible con TRACKING_REQUIREMENTS.md líneas 207-265
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaveRouteScreen(
-    trackingResult: TrackingResult,
     onNavigateBack: () -> Unit,
     onSaveRoute: (String) -> Unit,
     onDiscardRoute: () -> Unit,
     viewModel: SaveRouteViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val trackingResult by viewModel.trackingResult.collectAsStateWithLifecycle()
     
     // Dialogs
     if (uiState.showDiscardDialog) {
@@ -72,28 +71,44 @@ fun SaveRouteScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Estadísticas del recorrido
-            StatsSection(trackingResult)
-            
-            // Campo nombre
-            NameInputSection(
-                routeName = uiState.routeName,
-                onNameChange = { viewModel.updateRouteName(it) },
-                isError = uiState.nameError != null,
-                errorMessage = uiState.nameError
-            )
-            
-            // Sección de fotos
-            PhotosSection(
-                photos = trackingResult.fotosCapturadas,
-                onAddPhoto = { /* TODO: Implementar agregar foto */ }
-            )
+            trackingResult?.let { result ->
+                StatsSection(result)
+                
+                // Campo nombre
+                NameInputSection(
+                    routeName = uiState.routeName,
+                    onNameChange = { viewModel.updateRouteName(it) },
+                    isError = uiState.nameError != null,
+                    errorMessage = uiState.nameError
+                )
+                
+                // Sección de fotos
+                PhotosSection(
+                    photos = result.fotosCapturadas,
+                    onAddPhoto = { /* TODO: Implementar agregar foto */ }
+                )
+            } ?: run {
+                // Mostrar estado de carga mientras se obtienen los datos
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
             
             // Botón guardar
             Button(
                 onClick = {
                     if (viewModel.validateAndSave()) {
                         viewModel.saveTrackingResult(
-                            trackingResult = trackingResult,
                             onSuccess = { onSaveRoute(uiState.routeName) },
                             onError = { /* TODO: Mostrar error en Snackbar */ }
                         )
