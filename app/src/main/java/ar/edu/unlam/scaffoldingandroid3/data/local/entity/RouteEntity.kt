@@ -16,4 +16,5 @@ data class RouteEntity(
     val points: List<Route.Point>,
     val distance: Double,
     val duration: Long,
+    val photoUri: String,
 )
