@@ -65,6 +65,7 @@ class RouteDaoTest {
                     points = points,
                     distance = 1000.0,
                     duration = 60000L,
+                    photoUri = "photo",
                 )
 
             // Act: Inserta y recupera la entidad
@@ -96,6 +97,7 @@ class RouteDaoTest {
                         ),
                     distance = 0.0,
                     duration = 0L,
+                    photoUri = "photo",
                 )
             routeDao.insert(entity)
             routeDao.deleteRoute("route2")
@@ -117,6 +119,7 @@ class RouteDaoTest {
                         ),
                     distance = 500.0,
                     duration = 1000L,
+                    photoUri = "photo",
                 )
             val entity2 =
                 RouteEntity(
@@ -129,6 +132,7 @@ class RouteDaoTest {
                         ),
                     distance = 1200.0,
                     duration = 3000L,
+                    photoUri = "photo",
                 )
             routeDao.insert(entity1)
             routeDao.insert(entity2)
