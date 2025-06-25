@@ -2,7 +2,7 @@ package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.scaffoldingandroid3.domain.usecase.GetRoutesUseCase
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +17,14 @@ import kotlinx.coroutines.launch
 class MyRoutesViewModel
     @Inject
     constructor(
-        private val getRoutesUseCase: GetRoutesUseCase,
+        private val routeRepository: RouteRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(MyRoutesUiState())
         val uiState: StateFlow<MyRoutesUiState> = _uiState.asStateFlow()
 
         init {
             viewModelScope.launch {
-                getRoutesUseCase().onStart { _uiState.update { it.copy(isLoading = true) } }
+                routeRepository.getAllRoutes().onStart { _uiState.update { it.copy(isLoading = true) } }
                     .catch { e ->
                         _uiState.update { it.copy(isLoading = false, error = e.message) }
                     }.collect { list ->

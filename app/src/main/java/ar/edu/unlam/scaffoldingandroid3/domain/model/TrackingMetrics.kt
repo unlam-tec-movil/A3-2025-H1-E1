@@ -13,6 +13,7 @@ package ar.edu.unlam.scaffoldingandroid3.domain.model
  * @property currentElevation Elevación actual en metros sobre el nivel del mar
  * @property totalElevationGain Ganancia total de elevación en metros
  * @property totalElevationLoss Pérdida total de elevación en metros
+ * @property totalSteps Número total de pasos detectados
  * @property lastLocation Última ubicación registrada
  */
 
@@ -26,5 +27,6 @@ data class TrackingMetrics(
     val currentElevation: Double = 0.0,
     val totalElevationGain: Double = 0.0,
     val totalElevationLoss: Double = 0.0,
+    val totalSteps: Int = 0,
     val lastLocation: LocationPoint? = null,
 )
