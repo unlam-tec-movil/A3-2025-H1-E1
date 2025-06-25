@@ -29,7 +29,7 @@ object DatabaseModule {
         @ApplicationContext appContext: Context,
     ): AppDatabase =
         Room.databaseBuilder(appContext, AppDatabase::class.java, "routes.db")
-            .fallbackToDestructiveMigration() // Para desarrollo - elimina datos existentes
+            .fallbackToDestructiveMigration(true)
             .build()
 
     @Provides
