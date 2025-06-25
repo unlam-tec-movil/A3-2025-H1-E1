@@ -28,9 +28,10 @@ fun MyRoutesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         if (uiState.isLoading) {

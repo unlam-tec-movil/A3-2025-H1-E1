@@ -65,9 +65,11 @@ fun NavGraph(
 
             if (route != null) {
                 RouteDetailScreen(
-                    route = route, onStartClick = {
+                    route = route,
+                    onStartClick = {
                         navController.navigate(Screen.Tracking.route)
-                    })
+                    },
+                )
             } else {
                 // 2) Fallback: si no llega nada, volvemos atrás
                 LaunchedEffect(Unit) {

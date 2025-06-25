@@ -25,7 +25,7 @@ data class Route(
     val distance: Double,
     val duration: Long,
     val photoUri: String = "",
-): Parcelable {
+) : Parcelable {
     /**
      * Representa un punto específico en la ruta.
      *
