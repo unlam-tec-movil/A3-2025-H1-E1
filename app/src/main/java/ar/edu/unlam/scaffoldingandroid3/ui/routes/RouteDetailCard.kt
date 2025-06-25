@@ -64,23 +64,26 @@ fun RouteDetailCard(
 //    }
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
         ) {
             // Mapa de la ruta
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.LightGray),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.LightGray),
             ) {
 //                AsyncImage(
 //                    model = MapUtils.generateStaticMapUrl(
@@ -124,9 +127,10 @@ fun RouteDetailCard(
             Spacer(modifier = Modifier.height(8.dp))
             // Carrusel de fotos
             if (photos.isNotEmpty()) {
-                val pagerState = rememberPagerState(
-                    pageCount = { photos.size },
-                )
+                val pagerState =
+                    rememberPagerState(
+                        pageCount = { photos.size },
+                    )
                 Text(
                     text = "Fotos de la ruta",
                     style = MaterialTheme.typography.titleMedium,
@@ -135,17 +139,19 @@ fun RouteDetailCard(
                 Spacer(modifier = Modifier.height(8.dp))
                 HorizontalPager(
                     state = pagerState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
                 ) { page ->
                     AsyncImage(
                         model = photos[page].uri,
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp)
-                            .clip(RoundedCornerShape(8.dp)),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                                .clip(RoundedCornerShape(8.dp)),
                         contentScale = ContentScale.Crop,
                     )
                 }
@@ -154,14 +160,16 @@ fun RouteDetailCard(
             // Botón "Iniciar"
             Button(
                 onClick = onStartClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
@@ -182,54 +190,61 @@ fun RouteDetailCard(
 @Preview(showBackground = true)
 @Composable
 fun RouteDetailCardPreview() {
-    val sampleRoute = Route(
-        id = "1",
-        name = "Ruta por el Parque",
-        points = listOf(
-            Route.Point(
-                latitude = -34.6037,
-                longitude = -58.3816,
+    val sampleRoute =
+        Route(
+            id = "1",
+            name = "Ruta por el Parque",
+            points =
+                listOf(
+                    Route.Point(
+                        latitude = -34.6037,
+                        longitude = -58.3816,
+                        timestamp = System.currentTimeMillis(),
+                    ),
+                    Route.Point(
+                        latitude = -34.6038,
+                        longitude = -58.3817,
+                        timestamp = System.currentTimeMillis() + 1000,
+                    ),
+                ),
+            // 5.2 km
+            distance = 5200.0,
+            // 30 minutos
+            duration = 1800000,
+        )
+    val samplePhotos =
+        listOf(
+            Photo(
+                id = 1,
+                uri = "https://picsum.photos/200/300",
                 timestamp = System.currentTimeMillis(),
+                location =
+                    LocationPoint(
+                        accuracy = 5f,
+                        speed = 0f,
+                        altitude = 100.0,
+                        latitude = -34.6037,
+                        longitude = -58.3816,
+                        timestamp = System.currentTimeMillis(),
+                    ),
+                description = "Inicio de la ruta",
             ),
-            Route.Point(
-                latitude = -34.6038,
-                longitude = -58.3817,
-                timestamp = System.currentTimeMillis() + 1000,
-            ),
-        ),
-        distance = 5200.0, // 5.2 km
-        duration = 1800000, // 30 minutos
-    )
-    val samplePhotos = listOf(
-        Photo(
-            id = 1,
-            uri = "https://picsum.photos/200/300",
-            timestamp = System.currentTimeMillis(),
-            location = LocationPoint(
-                accuracy = 5f,
-                speed = 0f,
-                altitude = 100.0,
-                latitude = -34.6037,
-                longitude = -58.3816,
+            Photo(
+                id = 2,
+                uri = "https://picsum.photos/200/301",
                 timestamp = System.currentTimeMillis(),
+                location =
+                    LocationPoint(
+                        accuracy = 5f,
+                        speed = 0f,
+                        altitude = 100.0,
+                        latitude = -34.6038,
+                        longitude = -58.3817,
+                        timestamp = System.currentTimeMillis(),
+                    ),
+                description = "Punto intermedio",
             ),
-            description = "Inicio de la ruta",
-        ),
-        Photo(
-            id = 2,
-            uri = "https://picsum.photos/200/301",
-            timestamp = System.currentTimeMillis(),
-            location = LocationPoint(
-                accuracy = 5f,
-                speed = 0f,
-                altitude = 100.0,
-                latitude = -34.6038,
-                longitude = -58.3817,
-                timestamp = System.currentTimeMillis(),
-            ),
-            description = "Punto intermedio",
-        ),
-    )
+        )
     ScaffoldingAndroid3Theme {
         Surface(
             modifier = Modifier.fillMaxWidth(),

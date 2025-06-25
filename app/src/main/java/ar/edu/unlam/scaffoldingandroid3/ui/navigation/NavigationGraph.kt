@@ -57,16 +57,18 @@ fun NavGraph(
         }
         composable(
             route = Screen.RouteDetail.route,
-            arguments = listOf(
-                navArgument("routeId") {
-                    type = NavType.StringType
-                    nullable = false
-                },
-            ),
+            arguments =
+                listOf(
+                    navArgument("routeId") {
+                        type = NavType.StringType
+                        nullable = false
+                    },
+                ),
         ) { backStackEntry ->
             // Extrae el valor de "routeId" desde los argumentos
-            val routeId = backStackEntry.arguments?.getString("routeId")
-                ?: error("routeId es nulo")
+            val routeId =
+                backStackEntry.arguments?.getString("routeId")
+                    ?: error("routeId es nulo")
             RouteDetailScreen(
                 routeId = routeId,
                 onStartClick = {
