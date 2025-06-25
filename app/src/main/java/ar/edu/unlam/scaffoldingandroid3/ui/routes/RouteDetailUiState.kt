@@ -1,6 +1,5 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
-import ar.edu.unlam.scaffoldingandroid3.domain.model.Photo
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
 /**
@@ -15,6 +14,6 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 data class RouteDetailUiState(
     val isLoading: Boolean = false,
     val route: Route? = null,
-    val photos: List<Photo> = emptyList(),
+//    val photos: List<Photo> = emptyList(),
     val error: String? = null,
 )

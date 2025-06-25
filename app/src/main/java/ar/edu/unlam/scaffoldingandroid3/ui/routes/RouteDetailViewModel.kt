@@ -3,7 +3,6 @@ package ar.edu.unlam.scaffoldingandroid3.ui.routes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.scaffoldingandroid3.domain.model.Photo
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,56 +18,53 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RouteDetailViewModel
-    @Inject
-    constructor(
-        private val routeRepository: RouteRepository,
-        savedStateHandle: SavedStateHandle,
-    ) : ViewModel() {
-        private val routeId: String = checkNotNull(savedStateHandle["routeId"])
-        private val _uiState = MutableStateFlow(RouteDetailUiState())
-        val uiState: StateFlow<RouteDetailUiState> = _uiState
+@Inject constructor(
+    private val routeRepository: RouteRepository,
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+    private val routeId: String = checkNotNull(savedStateHandle["routeId"])
+    private val _uiState = MutableStateFlow(RouteDetailUiState())
+    val uiState: StateFlow<RouteDetailUiState> = _uiState
 
-        init {
-            loadRouteDetails()
-        }
+    init {
+        loadRouteDetails()
+    }
 
-        private fun loadRouteDetails() {
-            viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = true, error = null) }
-                try {
-                    val route = routeRepository.getRoute(routeId)
-                    if (route != null) {
-                        // TODO: Implement getPhotosByRoute in PhotoRepository
-                        // val photos = photoRepository.getPhotosByRoute(routeId)
-                        val photos = emptyList<Photo>() // Temporary until PhotoRepository is implemented
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                route = route,
-                                photos = photos,
-                                error = null,
-                            )
-                        }
-                    } else {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                error = "Ruta no encontrada",
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
+    private fun loadRouteDetails() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                val route = routeRepository.getRoute(routeId)
+                if (route != null) {
+                    // TODO: Implement getPhotosByRoute in PhotoRepository
+                    // val photos = photoRepository.getPhotosByRoute(routeId)
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = e.message ?: "Error al cargar la ruta",
+                            route = route,
+                            error = null,
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Ruta no encontrada",
                         )
                     }
                 }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message ?: "Error al cargar la ruta",
+                    )
+                }
             }
         }
-
-        fun retryLoading() {
-            loadRouteDetails()
-        }
     }
+
+    fun clearError() {
+        _uiState.update { it.copy(error = null) }
+    }
+}

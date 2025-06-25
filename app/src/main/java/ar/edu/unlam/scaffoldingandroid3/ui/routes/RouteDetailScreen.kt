@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
-import ar.edu.unlam.scaffoldingandroid3.domain.model.Photo
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
@@ -55,13 +53,12 @@ fun RouteDetailScreen(
                 uiState.error != null -> {
                     ErrorDialog(
                         errorMessage = uiState.error!!,
-                        onDismiss = viewModel::retryLoading,
+                        onDismiss = { viewModel.clearError() },
                     )
                 }
                 uiState.route != null -> {
                     RouteDetailCard(
                         route = uiState.route!!,
-                        photos = uiState.photos,
                         onStartClick = onStartClick,
                     )
                 }
@@ -95,24 +92,24 @@ fun RouteDetailScreenPreview() {
             // 30 minutos
             duration = 1800000,
         )
-    val samplePhotos =
-        listOf(
-            Photo(
-                id = 1,
-                uri = "https://picsum.photos/200/300",
-                timestamp = System.currentTimeMillis(),
-                location =
-                    LocationPoint(
-                        accuracy = 5f,
-                        speed = 0f,
-                        altitude = 100.0,
-                        latitude = -34.6037,
-                        longitude = -58.3816,
-                        timestamp = System.currentTimeMillis(),
-                    ),
-                description = "Inicio de la ruta",
-            ),
-        )
+//    val samplePhotos =
+//        listOf(
+//            Photo(
+//                id = 1,
+//                uri = "https://picsum.photos/200/300",
+//                timestamp = System.currentTimeMillis(),
+//                location =
+//                    LocationPoint(
+//                        accuracy = 5f,
+//                        speed = 0f,
+//                        altitude = 100.0,
+//                        latitude = -34.6037,
+//                        longitude = -58.3816,
+//                        timestamp = System.currentTimeMillis(),
+//                    ),
+//                description = "Inicio de la ruta",
+//            ),
+//        )
 
     ScaffoldingAndroid3Theme {
         Surface(
@@ -121,7 +118,7 @@ fun RouteDetailScreenPreview() {
         ) {
             RouteDetailCard(
                 route = sampleRoute,
-                photos = samplePhotos,
+//                photos = samplePhotos,
                 onStartClick = {},
             )
         }
