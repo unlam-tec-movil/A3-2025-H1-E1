@@ -1,7 +1,10 @@
 package ar.edu.unlam.scaffoldingandroid3.data.repository
 
 import android.content.Context
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.LocationPointDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
+import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.LocationPointEntityMapper.toDomainList
+import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.LocationPointEntityMapper.toEntityList
 import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.TrackingSessionEntityMapper.toEntity
 import ar.edu.unlam.scaffoldingandroid3.data.sensor.MetricsCalculator
 import ar.edu.unlam.scaffoldingandroid3.data.sensor.TrackingService
@@ -35,6 +38,7 @@ class TrackingSessionRepositoryImpl
         @ApplicationContext private val context: Context,
         private val metricsCalculator: MetricsCalculator,
         private val trackingDao: TrackingDao,
+        private val locationPointDao: LocationPointDao,
     ) : TrackingSessionRepository {
         private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         private var timerJob: Job? = null
@@ -152,7 +156,8 @@ class TrackingSessionRepositoryImpl
                     routePoint = metricsCalculator.getAllRoutePoints(),
                 )
 
-            currentSession.value = null
+            // Mantener sesión completada disponible para SaveRoute
+            currentSession.value = finalSession
             trackingStatus.value = TrackingStatus.COMPLETED
 
             // Detener el servicio
@@ -196,6 +201,12 @@ class TrackingSessionRepositoryImpl
 
                 // Guardar sesión en BD y obtener ID
                 val sessionId = trackingDao.insertTrackingSession(sessionEntity)
+
+                // Guardar puntos GPS de la ruta (usando mapper)
+                if (session.routePoint.isNotEmpty()) {
+                    val locationPointEntities = session.routePoint.toEntityList(sessionId)
+                    locationPointDao.insertLocationPoints(locationPointEntities)
+                }
 
                 // TODO: Guardar fotos asociadas si las hay
                 // Las fotos se guardarían aquí usando sessionId
@@ -291,6 +302,25 @@ class TrackingSessionRepositoryImpl
          */
         override suspend fun getCurrentRoutePoints(): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint> {
             return metricsCalculator.getCurrentRoutePoints()
+        }
+
+        /**
+         * Limpia la sesión completada después de guardar
+         */
+        override suspend fun clearCompletedSession() {
+            currentSession.value = null
+        }
+
+        /**
+         * Obtiene los puntos GPS de una sesión guardada
+         */
+        override suspend fun getLocationPointsBySession(sessionId: Long): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint> {
+            return try {
+                val locationPointEntities = locationPointDao.getLocationPointsBySession(sessionId)
+                locationPointEntities.toDomainList()
+            } catch (e: Exception) {
+                emptyList()
+            }
         }
 
         /**

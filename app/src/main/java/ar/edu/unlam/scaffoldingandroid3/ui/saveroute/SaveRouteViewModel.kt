@@ -53,16 +53,12 @@ class SaveRouteViewModel
         }
 
         private fun createTrackingResultFromSession(session: TrackingSession): TrackingResult {
-            val totalDuration = session.endTime - session.startTime
-            val tiempoTotal = formatTime(totalDuration)
-            val tiempoEnMovimiento = formatTime(session.metrics.currentDuration)
+            val duracion = formatTime(session.metrics.currentDuration)
 
             return TrackingResult(
-                tiempoTotal = tiempoTotal,
-                tiempoEnMovimiento = tiempoEnMovimiento,
+                duracion = duracion,
                 distanciaTotal = session.metrics.currentDistance,
-                // Simplificado por ahora
-                pasosTotales = 0,
+                pasosTotales = session.metrics.totalSteps,
                 velocidadMedia = session.metrics.averageSpeed,
                 velocidadMaxima = session.metrics.maxSpeed,
                 altitudMinima = session.metrics.currentElevation,
@@ -129,6 +125,15 @@ class SaveRouteViewModel
         }
 
         /**
+         * Descarta el recorrido y limpia la sesión
+         */
+        fun discardRoute() {
+            viewModelScope.launch {
+                trackingSessionRepository.clearCompletedSession()
+            }
+        }
+
+        /**
          * Guarda el resultado de tracking en base de datos
          */
         fun saveTrackingResult(
@@ -151,6 +156,8 @@ class SaveRouteViewModel
 
                 saveTrackingResultUseCase.execute(updatedResult)
                     .onSuccess { sessionId ->
+                        // Limpiar sesión completada después de guardar
+                        trackingSessionRepository.clearCompletedSession()
                         _uiState.value = _uiState.value.copy(isLoading = false)
                         onSuccess()
                     }

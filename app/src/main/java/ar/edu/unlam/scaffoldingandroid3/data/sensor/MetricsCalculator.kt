@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Calculadora SIMPLIFICADA de métricas en tiempo real
+ * Calculadora de métricas en tiempo real
  */
 @Singleton
 class MetricsCalculator
@@ -78,11 +78,11 @@ class MetricsCalculator
                 val distance = results[0] / 1000.0 // convertir a km
                 val timeDiff = (currentTime - lastLocationTime) / 1000.0 // segundos
 
-                // FILTRADO OPTIMIZADO para tracking suave + mejor dibujado de ruta
-                val accuracyThreshold = 20.0f // Relajado: 20m para mejor cobertura
-                val speedThreshold = 100.0 // Filtrar saltos GPS > 100 km/h
-                val minDistance = 0.005 // Reducido: 5m para mejor detalle de ruta
-                val maxTimeDiff = 10.0 // Reducido: 10 segundos para actualizaciones más frecuentes
+                // Filtrado para distancia más precisa
+                val accuracyThreshold = 15.0f // 15m - Solo GPS preciso (evita inflación)
+                val speedThreshold = 50.0 // Filtrar saltos GPS > 50 km/h (más realista para caminata)
+                val minDistance = 0.005 // 5m - Balance entre precisión y funcionalidad
+                val maxTimeDiff = 5.0 // 5s - Mantiene responsividad sin ser excesivo
 
                 val instantSpeed = if (timeDiff > 0) (distance / timeDiff) * 3600.0 else 0.0
                 val hasGoodAccuracy = location.accuracy <= accuracyThreshold
@@ -90,7 +90,7 @@ class MetricsCalculator
                 val hasSignificantMovement = distance >= minDistance
                 val hasTimedOut = timeDiff >= maxTimeDiff
 
-                // Lógica mejorada: aceptar puntos buenos aunque tengan poca distancia
+                // Aceptar puntos buenos aunque tengan poca distancia
                 val shouldAddPoint = hasGoodAccuracy && isReasonableSpeed && (hasSignificantMovement || hasTimedOut)
 
                 if (shouldAddPoint) {
@@ -250,7 +250,7 @@ class MetricsCalculator
                 // Acumular tiempo pausado
                 pausedDuration += System.currentTimeMillis() - pauseStartTime
                 // Al reanudar, la primera ubicación será un nuevo inicio
-                // Esto crea el gap visual correcto según especificaciones
+                // Esto crea el gap visual correcto
             }
         }
 

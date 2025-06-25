@@ -42,13 +42,11 @@ class StopTrackingUseCase
                     trackingSessionRepository.stopTrackingSession()
                         ?: return Result.failure(Exception("Error al finalizar sesión"))
 
-                // 5. Validar que la sesión tiene datos válidos
-                if (finalSession.routePoint.isEmpty()) {
-                    return Result.failure(Exception("La sesión no contiene puntos GPS válidos"))
-                }
+                // 5. Permitir guardado incluso sin puntos GPS (útil para simuladores y testing)
+                // El usuario puede decidir si vale la pena guardarlo en SaveRoute
 
-                // 6. Guardar sesión en base de datos (cuando esté implementada)
-                // val sessionId = trackingSessionRepository.saveTrackingSession(finalSession)
+                // 6. Sesión finalizada - se guardará solo si usuario confirma en SaveRoute
+                // NO guardar automáticamente aquí para evitar duplicados
 
                 Result.success(finalSession)
             } catch (e: Exception) {

@@ -70,7 +70,10 @@ fun NavGraph(
         composable(Screen.SaveRoute.route) {
             SaveRouteScreen(
                 onNavigateBack = {
-                    navController.popBackStack()
+                    // Limpiar datos temporales y volver al mapa
+                    navController.navigate(Screen.Map.route) {
+                        popUpTo(Screen.Map.route) { inclusive = false }
+                    }
                 },
                 onSaveRoute = { routeName ->
                     // Volver al mapa principal después de guardar

@@ -1,12 +1,34 @@
 package ar.edu.unlam.scaffoldingandroid3.data.local.entity
 
-/**
- * TODO: Entity Room - Tabla de puntos GPS durante tracking
- * @Entity, @PrimaryKey, @ForeignKey a TrackingSessionEntity
- * Propiedades: id, sessionId, latitude, longitude, timestamp, accuracy, speed, altitude
- */
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
+/**
+ * Entity Room - Puntos GPS de tracking
+ * Almacena la ruta completa asociada a una sesión de tracking
+ */
+@Entity(
+    tableName = "location_points",
+    foreignKeys = [
+        ForeignKey(
+            entity = TrackingSessionEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["sessionId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["sessionId"])]
+)
 data class LocationPointEntity(
-    val latitude: Double = 0.0,
-    val longitude: Double = 0.0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val sessionId: Long,
+    val latitude: Double,
+    val longitude: Double,
+    val altitude: Double?,
+    val accuracy: Float?,
+    val speed: Float?,
+    val timestamp: Long
 )

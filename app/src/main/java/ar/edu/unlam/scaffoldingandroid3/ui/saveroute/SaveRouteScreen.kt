@@ -31,14 +31,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.ConfettiAnimation
 
 /**
  * Pantalla para guardar el recorrido completado
@@ -54,11 +66,18 @@ fun SaveRouteScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val trackingResult by viewModel.trackingResult.collectAsStateWithLifecycle()
 
+    // Manejar botón back del sistema Android
+    BackHandler {
+        viewModel.discardRoute()
+        onNavigateBack()
+    }
+
     // Dialogs
     if (uiState.showDiscardDialog) {
         DiscardRouteDialog(
             onConfirm = {
                 viewModel.hideDiscardDialog()
+                viewModel.discardRoute()
                 onDiscardRoute()
             },
             onDismiss = { viewModel.hideDiscardDialog() },
@@ -68,9 +87,12 @@ fun SaveRouteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Guardar recorrido") },
+                title = { }, // Sin título
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = {
+                        viewModel.discardRoute()
+                        onNavigateBack()
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
@@ -82,34 +104,34 @@ fun SaveRouteScreen(
             )
         },
     ) { paddingValues ->
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            // Estadísticas del recorrido
-            trackingResult?.let { result ->
-                StatsSection(result)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                // Estadísticas del recorrido con animación
+                trackingResult?.let { result ->
+                    AnimatedStatsSection(result)
 
-                // Campo nombre
-                NameInputSection(
-                    routeName = uiState.routeName,
-                    onNameChange = { viewModel.updateRouteName(it) },
-                    isError = uiState.nameError != null,
-                    errorMessage = uiState.nameError,
-                )
+                    // Campo nombre con animación
+                    AnimatedNameInputSection(
+                        routeName = uiState.routeName,
+                        onNameChange = { viewModel.updateRouteName(it) },
+                        isError = uiState.nameError != null,
+                        errorMessage = uiState.nameError,
+                    )
 
-                // Sección de fotos
-                PhotosSection(
-                    photos = result.fotosCapturadas,
-                    onAddPhoto = { /* TODO: Implementar agregar foto */ },
-                )
-            } ?: run {
-                // Mostrar estado de carga mientras se obtienen los datos
+                    // Sección de fotos con animación
+                    AnimatedPhotosSection(
+                        photos = result.fotosCapturadas,
+                        onAddPhoto = { /* TODO: Implementar agregar foto */ },
+                    )
+                } ?: run {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -125,29 +147,40 @@ fun SaveRouteScreen(
                     }
                 }
             }
-
-            // Botón guardar
-            Button(
-                onClick = {
-                    if (viewModel.validateAndSave()) {
-                        viewModel.saveTrackingResult(
-                            onSuccess = { onSaveRoute(uiState.routeName) },
-                            onError = { /* TODO: Mostrar error en Snackbar */ },
-                        )
+                
+                // Botón hacia abajo
+                Box(modifier = Modifier.weight(1f))
+                
+                // Botón guardar
+                Button(
+                    onClick = {
+                        if (viewModel.validateAndSave()) {
+                            viewModel.saveTrackingResult(
+                                onSuccess = { onSaveRoute(uiState.routeName) },
+                                onError = { /* TODO: Mostrar error en Snackbar */ },
+                            )
+                        }
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                    enabled = !uiState.isLoading,
+                ) {
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                    } else {
+                        Text("Guardar recorrido", style = MaterialTheme.typography.titleMedium)
                     }
-                },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                enabled = !uiState.isLoading,
-            ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                } else {
-                    Text("Guardar recorrido", style = MaterialTheme.typography.titleMedium)
                 }
             }
+            
+            // Confetti de celebración - pasa por encima de todo el contenido
+            ConfettiAnimation(
+                modifier = Modifier.fillMaxSize(),
+                particleCount = 80,
+                duration = 4000     // Duración
+            )
         }
     }
 }
@@ -168,10 +201,9 @@ private fun StatsSection(trackingResult: TrackingResult) {
                 fontWeight = FontWeight.Bold,
             )
 
-            StatRow("Tiempo de grabación:", trackingResult.tiempoTotal)
-            StatRow("Tiempo en movimiento:", trackingResult.tiempoEnMovimiento)
+            StatRow("Duración:", trackingResult.duracion)
             StatRow("Pasos:", "${trackingResult.pasosTotales}")
-            StatRow("Distancia recorrida:", "%.2f km".format(trackingResult.distanciaTotal))
+            StatRow("Distancia recorrida:", formatDistance(trackingResult.distanciaTotal))
             StatRow("Velocidad Media:", "%.1f km/h".format(trackingResult.velocidadMedia))
             StatRow("Velocidad Máxima:", "%.1f km/h".format(trackingResult.velocidadMaxima))
             StatRow("Altitud mínima:", "%.0f m".format(trackingResult.altitudMinima))
@@ -202,7 +234,6 @@ private fun StatRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NameInputSection(
     routeName: String,
@@ -280,7 +311,7 @@ private fun PhotosSection(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(photos) { photo ->
-                        PhotoThumbnail(photo)
+                        PhotoThumbnail()
                     }
                 }
             } else {
@@ -295,7 +326,7 @@ private fun PhotosSection(
 }
 
 @Composable
-private fun PhotoThumbnail(photo: ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto) {
+private fun PhotoThumbnail() {
     Card(
         modifier = Modifier.size(80.dp),
         shape = RoundedCornerShape(8.dp),
@@ -333,4 +364,137 @@ private fun DiscardRouteDialog(
             }
         },
     )
+}
+
+/**
+ * Sección de estadísticas con animación mejorada
+ */
+@Composable
+private fun AnimatedStatsSection(trackingResult: TrackingResult) {
+    val visible = remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(800)
+        visible.value = true
+    }
+    
+    AnimatedVisibility(
+        visible = visible.value,
+        enter = slideInHorizontally(
+            initialOffsetX = { -it },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        ) + scaleIn(
+            initialScale = 0.7f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        ) + fadeIn(
+            animationSpec = tween(800)
+        )
+    ) {
+        StatsSection(trackingResult)
+    }
+}
+
+/**
+ * Sección de nombre con animación mejorada
+ */
+@Composable
+private fun AnimatedNameInputSection(
+    routeName: String,
+    onNameChange: (String) -> Unit,
+    isError: Boolean,
+    errorMessage: String?,
+) {
+    val visible = remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(1400) // Delay más escalonado
+        visible.value = true
+    }
+    
+    AnimatedVisibility(
+        visible = visible.value,
+        enter = slideInHorizontally(
+            initialOffsetX = { -it },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        ) + scaleIn(
+            initialScale = 0.6f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        ) + fadeIn(
+            animationSpec = tween(900)
+        )
+    ) {
+        NameInputSection(
+            routeName = routeName,
+            onNameChange = onNameChange,
+            isError = isError,
+            errorMessage = errorMessage,
+        )
+    }
+}
+
+/**
+ * Sección de fotos con animación espectacular
+ */
+@Composable
+private fun AnimatedPhotosSection(
+    photos: List<ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto>,
+    onAddPhoto: () -> Unit,
+) {
+    val visible = remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(2100) // Delay más largo
+        visible.value = true
+    }
+    
+    AnimatedVisibility(
+        visible = visible.value,
+        enter = slideInHorizontally(
+            initialOffsetX = { -it },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessVeryLow
+            )
+        ) + scaleIn(
+            initialScale = 0.5f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessVeryLow
+            )
+        ) + fadeIn(
+            animationSpec = tween(1000)
+        )
+    ) {
+        PhotosSection(
+            photos = photos,
+            onAddPhoto = onAddPhoto,
+        )
+    }
+}
+
+/**
+ * Formatea distancia dinámicamente: metros si < 1km, kilómetros si >= 1km
+ * Misma lógica que TrackingScreen para consistencia de UI
+ */
+private fun formatDistance(distanceKm: Double): String {
+    return if (distanceKm < 1.0) {
+        // Mostrar en metros para distancias pequeñas
+        val meters = (distanceKm * 1000).toInt()
+        "$meters m"
+    } else {
+        // Mostrar en kilómetros para distancias grandes
+        "%.2f km".format(distanceKm)
+    }
 }

@@ -2,6 +2,16 @@ package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +28,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
@@ -44,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -90,7 +100,6 @@ fun TrackingScreen(
         }
     }
 
-    // Manejo de errores
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
             snackbarHostState.showSnackbar(error)
@@ -110,9 +119,7 @@ fun TrackingScreen(
         )
     }
 
-    // Sin Scaffold ni AppBar - diseño completamente minimalista
     Box(modifier = Modifier.fillMaxSize()) {
-        // Pantalla única con mapa y botones dinámicos
         TrackingMapScreen(
             metrics = metrics,
             detailedStats = detailedStats,
@@ -131,7 +138,6 @@ fun TrackingScreen(
             onCapturePhoto = viewModel::capturePhoto,
         )
 
-        // Loading overlay
         if (uiState.isLoading) {
             Box(
                 modifier =
@@ -166,9 +172,9 @@ fun TrackingMapScreen(
             modifier = Modifier.fillMaxSize(),
             routePoints = uiState.routePoints,
             currentLocation = uiState.currentLocation,
+            showZoomControls = false,
         )
 
-        // Botón de navegación flotante minimalista (siempre visible)
         FloatingNavigationButton(
             onNavigationBack = onNavigationBack,
             modifier =
@@ -176,8 +182,7 @@ fun TrackingMapScreen(
                     .align(Alignment.TopStart)
                     .padding(16.dp),
         )
-
-        // Botón de cámara debajo de la flecha de navegación (solo durante grabación)
+        // Botón de cámara
         if (uiState.screenState == TrackingScreenState.RECORDING ||
             uiState.screenState == TrackingScreenState.EXPANDED_STATS
         ) {
@@ -185,7 +190,7 @@ fun TrackingMapScreen(
                 modifier =
                     Modifier
                         .align(Alignment.TopStart)
-                        .padding(start = 16.dp, top = 72.dp) // Debajo del botón de navegación
+                        .padding(start = 16.dp, top = 72.dp)
                         .background(
                             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
                             shape = RoundedCornerShape(20.dp),
@@ -218,8 +223,8 @@ fun TrackingMapScreen(
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter),
-            color = Color.White,
-            shadowElevation = 8.dp,
+            color = Color.Transparent,
+            shadowElevation = 0.dp,
         ) {
             when (uiState.screenState) {
                 TrackingScreenState.PREPARATION -> {
@@ -237,7 +242,6 @@ fun TrackingMapScreen(
                         ) {
                             Button(
                                 onClick = onStartClick,
-                                // Tu lógica aquí ya es correcta
                                 enabled = !uiState.isLoading && isPermissionGranted,
                                 modifier =
                                     Modifier
@@ -265,7 +269,6 @@ fun TrackingMapScreen(
                                         "La app funcionará, pero los pasos no se medirán.",
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 style = MaterialTheme.typography.bodySmall,
-                                // Un color sutil
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
                             )
@@ -273,19 +276,8 @@ fun TrackingMapScreen(
                     }
                 }
 
-                TrackingScreenState.RECORDING -> {
-                    TrackingPanel(
-                        metrics = metrics,
-                        uiState = uiState,
-                        onPauseClick = onPauseClick,
-                        onResumeClick = onResumeClick,
-                        onStopClick = onStopClick,
-                        onExpandClick = onExpandStats,
-                        isExpanded = false,
-                    )
-                }
-
-                TrackingScreenState.EXPANDED_STATS -> {
+                TrackingScreenState.RECORDING, TrackingScreenState.EXPANDED_STATS -> {
+                    // UN SOLO PANEL que se mantiene durante ambos estados
                     TrackingPanel(
                         metrics = metrics,
                         uiState = uiState,
@@ -294,10 +286,21 @@ fun TrackingMapScreen(
                         onResumeClick = onResumeClick,
                         onStopClick = onStopClick,
                         onExpandClick = onExpandStats,
-                        isExpanded = true,
+                        isExpanded = uiState.screenState == TrackingScreenState.EXPANDED_STATS,
                     )
                 }
             }
+        }
+        
+        // Botón flechita solo visible cuando hay panel de estadísticas
+        if (uiState.screenState != TrackingScreenState.PREPARATION) {
+            FixedArrowButton(
+                isExpanded = uiState.screenState == TrackingScreenState.EXPANDED_STATS,
+                onClick = onExpandStats,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 24.dp, bottom = 120.dp)
+            )
         }
     }
 }
@@ -307,6 +310,7 @@ fun ActiveTrackingMap(
     modifier: Modifier = Modifier,
     routePoints: List<com.google.android.gms.maps.model.LatLng> = emptyList(),
     currentLocation: com.google.android.gms.maps.model.LatLng? = null,
+    showZoomControls: Boolean = true,
 ) {
     val context = LocalContext.current
     var hasLocationPermission by remember {
@@ -372,12 +376,15 @@ fun ActiveTrackingMap(
             com.google.maps.android.compose.MapProperties(
                 isMyLocationEnabled = hasLocationPermission,
             ),
+        uiSettings = com.google.maps.android.compose.MapUiSettings(
+            zoomControlsEnabled = showZoomControls,
+        ),
     ) {
         // Dibujar polyline de la ruta en tiempo real
         if (routePoints.size >= 2) {
             com.google.maps.android.compose.Polyline(
                 points = routePoints,
-                color = androidx.compose.ui.graphics.Color(0xFF2196F3),
+                color = Color(0xFF2196F3),
                 width = 8f,
             )
         }
@@ -392,28 +399,6 @@ fun ActiveTrackingMap(
     }
 }
 
-@Composable
-fun ExpandedStatsScreen(
-    metrics: ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics,
-    detailedStats: Map<String, Any>,
-    uiState: TrackingUiState,
-    onCollapseStats: () -> Unit,
-    onStopClick: () -> Unit,
-) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Panel expandido de estadísticas
-        TrackingPanel(
-            metrics = metrics,
-            uiState = uiState,
-            detailedStats = detailedStats,
-            onPauseClick = {},
-            onResumeClick = {},
-            onStopClick = onStopClick,
-            onExpandClick = onCollapseStats,
-            isExpanded = true,
-        )
-    }
-}
 
 @Composable
 fun TrackingPanel(
@@ -426,6 +411,50 @@ fun TrackingPanel(
     onExpandClick: () -> Unit,
     isExpanded: Boolean,
 ) {
+    // Control de aparición inicial del panel (solo una vez)
+    var hasAppeared by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(100)
+        hasAppeared = true
+    }
+    
+    // Animación de aparición inicial del panel COMPLETO (solo cuando aparece por primera vez)
+    AnimatedVisibility(
+        visible = hasAppeared,
+        enter = slideInVertically(
+            initialOffsetY = { it }, // Desde abajo
+            animationSpec = tween(
+                durationMillis = 500,
+                easing = FastOutSlowInEasing
+            )
+        ) + fadeIn(animationSpec = tween(500))
+    ) {
+        TrackingPanelContent(
+            metrics = metrics,
+            uiState = uiState,
+            detailedStats = detailedStats,
+            onPauseClick = onPauseClick,
+            onResumeClick = onResumeClick,
+            onStopClick = onStopClick,
+            onExpandClick = onExpandClick,
+            isExpanded = isExpanded
+        )
+    }
+}
+
+@Composable
+private fun TrackingPanelContent(
+    metrics: ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics,
+    uiState: TrackingUiState,
+    detailedStats: Map<String, Any> = emptyMap(),
+    onPauseClick: () -> Unit,
+    onResumeClick: () -> Unit,
+    onStopClick: () -> Unit,
+    onExpandClick: () -> Unit,
+    isExpanded: Boolean,
+) {
+
     Card(
         modifier =
             Modifier
@@ -451,31 +480,101 @@ fun TrackingPanel(
                         }
                     }
                 },
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Sin sombra
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent), // Fondo transparente
     ) {
         Box {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(if (isExpanded) 12.dp else 6.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                if (isExpanded) {
-                    // Estadísticas completas de todos los sensores
-                    ExpandedStatsContent(
-                        metrics = metrics,
-                        detailedStats = detailedStats,
-                        uiState = uiState,
+                // Estadísticas adicionales con efecto cajón suave
+                AnimatedVisibility(
+                    visible = isExpanded,
+                    enter = slideInVertically(
+                        initialOffsetY = { -it }, // Entra desde arriba
+                        animationSpec = tween(400, easing = FastOutSlowInEasing)
+                    ) + fadeIn(animationSpec = tween(400)),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it }, // Sale hacia ABAJO con caída suave
+                        animationSpec = tween(
+                            durationMillis = 450, // Ligeramente más lento
+                            easing = androidx.compose.animation.core.CubicBezierEasing(0.25f, 0.46f, 0.45f, 0.94f) // Ease out suave
+                        )
+                    ) + fadeOut(animationSpec = tween(400))
+                ) {
+                    // Estadísticas adicionales (Velocidad, Altitud)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        MetricCard(
+                            title = "Vel. Actual",
+                            value = "%.1f km/h".format(metrics.currentSpeed),
+                            modifier = Modifier.weight(1f),
+                        )
+                        MetricCard(
+                            title = "Vel. Máx.",
+                            value = "%.1f km/h".format(metrics.maxSpeed),
+                            modifier = Modifier.weight(1f),
+                        )
+                        MetricCard(
+                            title = "Altitud",
+                            value = "%.0f m".format(metrics.currentElevation),
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+
+                // Estadísticas base siempre visibles
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    MetricCard(
+                        title = "Duración",
+                        value = uiState.elapsedTime,
+                        modifier = Modifier.weight(1f),
                     )
-                } else {
-                    // Métricas básicas compactas
-                    CompactMetricsContent(
-                        metrics = metrics,
-                        elapsedTime = uiState.elapsedTime,
-                        stepCount = uiState.stepCount,
+                    MetricCard(
+                        title = "Distancia",
+                        value = formatDistance(metrics.currentDistance),
+                        modifier = Modifier.weight(1f),
+                    )
+                    MetricCard(
+                        title = "Pasos",
+                        value = uiState.stepCount.toString(),
+                        modifier = Modifier.weight(1f),
                     )
                 }
 
-                // Botones de control
+                // Errores de sensores (solo si hay errores y está expandido)
+                if (uiState.sensorErrors.isNotEmpty() && isExpanded) {
+                    AnimatedVisibility(
+                        visible = isExpanded,
+                        enter = fadeIn(animationSpec = tween(400)),
+                        exit = fadeOut(animationSpec = tween(350))
+                    ) {
+                        Column {
+                            Text(
+                                text = "⚠️ Estado de Sensores",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                            uiState.sensorErrors.forEach { error ->
+                                Text(
+                                    text = error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Botones de control siempre visibles
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -526,152 +625,12 @@ fun TrackingPanel(
                     }
                 }
             }
-
-            // Flecha expandir/contraer en esquina superior derecha
-            IconButton(
-                onClick = onExpandClick,
-                modifier = Modifier.align(Alignment.TopEnd),
-            ) {
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                    contentDescription = if (isExpanded) "Contraer" else "Expandir",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                )
-            }
         }
     }
 }
 
-@Composable
-fun CompactMetricsContent(
-    metrics: ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics,
-    elapsedTime: String,
-    stepCount: Int = 0,
-) {
-    // Panel plegado: compacto y con altura mínima
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        CompactMetricCard(
-            title = "Tiempo Activo",
-            value = elapsedTime,
-            modifier = Modifier.weight(1f),
-        )
-        CompactMetricCard(
-            title = "Distancia",
-            value = "%.2f km".format(metrics.currentDistance),
-            modifier = Modifier.weight(1f),
-        )
-        CompactMetricCard(
-            title = "Pasos",
-            value = stepCount.toString(),
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
 
-@Composable
-fun BasicMetricsContent(
-    metrics: ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics,
-    elapsedTime: String,
-    stepCount: Int = 0,
-) {
-    // Fila única con las 3 métricas principales (más grandes y sin título del panel)
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        EnhancedMetricCard(
-            title = "Tiempo Activo",
-            value = elapsedTime,
-            modifier = Modifier.weight(1f),
-        )
-        EnhancedMetricCard(
-            title = "Distancia",
-            value = "%.2f km".format(metrics.currentDistance),
-            modifier = Modifier.weight(1f),
-        )
-        EnhancedMetricCard(
-            title = "Pasos",
-            value = stepCount.toString(),
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
 
-@Composable
-fun ExpandedStatsContent(
-    metrics: ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics,
-    detailedStats: Map<String, Any>,
-    uiState: TrackingUiState,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        // Primera fila: Vel. Actual, Vel. Máx, Altitud
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            MetricCard(
-                title = "Vel. Actual",
-                value = "%.1f km/h".format(metrics.currentSpeed),
-                modifier = Modifier.weight(1f),
-            )
-            MetricCard(
-                title = "Vel. Máx.",
-                value = "%.1f km/h".format(metrics.maxSpeed),
-                modifier = Modifier.weight(1f),
-            )
-            MetricCard(
-                title = "Altitud",
-                value = "%.0f m".format(metrics.currentElevation),
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        // Segunda fila: Tiempo Activo, Distancia, Pasos
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            MetricCard(
-                title = "Tiempo Activo",
-                value = uiState.elapsedTime,
-                modifier = Modifier.weight(1f),
-            )
-            MetricCard(
-                title = "Distancia",
-                value = "%.2f km".format(metrics.currentDistance),
-                modifier = Modifier.weight(1f),
-            )
-            MetricCard(
-                title = "Pasos",
-                value = uiState.stepCount.toString(),
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        // Mostrar errores de sensores si existen
-        if (uiState.sensorErrors.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "⚠️ Estado de Sensores",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.error,
-            )
-            Column {
-                uiState.sensorErrors.forEach { error ->
-                    Text(
-                        text = error,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun MetricCard(
@@ -705,82 +664,7 @@ fun MetricCard(
     }
 }
 
-@Composable
-fun CompactMetricCard(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        modifier = modifier,
-        colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-    ) {
-        Column(
-            // Padding compacto
-            modifier = Modifier.padding(6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = title,
-                // Título pequeño
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-            )
-            Text(
-                text = value,
-                // Valor moderado
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-            )
-        }
-    }
-}
 
-@Composable
-fun EnhancedMetricCard(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        modifier = modifier,
-        colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-    ) {
-        Column(
-            // Más padding que la card normal
-            modifier = Modifier.padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = title,
-                // Título ligeramente más grande
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = value,
-                // Valor mucho más grande
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }
-}
 
 @Composable
 private fun FloatingNavigationButton(
@@ -802,7 +686,6 @@ private fun FloatingNavigationButton(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Volver",
                 tint = MaterialTheme.colorScheme.onSurface,
-                // Flecha más grande
                 modifier = Modifier.size(28.dp),
             )
         }
@@ -829,4 +712,66 @@ private fun DiscardTrackingDialog(
             }
         },
     )
+}
+
+
+
+/**
+ * Formatea distancia dinámicamente: metros si < 1km, kilómetros si >= 1km
+ * Comportamiento profesional como Strava/Nike Run
+ */
+private fun formatDistance(distanceKm: Double): String {
+    return if (distanceKm < 1.0) {
+        // Mostrar en metros para distancias pequeñas
+        val meters = (distanceKm * 1000).toInt()
+        "$meters m"
+    } else {
+        // Mostrar en kilómetros para distancias grandes
+        "%.2f km".format(distanceKm)
+    }
+}
+
+/**
+ * Botón flechita con posición fija (no se mueve con el panel)
+ */
+@Composable
+private fun FixedArrowButton(
+    isExpanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Animación simple de rotación con spring elegante
+    val arrowRotation by animateFloatAsState(
+        targetValue = if (isExpanded) 180f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "fixed_arrow_rotation"
+    )
+
+    Surface(
+        onClick = onClick,
+        modifier = modifier.size(44.dp),
+        shape = RoundedCornerShape(22.dp),
+        color = Color(0xFF2196F3).copy(alpha = 0.9f),
+        shadowElevation = 3.dp,
+        tonalElevation = 1.dp
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowUp,
+                contentDescription = if (isExpanded) "Contraer" else "Expandir",
+                tint = Color.White,
+                modifier = Modifier
+                    .size(24.dp)
+                    .graphicsLayer {
+                        rotationZ = arrowRotation // Rotación suave con spring
+                    }
+            )
+        }
+    }
 }

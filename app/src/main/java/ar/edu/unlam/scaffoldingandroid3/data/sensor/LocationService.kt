@@ -93,8 +93,7 @@ class LocationService
                 awaitClose {
                     stopLocationUpdates()
                 }
-            } // Remover distinctUntilChanged para máxima fluidez
-        // Google Maps no filtra tanto - necesitamos todas las actualizaciones
+            }
 
         /**
          * Obtiene la última ubicación conocida
@@ -209,11 +208,11 @@ class LocationService
         fun isTracking(): Boolean = isTracking
 
         companion object {
-            // Configuración AGRESIVA para tracking SÚPER fluido como Google Maps
-            private const val LOCATION_UPDATE_INTERVAL = 500L // 500ms (más fluido que antes)
+            // Configuración para tracking
+            private const val LOCATION_UPDATE_INTERVAL = 500L // 500ms
             private const val FASTEST_LOCATION_UPDATE_INTERVAL = 250L // 250ms (muy responsivo)
-            private const val MIN_DISTANCE_CHANGE_FOR_UPDATES = 1.0f // 1 metro (balance detalle/ruido)
+            private const val MIN_DISTANCE_CHANGE_FOR_UPDATES = 1.0f // 1 metro
             private const val MAX_UPDATE_DELAY = 1000L // 1 segundo (muy rápido)
-            private const val MAX_ACCURACY_THRESHOLD = 30.0f // 30 metros (más permisivo para interiores)
+            private const val MAX_ACCURACY_THRESHOLD = 30.0f // 30 metros
         }
     }

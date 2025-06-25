@@ -5,7 +5,6 @@ import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toDomain
 import ar.edu.unlam.scaffoldingandroid3.data.local.mapper.toEntity
 import ar.edu.unlam.scaffoldingandroid3.domain.model.History
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.HistoryRepository
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
