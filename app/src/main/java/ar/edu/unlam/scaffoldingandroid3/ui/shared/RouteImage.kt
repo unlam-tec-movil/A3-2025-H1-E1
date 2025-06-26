@@ -17,7 +17,6 @@ fun RouteImage(
         contentDescription = "Foto de la ruta",
         placeholder = painterResource(R.drawable.img_default_route),
         error = painterResource(R.drawable.img_default_route),
-//        como hago para que mi imagen se vea centrada al estilo centerCrop?
         contentScale = androidx.compose.ui.layout.ContentScale.Crop,
     )
 }

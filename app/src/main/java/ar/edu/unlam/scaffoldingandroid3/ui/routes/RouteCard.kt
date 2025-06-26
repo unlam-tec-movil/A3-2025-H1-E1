@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.RouteImage
 
 /**
@@ -35,10 +36,7 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.RouteImage
 @Composable
 fun RouteCard(
     modifier: Modifier = Modifier,
-    name: String,
-    distance: Double,
-    duration: Long,
-    photo: String,
+    route: Route,
     onPlayClick: () -> Unit,
 ) {
     Card(
@@ -65,23 +63,23 @@ fun RouteCard(
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.LightGray),
                 ) {
-                    RouteImage(modifier, photo)
+                    RouteImage(modifier, route.photoUri)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = name,
+                        text = route.name,
                         style = MaterialTheme.typography.titleLarge,
                     )
                     Row {
                         Text(
-                            text = "${String.format("%.1f", distance)} km",
+                            text = "${String.format("%.1f", route.distance)} km",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "${duration / 60000} min",
+                            text = "${route.duration / 60000} min",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
@@ -112,10 +110,15 @@ fun RouteCard(
 @Composable
 fun RouteCardPreview() {
     RouteCard(
-        name = "Ruta 1",
-        distance = 10.00,
-        duration = 2000000,
-        photo = "",
+        route =
+            Route(
+                id = "1",
+                name = "Ruta 1",
+                photoUri = "",
+                distance = 10.0,
+                duration = 600000,
+                points = emptyList()
+            ),
         onPlayClick = {},
     )
 }

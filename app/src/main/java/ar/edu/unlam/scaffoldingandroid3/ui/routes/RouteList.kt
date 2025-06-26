@@ -14,10 +14,7 @@ fun RouteList(
     LazyColumn {
         items(list) { route ->
             RouteCard(
-                name = route.name,
-                distance = route.distance,
-                duration = route.duration,
-                photo = route.photoUri,
+                route = route,
                 onPlayClick = { onPlayClick(route) },
             )
         }
