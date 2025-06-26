@@ -61,7 +61,7 @@ fun BottomNavigationBar(
         HorizontalDivider(
             color = MaterialTheme.colorScheme.primary,
             thickness = 1.dp,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         Row(
             modifier =
