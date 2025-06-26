@@ -8,14 +8,16 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
 @Composable
 fun RouteList(
-    list: List<Route>,
+    routeList: List<Route>,
     onPlayClick: (Route) -> Unit,
+    onDeleteItem: (String) -> Unit,
 ) {
     LazyColumn {
-        items(list) { route ->
+        items(routeList) { route ->
             RouteCard(
                 route = route,
                 onPlayClick = { onPlayClick(route) },
+                onDeleteItem = { onDeleteItem(route.id) },
             )
         }
     }
@@ -30,5 +32,5 @@ fun RouteListPreview() {
             Route("2", "Ruta 2", emptyList(), 20.0, 12),
             Route("3", "Ruta 3", emptyList(), 30.0, 18),
         )
-    RouteList(list = list, onPlayClick = {})
+    RouteList(routeList = list, onPlayClick = {}, onDeleteItem = {})
 }

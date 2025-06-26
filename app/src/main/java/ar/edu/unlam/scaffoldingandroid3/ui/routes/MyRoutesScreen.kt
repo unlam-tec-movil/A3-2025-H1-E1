@@ -17,9 +17,9 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 
 /**
- * TODO
- * agregar @parcelable a Route para pasarle el objeto entero
- * a RouteDetailScreen
+ * Pantalla MyRoutesScreen
+ * Muestra la lista de rutas guardadas del usuario, gestionando estados de carga, error y vacío.
+ * Permite navegar al detalle de una ruta seleccionada.
  */
 @Composable
 fun MyRoutesScreen(
@@ -45,7 +45,7 @@ fun MyRoutesScreen(
 
             else -> {
                 RouteList(
-                    list = uiState.savedRoutes,
+                    routeList = uiState.savedRoutes,
 //                    list = listOf(
 //                        Route("1", "Ruta 1", emptyList(), 10.00, 8400000),
 //                        Route("2", "Ruta 2", emptyList(), 10.00, 8400000),
@@ -56,6 +56,9 @@ fun MyRoutesScreen(
                         navController.navigate(Screen.RouteDetail.route)
                         navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
                             selectedRoute
+                    },
+                    onDeleteItem = { routeId ->
+                        viewModel.deleteRouteItem(routeId)
                     },
                 )
             }

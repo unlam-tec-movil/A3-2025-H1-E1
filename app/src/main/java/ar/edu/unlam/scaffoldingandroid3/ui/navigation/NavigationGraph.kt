@@ -57,7 +57,9 @@ fun NavGraph(
             )
         }
         composable(Screen.History.route) {
-            HistoryScreen()
+            HistoryScreen(
+                navController = navController
+            )
         }
         composable(Screen.RouteDetail.route) { backStackEntry ->
             // 1) Leemos desde el savedStateHandle de ESTA entrada

@@ -15,42 +15,59 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MyRoutesViewModel
-    @Inject
-    constructor(
-        private val routeRepository: RouteRepository,
-    ) : ViewModel() {
-        private val _uiState = MutableStateFlow(MyRoutesUiState())
-        val uiState: StateFlow<MyRoutesUiState> = _uiState.asStateFlow()
+@Inject
+constructor(
+    private val routeRepository: RouteRepository,
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(MyRoutesUiState())
+    val uiState: StateFlow<MyRoutesUiState> = _uiState.asStateFlow()
 
-        init {
-            viewModelScope.launch {
-                routeRepository.getAllRoutes().onStart { _uiState.update { it.copy(isLoading = true) } }
-                    .catch { e ->
-                        _uiState.update { it.copy(isLoading = false, error = e.message) }
-                    }.collect { list ->
-                        if (list.isEmpty()) {
-                            _uiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    error = null,
-                                    emptyMessage = "Aún no hay rutas guardadas",
-                                )
-                            }
-                            return@collect
-                        }
+    init {
+        loadRoutes()
+    }
+
+    fun loadRoutes() {
+        viewModelScope.launch {
+            routeRepository.getAllRoutes().onStart { _uiState.update { it.copy(isLoading = true) } }
+                .catch { e ->
+                    _uiState.update { it.copy(isLoading = false, error = e.message) }
+                }.collect { list ->
+                    if (list.isEmpty()) {
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                savedRoutes = list,
                                 error = null,
-                                emptyMessage = null,
+                                emptyMessage = "Aún no hay rutas guardadas",
                             )
                         }
+                        return@collect
                     }
-            }
-        }
-
-        fun clearError() {
-            _uiState.update { it.copy(error = null, emptyMessage = null) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            savedRoutes = list,
+                            error = null,
+                            emptyMessage = null,
+                        )
+                    }
+                }
         }
     }
+
+    fun deleteRouteItem(routeId: String) {
+        viewModelScope.launch {
+            try {
+                routeRepository.deleteRoute(routeId)
+                loadRoutes()
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(error = "Error al eliminar el elemento: ${e.message}")
+                }
+            }
+        }
+    }
+
+    fun clearError() {
+        _uiState.update { it.copy(error = null, emptyMessage = null) }
+    }
+}

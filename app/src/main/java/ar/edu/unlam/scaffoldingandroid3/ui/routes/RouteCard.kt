@@ -30,6 +30,7 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.RouteImage
 
 /**
+ * TODO implementar la funcionalidad de eliminar una ruta
  * Card de cada ruta guardada
  */
 
@@ -38,6 +39,7 @@ fun RouteCard(
     modifier: Modifier = Modifier,
     route: Route,
     onPlayClick: () -> Unit,
+    onDeleteItem: () -> Unit,
 ) {
     Card(
         modifier =
@@ -120,5 +122,6 @@ fun RouteCardPreview() {
                 points = emptyList()
             ),
         onPlayClick = {},
+        onDeleteItem = {},
     )
 }
