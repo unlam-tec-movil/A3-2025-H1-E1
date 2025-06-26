@@ -66,7 +66,7 @@ fun HistoryScreen(
                         val route = history.toRoute()
                         navController.navigate(Screen.RouteDetail.route)
                         navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] = route
-                    }
+                    },
                 )
             }
         }
@@ -78,15 +78,16 @@ fun History.toRoute(): Route {
     return Route(
         id = this.id.toString(),
         name = this.routeName,
-        points = this.routePoint.map {
-            Route.Point(
-                latitude = it.latitude,
-                longitude = it.longitude,
-                timestamp = it.timestamp
-            )
-        },
+        points =
+            this.routePoint.map {
+                Route.Point(
+                    latitude = it.latitude,
+                    longitude = it.longitude,
+                    timestamp = it.timestamp,
+                )
+            },
         distance = this.metrics.currentDistance,
         duration = this.metrics.currentDuration,
-        photoUri = this.photoUri
+        photoUri = this.photoUri,
     )
 }

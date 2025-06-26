@@ -9,7 +9,7 @@ import coil.compose.AsyncImage
 @Composable
 fun RouteImage(
     modifier: Modifier = Modifier,
-    image: String
+    image: String,
 ) {
     AsyncImage(
         modifier = modifier,

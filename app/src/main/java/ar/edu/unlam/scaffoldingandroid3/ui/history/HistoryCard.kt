@@ -95,7 +95,7 @@ fun HistoryCard(
                 onClick = onDeleteItem,
                 modifier =
                     Modifier
-                        .size(52.dp)
+                        .size(52.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,

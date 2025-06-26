@@ -58,7 +58,7 @@ fun NavGraph(
         }
         composable(Screen.History.route) {
             HistoryScreen(
-                navController = navController
+                navController = navController,
             )
         }
         composable(Screen.RouteDetail.route) { backStackEntry ->

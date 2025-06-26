@@ -28,18 +28,20 @@ fun MyRoutesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         when {
             uiState.isLoading -> LoadingSpinner()
 
-            uiState.error != null -> ErrorDialog(
-                errorMessage = uiState.error!!,
-                onDismiss = { viewModel.clearError() },
-            )
+            uiState.error != null ->
+                ErrorDialog(
+                    errorMessage = uiState.error!!,
+                    onDismiss = { viewModel.clearError() },
+                )
 
             uiState.emptyMessage != null -> Text(text = uiState.emptyMessage!!)
 

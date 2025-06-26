@@ -119,7 +119,7 @@ fun RouteCardPreview() {
                 photoUri = "",
                 distance = 10.0,
                 duration = 600000,
-                points = emptyList()
+                points = emptyList(),
             ),
         onPlayClick = {},
         onDeleteItem = {},
