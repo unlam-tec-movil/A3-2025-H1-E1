@@ -1,13 +1,11 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -29,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.RouteImage
 
 /**
  * Card de cada ruta guardada
@@ -38,8 +36,9 @@ import androidx.compose.ui.unit.dp
 fun RouteCard(
     modifier: Modifier = Modifier,
     name: String,
-    distance: String,
-    duration: String,
+    distance: Double,
+    duration: Long,
+    photo: String,
     onPlayClick: () -> Unit,
 ) {
     Card(
@@ -62,32 +61,27 @@ fun RouteCard(
                 Box(
                     modifier =
                         Modifier
-                            .size(64.dp)
+                            .size(76.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.LightGray),
                 ) {
-                    // TODO: Cargar imagen de la ruta con Glide
-                    Image(
-                        imageVector = Icons.Filled.Face,
-                        contentDescription = "Play",
-                        modifier = Modifier.fillMaxSize(),
-                    )
+                    RouteImage(modifier, photo)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
                         text = name,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                     Row {
                         Text(
-                            text = distance,
+                            text = "${String.format("%.1f", distance)} km",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = duration,
+                            text = "${duration / 60000} min",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
@@ -98,7 +92,7 @@ fun RouteCard(
                 onClick = onPlayClick,
                 modifier =
                     Modifier
-                        .size(64.dp)
+                        .size(52.dp)
                         .background(
                             color = MaterialTheme.colorScheme.primary,
                             shape = CircleShape,
@@ -119,8 +113,9 @@ fun RouteCard(
 fun RouteCardPreview() {
     RouteCard(
         name = "Ruta 1",
-        distance = "10 km",
-        duration = "2 horas",
+        distance = 10.00,
+        duration = 2000000,
+        photo = "",
         onPlayClick = {},
     )
 }

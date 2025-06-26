@@ -28,31 +28,37 @@ fun MyRoutesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
-        if (uiState.isLoading) {
-            LoadingSpinner()
-        }
-        uiState.error?.let {
-            ErrorDialog(
-                errorMessage = it,
+        when {
+            uiState.isLoading -> LoadingSpinner()
+
+            uiState.error != null -> ErrorDialog(
+                errorMessage = uiState.error!!,
                 onDismiss = { viewModel.clearError() },
             )
+
+            uiState.emptyMessage != null -> Text(text = uiState.emptyMessage!!)
+
+            else -> {
+                RouteList(
+                    list = uiState.savedRoutes,
+//                    list = listOf(
+//                        Route("1", "Ruta 1", emptyList(), 10.00, 8400000),
+//                        Route("2", "Ruta 2", emptyList(), 10.00, 8400000),
+//                        Route("3", "Ruta 3", emptyList(), 10.00, 8400000),
+//                        Route("4", "Ruta 4", emptyList(), 10.00, 8400000),
+//                    ),
+                    onPlayClick = { selectedRoute ->
+                        navController.navigate(Screen.RouteDetail.route)
+                        navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
+                            selectedRoute
+                    },
+                )
+            }
         }
-        uiState.emptyMessage?.let {
-            Text(text = it)
-        }
-        RouteList(
-            list = uiState.savedRoutes,
-            onPlayClick = { selectedRoute ->
-                navController.navigate(Screen.RouteDetail.route)
-                navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
-                    selectedRoute
-            },
-        )
     }
 }

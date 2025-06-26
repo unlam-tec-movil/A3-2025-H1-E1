@@ -15,8 +15,9 @@ fun RouteList(
         items(list) { route ->
             RouteCard(
                 name = route.name,
-                distance = route.distance.toString(),
-                duration = route.duration.toString(),
+                distance = route.distance,
+                duration = route.duration,
+                photo = route.photoUri,
                 onPlayClick = { onPlayClick(route) },
             )
         }
