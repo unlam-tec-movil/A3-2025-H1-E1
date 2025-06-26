@@ -8,6 +8,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -176,8 +178,7 @@ fun MapScreen(
                     Modifier
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter),
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = MaterialTheme.dimens.elevationLarge,
+                color = MaterialTheme.colorScheme.inversePrimary,
             ) {
                 Row(
                     modifier =
@@ -186,20 +187,6 @@ fun MapScreen(
                             .padding(MaterialTheme.dimens.paddingMedium),
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.paddingSmall),
                 ) {
-                    Button(
-                        onClick = {},
-                        modifier =
-                            Modifier
-                                .weight(1f)
-                                .height(MaterialTheme.dimens.buttonHeightNormal),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            ),
-                    ) {
-                        Text(text = stringResource(id = R.string.load_routes))
-                    }
                     Button(
                         onClick = { navController.navigate(Screen.Tracking.route) },
                         modifier =

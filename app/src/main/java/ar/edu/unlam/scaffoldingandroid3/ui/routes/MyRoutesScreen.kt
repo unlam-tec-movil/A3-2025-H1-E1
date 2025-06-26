@@ -48,7 +48,7 @@ fun MyRoutesScreen(
             else -> {
                 RouteList(
                     routeList = uiState.savedRoutes,
-//                    list = listOf(
+//                    routeList = listOf(
 //                        Route("1", "Ruta 1", emptyList(), 10.00, 8400000),
 //                        Route("2", "Ruta 2", emptyList(), 10.00, 8400000),
 //                        Route("3", "Ruta 3", emptyList(), 10.00, 8400000),
