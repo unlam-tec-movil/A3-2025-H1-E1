@@ -18,11 +18,11 @@ fun HistoryList(
     onDeleteItem: (Long) -> Unit,
 ) {
     LazyColumn {
-        items(historyList) { history ->
-            HistoryCard(
+        items(historyList, key = { it.id }) { history ->
+            DismissibleHistoryItem(
                 history = history,
-                onClickItem = { onItemClick(history) },
-                onDeleteItem = { onDeleteItem(history.id) },
+                onItemClick = { onItemClick(history) },
+                onDelete = { onDeleteItem(history.id) },
             )
         }
     }

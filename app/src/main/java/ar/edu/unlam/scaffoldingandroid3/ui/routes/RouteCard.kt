@@ -44,8 +44,7 @@ fun RouteCard(
     Card(
         modifier =
             modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+                .fillMaxWidth(),
     ) {
         Row(
             modifier =
