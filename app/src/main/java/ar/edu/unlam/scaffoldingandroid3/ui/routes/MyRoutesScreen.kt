@@ -17,9 +17,9 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 
 /**
- * TODO
- * agregar @parcelable a Route para pasarle el objeto entero
- * a RouteDetailScreen
+ * Pantalla MyRoutesScreen
+ * Muestra la lista de rutas guardadas del usuario, gestionando estados de carga, error y vacío.
+ * Permite navegar al detalle de una ruta seleccionada.
  */
 @Composable
 fun MyRoutesScreen(
@@ -34,25 +34,36 @@ fun MyRoutesScreen(
                 .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
-        if (uiState.isLoading) {
-            LoadingSpinner()
+        when {
+            uiState.isLoading -> LoadingSpinner()
+
+            uiState.error != null ->
+                ErrorDialog(
+                    errorMessage = uiState.error!!,
+                    onDismiss = { viewModel.clearError() },
+                )
+
+            uiState.emptyMessage != null -> Text(text = uiState.emptyMessage!!)
+
+            else -> {
+                RouteList(
+                    routeList = uiState.savedRoutes,
+//                    routeList = listOf(
+//                        Route("1", "Ruta 1", emptyList(), 10.00, 8400000),
+//                        Route("2", "Ruta 2", emptyList(), 10.00, 8400000),
+//                        Route("3", "Ruta 3", emptyList(), 10.00, 8400000),
+//                        Route("4", "Ruta 4", emptyList(), 10.00, 8400000),
+//                    ),
+                    onPlayClick = { selectedRoute ->
+                        navController.navigate(Screen.RouteDetail.route)
+                        navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
+                            selectedRoute
+                    },
+                    onDeleteItem = { routeId ->
+                        viewModel.deleteRouteItem(routeId)
+                    },
+                )
+            }
         }
-        uiState.error?.let {
-            ErrorDialog(
-                errorMessage = it,
-                onDismiss = { viewModel.clearError() },
-            )
-        }
-        uiState.emptyMessage?.let {
-            Text(text = it)
-        }
-        RouteList(
-            list = uiState.savedRoutes,
-            onPlayClick = { selectedRoute ->
-                navController.navigate(Screen.RouteDetail.route)
-                navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
-                    selectedRoute
-            },
-        )
     }
 }

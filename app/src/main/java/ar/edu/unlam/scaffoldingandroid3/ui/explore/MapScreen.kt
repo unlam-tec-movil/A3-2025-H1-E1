@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -176,8 +175,7 @@ fun MapScreen(
                     Modifier
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter),
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = MaterialTheme.dimens.elevationLarge,
+                color = MaterialTheme.colorScheme.inversePrimary,
             ) {
                 Row(
                     modifier =
@@ -186,20 +184,6 @@ fun MapScreen(
                             .padding(MaterialTheme.dimens.paddingMedium),
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.paddingSmall),
                 ) {
-                    Button(
-                        onClick = {},
-                        modifier =
-                            Modifier
-                                .weight(1f)
-                                .height(MaterialTheme.dimens.buttonHeightNormal),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            ),
-                    ) {
-                        Text(text = stringResource(id = R.string.load_routes))
-                    }
                     Button(
                         onClick = { navController.navigate(Screen.Tracking.route) },
                         modifier =

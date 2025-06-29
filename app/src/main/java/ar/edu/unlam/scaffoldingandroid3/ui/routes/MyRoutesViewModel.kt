@@ -23,6 +23,10 @@ class MyRoutesViewModel
         val uiState: StateFlow<MyRoutesUiState> = _uiState.asStateFlow()
 
         init {
+            loadRoutes()
+        }
+
+        fun loadRoutes() {
             viewModelScope.launch {
                 routeRepository.getAllRoutes().onStart { _uiState.update { it.copy(isLoading = true) } }
                     .catch { e ->
@@ -47,6 +51,19 @@ class MyRoutesViewModel
                             )
                         }
                     }
+            }
+        }
+
+        fun deleteRouteItem(routeId: String) {
+            viewModelScope.launch {
+                try {
+                    routeRepository.deleteRoute(routeId)
+                    loadRoutes()
+                } catch (e: Exception) {
+                    _uiState.update {
+                        it.copy(error = "Error al eliminar el elemento: ${e.message}")
+                    }
+                }
             }
         }
 

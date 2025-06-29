@@ -12,7 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import ar.edu.unlam.scaffoldingandroid3.R
+import ar.edu.unlam.scaffoldingandroid3.domain.model.History
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
+import ar.edu.unlam.scaffoldingandroid3.ui.navigation.Screen
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 
@@ -23,7 +27,10 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
  * eso se implemente
  */
 @Composable
-fun HistoryScreen(viewModel: HistoryViewModel = hiltViewModel()) {
+fun HistoryScreen(
+    viewModel: HistoryViewModel = hiltViewModel(),
+    navController: NavHostController,
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     Box(
@@ -55,8 +62,32 @@ fun HistoryScreen(viewModel: HistoryViewModel = hiltViewModel()) {
                     onDeleteItem = { historyId ->
                         viewModel.deleteHistoryItem(historyId)
                     },
+                    onItemClick = { history ->
+                        val route = history.toRoute()
+                        navController.navigate(Screen.RouteDetail.route)
+                        navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] = route
+                    },
                 )
             }
         }
     }
+}
+
+// Mapper provisional de History a Route porque RouteDetailScreen espera un Route
+fun History.toRoute(): Route {
+    return Route(
+        id = this.id.toString(),
+        name = this.routeName,
+        points =
+            this.routePoint.map {
+                Route.Point(
+                    latitude = it.latitude,
+                    longitude = it.longitude,
+                    timestamp = it.timestamp,
+                )
+            },
+        distance = this.metrics.currentDistance,
+        duration = this.metrics.currentDuration,
+        photoUri = this.photoUri,
+    )
 }
