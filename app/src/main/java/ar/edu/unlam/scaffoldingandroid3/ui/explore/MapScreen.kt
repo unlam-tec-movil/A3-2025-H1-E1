@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,7 +44,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import ar.edu.unlam.scaffoldingandroid3.R
+import ar.edu.unlam.scaffoldingandroid3.ui.navigation.Screen
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
@@ -62,17 +63,12 @@ import com.google.android.gms.maps.model.MapStyleOptions
  * - Botones de acción para grabar y cargar rutas
  * - Navegación inferior
  *
- * @param onNewRouteClick Callback para iniciar la grabación de una nueva ruta
- * @param onLoadRoutesClick Callback para cargar rutas existentes
- * @param onRouteClick Callback para navegar a la pantalla de detalle de ruta
- TODO:
- Manejar el resultado de la foto tomada
+ * @param navController controla la navegación hacia otras pantallas
  */
+
 @Composable
 fun MapScreen(
-    onNewRouteClick: () -> Unit,
-    onLoadRoutesClick: () -> Unit,
-    onRouteClick: (String) -> Unit,
+    navController: NavHostController,
     viewModel: MapViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -157,7 +153,11 @@ fun MapScreen(
                 uiState = uiState,
                 cameraPositionState = uiState.cameraPositionState,
                 mapStyleOptions = mapStyleOptions,
-                onRouteClick = onRouteClick,
+                onRouteClick = { selectedRoute ->
+                    navController.navigate(Screen.RouteDetail.route)
+                    navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
+                        selectedRoute
+                },
                 onMapIdle = viewModel::onMapIdle,
                 markerBitmap = markerBitmap,
                 hikerBitmap = hikerBitmap,
@@ -232,8 +232,7 @@ fun MapScreen(
                     Modifier
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter),
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = MaterialTheme.dimens.elevationLarge,
+                color = MaterialTheme.colorScheme.inversePrimary,
             ) {
                 Row(
                     modifier =
@@ -243,21 +242,7 @@ fun MapScreen(
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.paddingSmall),
                 ) {
                     Button(
-                        onClick = onLoadRoutesClick,
-                        modifier =
-                            Modifier
-                                .weight(1f)
-                                .height(MaterialTheme.dimens.buttonHeightNormal),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            ),
-                    ) {
-                        Text(text = stringResource(id = R.string.load_routes))
-                    }
-                    Button(
-                        onClick = onNewRouteClick,
+                        onClick = { navController.navigate(Screen.Tracking.route) },
                         modifier =
                             Modifier
                                 .weight(1f)
@@ -276,9 +261,7 @@ fun MapScreen(
 private fun MapScreenPreview() {
     MaterialTheme {
         MapScreen(
-            onNewRouteClick = {},
-            onLoadRoutesClick = {},
-            onRouteClick = {},
+            navController = NavHostController(LocalContext.current),
         )
     }
 }

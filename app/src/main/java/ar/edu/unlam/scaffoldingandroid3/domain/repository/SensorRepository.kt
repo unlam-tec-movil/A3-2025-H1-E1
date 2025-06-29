@@ -3,9 +3,8 @@ package ar.edu.unlam.scaffoldingandroid3.domain.repository
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Puerto de salida - Sensores del dispositivo
- * Define métodos para acceso a acelerómetro, barómetro y magnetómetro
- * Compatible con CU-010 a CU-014: conteo de pasos, altitud y brújula
+ * Puerto de salida - Sensores del dispositivo SIMPLIFICADO
+ * Solo acelerómetro y barómetro para tracking básico
  */
 interface SensorRepository {
     /**
@@ -17,11 +16,6 @@ interface SensorRepository {
      * Obtiene actualizaciones de altitud del barómetro
      */
     fun getAltitudeUpdates(): Flow<Double>
-
-    /**
-     * Obtiene actualizaciones de orientación del magnetómetro
-     */
-    fun getCompassUpdates(): Flow<Float>
 
     /**
      * Inicia el tracking de sensores
@@ -54,26 +48,9 @@ interface SensorRepository {
     suspend fun getCurrentStepCount(): Int
 
     /**
-     * Obtiene la altitud actual
-     */
-    suspend fun getCurrentAltitude(): Double
-
-    /**
-     * Obtiene la orientación actual (azimuth)
-     */
-    suspend fun getCurrentAzimuth(): Float
-
-    /**
      * Verifica disponibilidad de sensores
      */
     fun isAccelerometerAvailable(): Boolean
 
     fun isBarometerAvailable(): Boolean
-
-    fun isMagnetometerAvailable(): Boolean
-
-    /**
-     * Verifica si está actualmente caminando
-     */
-    fun isCurrentlyWalking(): Boolean
 }

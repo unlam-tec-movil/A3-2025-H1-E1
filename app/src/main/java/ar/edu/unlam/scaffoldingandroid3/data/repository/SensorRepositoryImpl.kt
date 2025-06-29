@@ -32,13 +32,6 @@ class SensorRepositoryImpl
         }
 
         /**
-         * Obtiene actualizaciones de orientación del magnetómetro
-         */
-        override fun getCompassUpdates(): Flow<Float> {
-            return sensorManager.getCompassUpdates()
-        }
-
-        /**
          * Inicia el tracking de sensores
          */
         override suspend fun startSensorTracking() {
@@ -82,20 +75,6 @@ class SensorRepositoryImpl
         }
 
         /**
-         * Obtiene la altitud actual
-         */
-        override suspend fun getCurrentAltitude(): Double {
-            return sensorManager.currentPressure.toDouble() // Sería mejor calcular la altitud real
-        }
-
-        /**
-         * Obtiene la orientación actual (azimuth)
-         */
-        override suspend fun getCurrentAzimuth(): Float {
-            return sensorManager.getCurrentAzimuth()
-        }
-
-        /**
          * Verifica disponibilidad de sensores
          */
         override fun isAccelerometerAvailable(): Boolean {
@@ -104,16 +83,5 @@ class SensorRepositoryImpl
 
         override fun isBarometerAvailable(): Boolean {
             return sensorManager.isBarometerAvailable()
-        }
-
-        override fun isMagnetometerAvailable(): Boolean {
-            return sensorManager.isMagnetometerAvailable()
-        }
-
-        /**
-         * Verifica si está actualmente caminando
-         */
-        override fun isCurrentlyWalking(): Boolean {
-            return sensorManager.isCurrentlyWalking()
         }
     }

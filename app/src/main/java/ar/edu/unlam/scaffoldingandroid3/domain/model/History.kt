@@ -10,6 +10,6 @@ data class History(
     val routeName: String,
     val date: String,
     val metrics: TrackingMetrics,
-    val photos: List<Photo>,
+    val photoUri: String,
     val routePoint: List<LocationPoint>,
 )

@@ -11,8 +11,7 @@ package ar.edu.unlam.scaffoldingandroid3.domain.model
  * @property currentDistance Distancia recorrida en kilómetros
  * @property currentDuration Duración actual en milisegundos
  * @property currentElevation Elevación actual en metros sobre el nivel del mar
- * @property totalElevationGain Ganancia total de elevación en metros
- * @property totalElevationLoss Pérdida total de elevación en metros
+ * @property totalSteps Número total de pasos detectados
  * @property lastLocation Última ubicación registrada
  */
 
@@ -24,7 +23,8 @@ data class TrackingMetrics(
     val currentDistance: Double = 0.0,
     val currentDuration: Long = 0,
     val currentElevation: Double = 0.0,
-    val totalElevationGain: Double = 0.0,
-    val totalElevationLoss: Double = 0.0,
+    val minElevation: Double = 0.0,
+    val maxElevation: Double = 0.0,
+    val totalSteps: Int = 0,
     val lastLocation: LocationPoint? = null,
 )

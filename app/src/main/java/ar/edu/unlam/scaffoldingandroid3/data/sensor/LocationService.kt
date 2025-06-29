@@ -17,7 +17,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,7 +42,8 @@ class LocationService
                 setMinUpdateDistanceMeters(MIN_DISTANCE_CHANGE_FOR_UPDATES)
                 setMinUpdateIntervalMillis(FASTEST_LOCATION_UPDATE_INTERVAL)
                 setMaxUpdateDelayMillis(MAX_UPDATE_DELAY)
-                setWaitForAccurateLocation(true)
+                setWaitForAccurateLocation(false) // Más fluido, menos espera
+                setGranularity(com.google.android.gms.location.Granularity.GRANULARITY_PERMISSION_LEVEL)
             }.build()
 
         private var isTracking = false
@@ -64,16 +64,17 @@ class LocationService
                     object : LocationCallback() {
                         override fun onLocationResult(result: LocationResult) {
                             result.lastLocation?.let { location ->
+                                // Aceptar casi todas las ubicaciones para mejor fluidez
                                 if (location.accuracy <= MAX_ACCURACY_THRESHOLD) {
                                     trySend(location)
+                                } else {
+                                    trySend(location) // Enviar de todas maneras para fluidez
                                 }
                             }
                         }
 
                         override fun onLocationAvailability(availability: LocationAvailability) {
-                            if (!availability.isLocationAvailable) {
-                                // GPS deshabilitado o no disponible
-                            }
+                            // GPS availability status tracking
                         }
                     }
 
@@ -92,9 +93,6 @@ class LocationService
                 awaitClose {
                     stopLocationUpdates()
                 }
-            }.distinctUntilChanged { old, new ->
-                // Evitar actualizaciones redundantes (misma posición)
-                calculateDistance(old, new) < MIN_DISTANCE_CHANGE_FOR_UPDATES
             }
 
         /**
@@ -210,10 +208,11 @@ class LocationService
         fun isTracking(): Boolean = isTracking
 
         companion object {
-            private const val LOCATION_UPDATE_INTERVAL = 2000L // 2 segundos
-            private const val FASTEST_LOCATION_UPDATE_INTERVAL = 1000L // 1 segundo
+            // Configuración para tracking
+            private const val LOCATION_UPDATE_INTERVAL = 500L // 500ms
+            private const val FASTEST_LOCATION_UPDATE_INTERVAL = 250L // 250ms (muy responsivo)
             private const val MIN_DISTANCE_CHANGE_FOR_UPDATES = 1.0f // 1 metro
-            private const val MAX_UPDATE_DELAY = 5000L // 5 segundos
-            private const val MAX_ACCURACY_THRESHOLD = 20.0f // 20 metros de precisión máxima
+            private const val MAX_UPDATE_DELAY = 1000L // 1 segundo (muy rápido)
+            private const val MAX_ACCURACY_THRESHOLD = 30.0f // 30 metros
         }
     }

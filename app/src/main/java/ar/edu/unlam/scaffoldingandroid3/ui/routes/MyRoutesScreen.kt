@@ -5,20 +5,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ar.edu.unlam.scaffoldingandroid3.R
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import ar.edu.unlam.scaffoldingandroid3.ui.navigation.Screen
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 
 /**
- * TODO
- * Usar el viewModel que nos traiga la info de la base de datos
- * y la convierta a domain para poder pasarsela a la lista cuando
- * eso se implemente
+ * Pantalla MyRoutesScreen
+ * Muestra la lista de rutas guardadas del usuario, gestionando estados de carga, error y vacío.
+ * Permite navegar al detalle de una ruta seleccionada.
  */
 @Composable
-fun MyRoutesScreen() {
+fun MyRoutesScreen(
+    viewModel: MyRoutesViewModel = hiltViewModel(),
+    navController: NavHostController,
+) {
+    val uiState by viewModel.uiState.collectAsState()
     Box(
         modifier =
             Modifier
@@ -26,6 +34,36 @@ fun MyRoutesScreen() {
                 .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = stringResource(id = R.string.my_routes))
+        when {
+            uiState.isLoading -> LoadingSpinner()
+
+            uiState.error != null ->
+                ErrorDialog(
+                    errorMessage = uiState.error!!,
+                    onDismiss = { viewModel.clearError() },
+                )
+
+            uiState.emptyMessage != null -> Text(text = uiState.emptyMessage!!)
+
+            else -> {
+                RouteList(
+                    routeList = uiState.savedRoutes,
+//                    routeList = listOf(
+//                        Route("1", "Ruta 1", emptyList(), 10.00, 8400000),
+//                        Route("2", "Ruta 2", emptyList(), 10.00, 8400000),
+//                        Route("3", "Ruta 3", emptyList(), 10.00, 8400000),
+//                        Route("4", "Ruta 4", emptyList(), 10.00, 8400000),
+//                    ),
+                    onPlayClick = { selectedRoute ->
+                        navController.navigate(Screen.RouteDetail.route)
+                        navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
+                            selectedRoute
+                    },
+                    onDeleteItem = { routeId ->
+                        viewModel.deleteRouteItem(routeId)
+                    },
+                )
+            }
+        }
     }
 }

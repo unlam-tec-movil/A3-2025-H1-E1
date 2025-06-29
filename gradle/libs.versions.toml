@@ -23,7 +23,7 @@ roomCompiler = "2.7.1"
 roomRuntime = "2.7.1"
 roomTestingVersion = "2.7.1"
 retrofit = "2.9.0"
-
+accompanist = "0.34.0"
 
 [libraries]
 
@@ -56,6 +56,8 @@ google-dagger-hilt-android-testing = { group = "com.google.dagger", name = "hilt
 
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "maps-compose" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "play-services-maps" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "play-services-location" }
@@ -78,7 +80,6 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
 daggerHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }

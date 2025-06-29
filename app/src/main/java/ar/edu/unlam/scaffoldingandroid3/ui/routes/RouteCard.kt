@@ -24,20 +24,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.RouteImage
 
 /**
+ * TODO implementar la funcionalidad de eliminar una ruta
  * Card de cada ruta guardada
  */
 
 @Composable
 fun RouteCard(
     modifier: Modifier = Modifier,
-    userName: String,
-    location: String,
-    distance: String,
-    duration: String,
-    onPlayClick: () -> Unit = {},
+    route: Route,
+    onPlayClick: () -> Unit,
+    onDeleteItem: () -> Unit,
 ) {
     Card(
         modifier =
@@ -59,30 +61,27 @@ fun RouteCard(
                 Box(
                     modifier =
                         Modifier
-                            .size(64.dp)
+                            .size(76.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.LightGray),
-                )
+                ) {
+                    RouteImage(modifier, route.photoUri)
+                }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = userName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                    )
-                    Text(
-                        text = location,
-                        style = MaterialTheme.typography.titleMedium,
+                        text = route.name,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                     Row {
                         Text(
-                            text = distance,
+                            text = "${String.format("%.1f", route.distance)} km",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = duration,
+                            text = "${route.duration / 60000} min",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
@@ -93,7 +92,7 @@ fun RouteCard(
                 onClick = onPlayClick,
                 modifier =
                     Modifier
-                        .size(48.dp)
+                        .size(52.dp)
                         .background(
                             color = MaterialTheme.colorScheme.primary,
                             shape = CircleShape,
@@ -107,4 +106,22 @@ fun RouteCard(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun RouteCardPreview() {
+    RouteCard(
+        route =
+            Route(
+                id = "1",
+                name = "Ruta 1",
+                photoUri = "",
+                distance = 10.0,
+                duration = 600000,
+                points = emptyList(),
+            ),
+        onPlayClick = {},
+        onDeleteItem = {},
+    )
 }

@@ -2,7 +2,7 @@ package ar.edu.unlam.scaffoldingandroid3.ui.navigation
 
 /**
  * TODO: Sealed class - Destinos de navegación
- * Objects: PhotoPreview, RouteDetail
+ * Objects: PhotoPreview
  * Incluir argumentos necesarios (routeId, photoId, etc.)
  */
 
@@ -15,7 +15,7 @@ sealed class Screen(val route: String) {
 
     object History : Screen("history")
 
-    object RouteDetail : Screen("route/{routeId}") {
-        fun createRoute(routeId: String) = "route/$routeId"
-    }
+    object SaveRoute : Screen("save_route")
+
+    object RouteDetail : Screen("route_detail")
 }
