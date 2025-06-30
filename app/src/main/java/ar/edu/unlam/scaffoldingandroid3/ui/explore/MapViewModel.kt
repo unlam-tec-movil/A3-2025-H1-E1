@@ -4,11 +4,13 @@ import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.GetCurrentLocationUseCase
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.GetNearbyRoutesUseCase
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -204,6 +206,28 @@ class MapViewModel
                     )
                 }
             }
+        }
+
+        fun showRoute(route: Route) {
+            // Update state
+            _uiState.update { it.copy(selectedRoute = route) }
+
+            // Calcular bounds de todos los puntos
+            if (route.points.isNotEmpty()) {
+                val builder = LatLngBounds.builder()
+                route.points.forEach { p ->
+                    builder.include(LatLng(p.latitude, p.longitude))
+                }
+                val bounds = builder.build()
+                val padding = 100 // px
+                viewModelScope.launch {
+                    _uiState.value.cameraPositionState.animate(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+                }
+            }
+        }
+
+        fun clearSelectedRoute() {
+            _uiState.update { it.copy(selectedRoute = null) }
         }
 
         companion object {

@@ -39,6 +39,7 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Polyline
 
 @Composable
 internal fun MapContent(
@@ -75,7 +76,15 @@ internal fun MapContent(
                 myLocationButtonEnabled = uiState.isLocationEnabled,
                 zoomControlsEnabled = true,
             ),
-    )
+    ) {
+        // Dibujar Polyline dentro del contexto del mapa
+        uiState.selectedRoute?.let { selRoute ->
+            val polyPoints = selRoute.points.map { LatLng(it.latitude, it.longitude) }
+            if (polyPoints.size >= 2) {
+                Polyline(points = polyPoints, color = Color.Blue, width = 8f)
+            }
+        }
+    }
 
     // The logic for displaying markers is now contained here
     val density = LocalDensity.current

@@ -12,11 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +38,6 @@ fun HistoryCard(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(8.dp)
                 .clickable { onClickItem() },
     ) {
         Row(
@@ -90,18 +85,6 @@ fun HistoryCard(
                         )
                     }
                 }
-            }
-            IconButton(
-                onClick = onDeleteItem,
-                modifier =
-                    Modifier
-                        .size(52.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Eliminar actividad",
-                    tint = Color.Red,
-                )
             }
         }
     }

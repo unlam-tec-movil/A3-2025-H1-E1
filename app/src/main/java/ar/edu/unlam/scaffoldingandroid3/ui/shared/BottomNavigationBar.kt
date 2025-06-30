@@ -141,21 +141,17 @@ private fun NavigationItem(
                     .clip(RoundedCornerShape(12.dp))
                     .background(containerColor)
                     .clickable {
-                        /* Navega evitando múltiples instancias y restaurando estado
-                           TODO: Investigar funcionamiento en casos de uso al estar grabando ruta
-                                 por que el popUpTo elimina el stack de las pantallas intermedias*/
-                        if (currentRoute != route) {
+                        if (route == Screen.Map.route) {
+                            // Volver al mapa existente preservando su estado y stack limpio
+                            navController.popBackStack(Screen.Map.route, inclusive = false)
+                        } else {
                             navController.navigate(route) {
-                                /*PopUp hasta la pantalla de inicio del grafo (MapScreen) y
-                                  guarda el estado del mapa */
                                 popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
                                     inclusive = false
+                                    saveState = false
                                 }
-                                // launchSingleTop Evita apilar varias instancias
                                 launchSingleTop = true
-                                // restoreState Restaura el estado guardado del mapa
-                                restoreState = true
+                                restoreState = false
                             }
                         }
                     },
