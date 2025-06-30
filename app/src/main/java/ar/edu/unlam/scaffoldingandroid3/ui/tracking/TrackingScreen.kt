@@ -119,11 +119,6 @@ fun TrackingScreen(
         }
     }
 
-    val photoFile = viewModel.createImageFile(context)
-    photoUri = FileProvider.getUriForFile(context,"${context.packageName}.fileprovider", photoFile)
-    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-        putExtra(MediaStore.EXTRA_OUTPUT, photoUri)}
-
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
