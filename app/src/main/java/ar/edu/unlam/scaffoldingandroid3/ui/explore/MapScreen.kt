@@ -44,6 +44,7 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
 import com.google.android.gms.maps.model.MapStyleOptions
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
 /**
  * Pantalla principal del mapa que muestra la ubicación actual y permite la interacción con rutas.
@@ -56,10 +57,12 @@ import com.google.android.gms.maps.model.MapStyleOptions
  * - Navegación inferior
  *
  * @param navController controla la navegación hacia otras pantallas
+ * @param selectedRoute la ruta seleccionada para mostrar
  */
 @Composable
 fun MapScreen(
     navController: NavHostController,
+    selectedRoute: Route? = null,
     viewModel: MapViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -82,6 +85,11 @@ fun MapScreen(
         remember {
             MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
         }
+
+    // Si llega una ruta externa, pedir al ViewModel que la muestre
+    LaunchedEffect(selectedRoute) {
+        selectedRoute?.let { viewModel.showRoute(it) }
+    }
 
     LaunchedEffect(uiState.showNoResultsMessage) {
         if (uiState.showNoResultsMessage) {
@@ -184,14 +192,29 @@ fun MapScreen(
                             .padding(MaterialTheme.dimens.paddingMedium),
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.paddingSmall),
                 ) {
-                    Button(
-                        onClick = { navController.navigate(Screen.Tracking.route) },
-                        modifier =
-                            Modifier
-                                .weight(1f)
-                                .height(MaterialTheme.dimens.buttonHeightNormal),
-                    ) {
-                        Text(text = stringResource(id = R.string.new_route))
+                    if (uiState.selectedRoute != null) {
+                        Button(
+                            onClick = {
+                                viewModel.clearSelectedRoute()
+                                navController.navigate(Screen.Tracking.route)
+                            },
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(MaterialTheme.dimens.buttonHeightNormal),
+                        ) {
+                            Text(text = stringResource(id = R.string.start_route))
+                        }
+                    } else {
+                        Button(
+                            onClick = { navController.navigate(Screen.Tracking.route) },
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(MaterialTheme.dimens.buttonHeightNormal),
+                        ) {
+                            Text(text = stringResource(id = R.string.new_route))
+                        }
                     }
                 }
             }

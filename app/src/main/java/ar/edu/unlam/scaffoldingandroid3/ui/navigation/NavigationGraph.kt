@@ -51,9 +51,13 @@ fun NavGraph(
                 navController = navController,
             )
         }
-        composable(Screen.Map.route) {
+        composable(Screen.Map.route) { backStackEntry ->
+            // Leemos si se pasó una ruta para mostrar
+            val selectedRoute: Route? = backStackEntry.savedStateHandle.remove("selectedRoute")
+
             MapScreen(
                 navController = navController,
+                selectedRoute = selectedRoute,
             )
         }
         composable(Screen.History.route) {
@@ -69,7 +73,12 @@ fun NavGraph(
                 RouteDetailScreen(
                     route = route,
                     onStartClick = {
-                        navController.navigate(Screen.Tracking.route)
+                        // Pasar la ruta al Map para que se dibuje y centrar cámara
+                        navController.getBackStackEntry(Screen.Map.route).savedStateHandle["selectedRoute"] = route
+                        val popped = navController.popBackStack(Screen.Map.route, inclusive = false)
+                        if (!popped) {
+                            navController.navigate(Screen.Map.route)
+                        }
                     },
                 )
             } else {
