@@ -81,5 +81,5 @@ interface TrackingSessionRepository {
      */
     suspend fun getLocationPointsBySession(sessionId: Long): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint>
 
-    fun setPhoto(uri: String)
+    suspend fun setPhoto(uri: String)
 }

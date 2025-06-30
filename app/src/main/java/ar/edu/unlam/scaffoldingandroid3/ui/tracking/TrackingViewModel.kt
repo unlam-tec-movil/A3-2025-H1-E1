@@ -329,7 +329,9 @@ class TrackingViewModel
                 photoCount = currentPhotos.size,
                 lastPhotoUri = uri.toString()
             )
-            trackingSessionRepository.setPhoto(uri.toString())
+            viewModelScope.launch {
+                trackingSessionRepository.setPhoto(uri.toString())
+            }
         }
 /*
         fun capturePhoto() {

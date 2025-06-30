@@ -89,7 +89,7 @@ class TrackingSessionRepositoryImpl
             return session
         }
 
-        override fun setPhoto(uri: String) {
+        override suspend fun setPhoto(uri: String) {
             currentSession.value = currentSession.value?.copy(photo = uri)
         }
 
