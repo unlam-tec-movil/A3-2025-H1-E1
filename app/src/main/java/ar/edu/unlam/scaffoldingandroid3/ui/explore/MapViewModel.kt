@@ -134,7 +134,10 @@ class MapViewModel
 
         fun createImageFile(context: Context): File {
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val storageDir = File(context.getExternalFilesDir(null), "tracking_photos")
+            if (!storageDir.exists()) {
+                storageDir.mkdirs()
+            }
             return File.createTempFile("JPEG_${timestamp}_", ".jpg", storageDir)
         }
 

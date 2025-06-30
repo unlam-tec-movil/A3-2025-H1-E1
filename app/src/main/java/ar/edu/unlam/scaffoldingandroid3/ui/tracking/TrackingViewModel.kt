@@ -1,8 +1,12 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
+import android.content.Context
+import android.net.Uri
+import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
+import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
@@ -16,7 +20,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -297,6 +306,31 @@ class TrackingViewModel
                     }
                 callback(canStart, blockingReasons)
             }
+        }
+
+        fun createImageFile(context: Context): File {
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val storageDir = File(context.getExternalFilesDir(null), "tracking_photos")
+            if (!storageDir.exists()) {
+                storageDir.mkdirs()
+            }
+            return File.createTempFile("JPEG_${timestamp}_", ".jpg", storageDir)
+        }
+
+        fun onPhotoTaken(uri: Uri) {
+            val photo = TrackingPhoto(
+                uri = uri.toString(),
+                orderInRoute = _uiState.value.capturedPhotos.size
+            )
+
+            val currentPhotos = _uiState.value.capturedPhotos.toMutableList()
+            currentPhotos.add(photo)
+
+            _uiState.value = _uiState.value.copy(
+                capturedPhotos = currentPhotos,
+                photoCount = currentPhotos.size,
+                lastPhotoUri = uri.toString()
+            )
         }
 
         fun capturePhoto() {

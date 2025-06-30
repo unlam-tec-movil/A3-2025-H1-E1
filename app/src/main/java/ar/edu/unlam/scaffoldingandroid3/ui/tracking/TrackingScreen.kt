@@ -1,6 +1,12 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
+import android.net.Uri
+import android.content.Intent
+import androidx.core.content.FileProvider
+import android.provider.MediaStore
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -100,6 +106,17 @@ fun TrackingScreen(
         }
     }
 
+    val context = LocalContext.current
+    var photoUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK && photoUri != null) {
+            viewModel.onPhotoTaken(photoUri!!)
+        }
+    }
+
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
             snackbarHostState.showSnackbar(error)
@@ -135,7 +152,18 @@ fun TrackingScreen(
             },
             isPermissionGranted = activityRecognitionPermissionState.status.isGranted,
             onExpandStats = viewModel::toggleStatsExpansion,
-            onCapturePhoto = viewModel::capturePhoto,
+            onCapturePhoto =  {
+                val photoFile = viewModel.createImageFile(context)
+                photoUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    photoFile
+                )
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                    putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                }
+                cameraLauncher.launch(intent)
+            }
         )
 
         if (uiState.isLoading) {
