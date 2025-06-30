@@ -1,7 +1,9 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
+import android.Manifest
 import android.net.Uri
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.core.content.FileProvider
 import android.provider.MediaStore
 import android.os.Build
@@ -116,6 +118,16 @@ fun TrackingScreen(
             viewModel.onPhotoTaken(photoUri!!)
         }
     }
+    val cameraPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                if (isGranted) {
+                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    cameraLauncher.launch(intent)
+                }
+            },
+        )
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
@@ -153,6 +165,11 @@ fun TrackingScreen(
             isPermissionGranted = activityRecognitionPermissionState.status.isGranted,
             onExpandStats = viewModel::toggleStatsExpansion,
             onCapturePhoto =  {
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.CAMERA,
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
                 val photoFile = viewModel.createImageFile(context)
                 photoUri = FileProvider.getUriForFile(
                     context,
@@ -163,6 +180,9 @@ fun TrackingScreen(
                     putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
                 }
                 cameraLauncher.launch(intent)
+                } else {
+                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
             }
         )
 

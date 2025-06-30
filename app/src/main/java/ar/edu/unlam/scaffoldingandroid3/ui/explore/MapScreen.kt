@@ -196,7 +196,7 @@ fun MapScreen(
                         photoUri =
                             FileProvider.getUriForFile(
                                 context,
-                                "${context.packageName}.provider",
+                                "${context.packageName}.fileprovider",
                                 photoFile,
                             )
                         val intent =
