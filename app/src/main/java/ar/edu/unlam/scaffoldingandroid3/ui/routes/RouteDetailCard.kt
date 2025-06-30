@@ -30,6 +30,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.generateStaticMapUrl
+import coil.compose.AsyncImage
+import androidx.compose.foundation.layout.fillMaxSize
+import ar.edu.unlam.scaffoldingandroid3.BuildConfig
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import coil.request.ImageRequest
+import coil.compose.rememberAsyncImagePainter
+import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Composable - Card expandido con detalles completos de ruta
@@ -44,16 +57,13 @@ fun RouteDetailCard(
     onStartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Obtener API key desde recursos
-//    val context = LocalContext.current
-//    val apiKey = remember {
-//        context.getString(ar.edu.unlam.scaffoldingandroid3.R.string.google_maps_api_key)
-//    }
-//    val configuration = LocalConfiguration.current
-//    val screenWidth = configuration.screenWidthDp.dp
-//    val mapHeight = remember {
-//        (screenWidth * 0.6f)
-//    }
+    // Parámetros para la imagen de mapa estático
+    val apiKey = remember { BuildConfig.MAPS_API_KEY }
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val mapHeight = remember {
+        (screenWidth * 0.6f)
+    }
 
     Card(
         modifier =
@@ -73,21 +83,37 @@ fun RouteDetailCard(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(mapHeight)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.LightGray),
             ) {
-//                AsyncImage(
-//                    model = MapUtils.generateStaticMapUrl(
-//                        route = route,
-//                        apiKey = apiKey,
-//                        width = (screenWidth.value * 2).toInt(), // x2 para mejor calidad
-//                        height = (mapHeight.value * 2).toInt(),
-//                    ),
-//                    contentDescription = "Mapa de la ruta",
-//                    modifier = Modifier.fillMaxWidth(),
-//                    contentScale = ContentScale.Crop,
-//                )
+                val staticMapUrl = remember(route, apiKey) {
+                    generateStaticMapUrl(
+                        route = route,
+                        apiKey = apiKey,
+                        width = screenWidth.value.toInt().coerceAtLeast(200),
+                        height = mapHeight.value.toInt().coerceAtLeast(150),
+                        scale = 2,
+                    )
+                }
+                Log.d("RouteDetailCard", "Loading static map with URL: $staticMapUrl")
+
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(staticMapUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Mapa de la ruta",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    loading = {
+                        // Podrías mostrar un spinner aquí
+                        Log.d("RouteDetailCard", "Static map loading…")
+                    },
+                    error = {
+                        Log.e("RouteDetailCard", "Error cargando static map")
+                    },
+                )
             }
             Spacer(modifier = Modifier.height(16.dp))
             // Metadata de la ruta
