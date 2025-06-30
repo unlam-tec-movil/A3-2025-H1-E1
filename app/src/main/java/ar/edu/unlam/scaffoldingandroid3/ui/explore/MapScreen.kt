@@ -35,7 +35,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ar.edu.unlam.scaffoldingandroid3.R
@@ -54,11 +57,6 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
 import com.google.android.gms.maps.model.MapStyleOptions
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.core.content.FileProvider
 
 /**
  * Pantalla principal del mapa que muestra la ubicación actual y permite la interacción con rutas.
@@ -90,13 +88,14 @@ fun MapScreen(
             },
         )
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK && photoUri != null) {
-            viewModel.onPhotoTaken(photoUri!!) // Pasás el URI al ViewModel
+    val cameraLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK && photoUri != null) {
+                viewModel.onPhotoTaken(photoUri!!) // Pasás el URI al ViewModel
+            }
         }
-    }
 
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(
@@ -182,38 +181,41 @@ fun MapScreen(
                 onClick = {
                     if (ContextCompat.checkSelfPermission(
                             context,
-                            Manifest.permission.CAMERA
+                            Manifest.permission.CAMERA,
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
                         val photoFile = viewModel.createImageFile(context)
-                        photoUri = FileProvider.getUriForFile(
-                            context,
-                            "${context.packageName}.provider",
-                            photoFile
-                        )
-                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-                            putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-                        }
+                        photoUri =
+                            FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.provider",
+                                photoFile,
+                            )
+                        val intent =
+                            Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                                putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                            }
                         cameraLauncher.launch(intent)
                     } else {
                         cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                     }
                 },
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(
-                        bottom = 120.dp,
-                        start = MaterialTheme.dimens.paddingMedium
-                    )
-                    .size(56.dp),
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(
+                            bottom = 120.dp,
+                            start = MaterialTheme.dimens.paddingMedium,
+                        )
+                        .size(56.dp),
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_camera),
                     contentDescription = stringResource(R.string.camera_button_content_description),
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
 

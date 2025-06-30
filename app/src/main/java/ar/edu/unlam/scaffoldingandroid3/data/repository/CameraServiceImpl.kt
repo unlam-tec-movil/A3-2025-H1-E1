@@ -16,19 +16,19 @@ import java.util.Locale
  * Usa CameraX para captura + permisos Android + file storage
  */
 
-class CameraServiceImpl{
+class CameraServiceImpl {
     fun createImageFile(context: Context): File {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile("ROUTE_${timeStamp}_", ".jpg", storageDir)
     }
-    
+
     fun getImageUri(context: Context): Uri {
         val imageFile = createImageFile(context)
         return FileProvider.getUriForFile(
             context,
             "${context.packageName}.provider",
-            imageFile
+            imageFile,
         )
     }
 }
