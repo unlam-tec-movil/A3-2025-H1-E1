@@ -11,6 +11,7 @@ import com.google.maps.android.compose.CameraPositionState
  * @property isLocationEnabled indica si la ubicación del usuario está habilitada.
  * @property currentLocation la última ubicación conocida del usuario.
  * @property nearbyRoutes la lista de rutas de trekking cercanas a mostrar en el mapa.
+ * @property selectedRoute la ruta iniciada por el usuario.
  * @property error un mensaje de error a mostrar, si lo hubiera.
  * @property lastSearchedLocation la última ubicación buscada por el usuario.
  * @property showSearchInAreaButton indica si el botón de búsqueda en área está visible.
@@ -25,6 +26,7 @@ data class MapUiState(
     val currentLocation: LocationPoint? = null,
     val lastSearchedLocation: LocationPoint? = null,
     val nearbyRoutes: List<Route> = emptyList(),
+    val selectedRoute: Route? = null,
     val error: String? = null,
     val cameraPositionState: CameraPositionState = CameraPositionState(),
     val lastPhotoUri: String? = null,

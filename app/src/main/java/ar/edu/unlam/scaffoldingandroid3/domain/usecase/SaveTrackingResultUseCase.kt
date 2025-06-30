@@ -1,56 +1,51 @@
 package ar.edu.unlam.scaffoldingandroid3.domain.usecase
 
+import ar.edu.unlam.scaffoldingandroid3.domain.model.History
+import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
+import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
+import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
+import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.HistoryRepository
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 import javax.inject.Inject
 
 /**
- * Use Case para guardar resultados de tracking en base de datos
- * Compatible con Clean Architecture: ViewModel → UseCase → Repository
+ * Caso de uso que persiste la información de un recorrido completado.
+ *
+ * 1. Guarda la TrackingSession (detalle técnico completo)
+ * 2. Guarda la Route para la pantalla "Mis rutas"
+ * 3. Guarda el History para la pantalla "Historial"
  */
 class SaveTrackingResultUseCase
     @Inject
     constructor(
         private val trackingSessionRepository: TrackingSessionRepository,
+        private val routeRepository: RouteRepository,
+        private val historyRepository: HistoryRepository,
     ) {
         /**
-         * Guarda el resultado completo de tracking en base de datos
+         * Persiste la información y devuelve el ID de la TrackingSession guardada.
          */
         suspend fun execute(trackingResult: TrackingResult): Result<Long> {
             return try {
-                // Crear sesión de dominio a partir del resultado
-                val session =
-                    ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession(
-                        // Se asignará automáticamente
-                        id = 0L,
-                        routeName = trackingResult.nombreRecorrido,
-                        status = ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus.COMPLETED,
-                        startTime = trackingResult.fechaCreacion,
-                        endTime = System.currentTimeMillis(),
-                        routePoint = trackingResult.rutaCompleta,
-                        metrics =
-                            ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics(
-                                currentDistance = trackingResult.distanciaTotal,
-                                averageSpeed = trackingResult.velocidadMedia,
-                                maxSpeed = trackingResult.velocidadMaxima,
-                                // Usar la altitud máxima como actual
-                                currentElevation = trackingResult.altitudMaxima,
-                                // Mapear altitudes min/max correctamente
-                                minElevation = trackingResult.altitudMinima,
-                                maxElevation = trackingResult.altitudMaxima,
-                                // No relevante para sesión completada
-                                currentSpeed = 0.0,
-                                // Convertir duración de string a milisegundos
-                                currentDuration = parseDurationStringToMillis(trackingResult.duracion),
-                                // No disponible en resultado final
-                                lastLocation = null,
-                                // Mapear pasos totales correctamente
-                                totalSteps = trackingResult.pasosTotales,
-                            ),
-                    )
-
-                // Guardar a través del repository (respeta Clean Architecture)
+                // 1) Crear y guardar TrackingSession
+                val session = buildTrackingSession(trackingResult)
                 val sessionId = trackingSessionRepository.saveTrackingSession(session)
+
+                // 2) Crear y guardar Route
+                val route = buildRoute(trackingResult)
+                routeRepository.saveRoute(route)
+
+                // 3) Crear y guardar History
+                val history = buildHistory(trackingResult)
+                historyRepository.saveCompletedActivity(history)
 
                 Result.success(sessionId)
             } catch (e: Exception) {
@@ -58,9 +53,73 @@ class SaveTrackingResultUseCase
             }
         }
 
-        /**
-         * Convierte string de duración HH:MM:SS a milisegundos
-         */
+        private fun buildTrackingSession(result: TrackingResult): TrackingSession {
+            return TrackingSession(
+                id = 0L,
+                routeName = result.nombreRecorrido,
+                status = TrackingStatus.COMPLETED,
+                startTime = result.fechaCreacion,
+                endTime = System.currentTimeMillis(),
+                routePoint = result.rutaCompleta,
+                metrics =
+                    TrackingMetrics(
+                        currentSpeed = 0.0,
+                        averageSpeed = result.velocidadMedia,
+                        maxSpeed = result.velocidadMaxima,
+                        currentDistance = result.distanciaTotal,
+                        currentDuration = parseDurationStringToMillis(result.duracion),
+                        currentElevation = result.altitudMaxima,
+                        minElevation = result.altitudMinima,
+                        maxElevation = result.altitudMaxima,
+                        totalSteps = result.pasosTotales,
+                        lastLocation = result.rutaCompleta.lastOrNull(),
+                    ),
+            )
+        }
+
+        private fun buildRoute(result: TrackingResult): Route {
+            val routePoints =
+                result.rutaCompleta.map { lp: LocationPoint ->
+                    Route.Point(
+                        latitude = lp.latitude,
+                        longitude = lp.longitude,
+                        timestamp = lp.timestamp,
+                    )
+                }
+
+            return Route(
+                id = UUID.randomUUID().toString(),
+                name = result.nombreRecorrido,
+                points = routePoints,
+                distance = result.distanciaTotal,
+                duration = parseDurationStringToMillis(result.duracion),
+                photoUri = result.fotosCapturadas.firstOrNull()?.uri ?: "",
+            )
+        }
+
+        private fun buildHistory(result: TrackingResult): History {
+            val metrics =
+                TrackingMetrics(
+                    averageSpeed = result.velocidadMedia,
+                    maxSpeed = result.velocidadMaxima,
+                    currentDistance = result.distanciaTotal,
+                    currentDuration = parseDurationStringToMillis(result.duracion),
+                    minElevation = result.altitudMinima,
+                    maxElevation = result.altitudMaxima,
+                    totalSteps = result.pasosTotales,
+                )
+
+            val dateStr = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(result.fechaCreacion))
+
+            return History(
+                routeName = result.nombreRecorrido,
+                date = dateStr,
+                metrics = metrics,
+                photoUri = result.fotosCapturadas.firstOrNull()?.uri ?: "",
+                routePoint = result.rutaCompleta,
+            )
+        }
+
         private fun parseDurationStringToMillis(duration: String): Long {
             return try {
                 val parts = duration.split(":")

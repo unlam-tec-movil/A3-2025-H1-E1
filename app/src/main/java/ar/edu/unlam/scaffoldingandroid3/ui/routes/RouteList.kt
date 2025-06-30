@@ -13,11 +13,11 @@ fun RouteList(
     onDeleteItem: (String) -> Unit,
 ) {
     LazyColumn {
-        items(routeList) { route ->
-            RouteCard(
+        items(routeList, key = { it.id }) { route ->
+            DismissibleRouteItem(
                 route = route,
                 onPlayClick = { onPlayClick(route) },
-                onDeleteItem = { onDeleteItem(route.id) },
+                onDelete = { onDeleteItem(route.id) },
             )
         }
     }
