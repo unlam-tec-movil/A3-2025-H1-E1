@@ -6,9 +6,9 @@ import android.graphics.Canvas
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import ar.edu.unlam.scaffoldingandroid3.R
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
 /**
  * Convierte un recurso de drawable vectorial (Vector Drawable) a un Bitmap.
@@ -120,7 +120,7 @@ fun generateStaticMapUrl(
 
     val params =
         buildString {
-            append("size=${finalW}x${finalH}")
+            append("size=${finalW}x$finalH")
             if (scale in 2..4) append("&scale=$scale")
             append("&maptype=$mapType")
             append("&path=weight:5|color:0x0000FF80|$path")

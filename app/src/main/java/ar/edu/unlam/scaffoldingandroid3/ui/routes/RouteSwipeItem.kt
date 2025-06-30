@@ -31,15 +31,18 @@ fun DismissibleRouteItem(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val dismissState: SwipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.StartToEnd || value == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
-                true
-            } else false
-        },
-        positionalThreshold = { total -> total * 0.5f },
-    )
+    val dismissState: SwipeToDismissBoxState =
+        rememberSwipeToDismissBoxState(
+            confirmValueChange = { value ->
+                if (value == SwipeToDismissBoxValue.StartToEnd || value == SwipeToDismissBoxValue.EndToStart) {
+                    onDelete()
+                    true
+                } else {
+                    false
+                }
+            },
+            positionalThreshold = { total -> total * 0.5f },
+        )
 
     val progress by animateFloatAsState(targetValue = dismissState.progress)
 
@@ -76,4 +79,4 @@ fun DismissibleRouteItem(
             )
         },
     )
-} 
+}

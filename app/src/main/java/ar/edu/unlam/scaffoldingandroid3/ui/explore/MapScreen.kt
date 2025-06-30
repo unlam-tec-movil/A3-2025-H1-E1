@@ -38,13 +38,13 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ar.edu.unlam.scaffoldingandroid3.R
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.navigation.Screen
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
 import com.google.android.gms.maps.model.MapStyleOptions
-import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
 /**
  * Pantalla principal del mapa que muestra la ubicación actual y permite la interacción con rutas.

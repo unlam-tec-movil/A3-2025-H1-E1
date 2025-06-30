@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,24 +23,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
-import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
-import ar.edu.unlam.scaffoldingandroid3.ui.shared.generateStaticMapUrl
-import coil.compose.AsyncImage
-import androidx.compose.foundation.layout.fillMaxSize
 import ar.edu.unlam.scaffoldingandroid3.BuildConfig
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.generateStaticMapUrl
+import ar.edu.unlam.scaffoldingandroid3.ui.theme.ScaffoldingAndroid3Theme
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import androidx.compose.ui.platform.LocalContext
 
 /**
  * Composable - Card expandido con detalles completos de ruta
@@ -58,9 +57,10 @@ fun RouteDetailCard(
     val apiKey = remember { BuildConfig.MAPS_API_KEY }
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val mapHeight = remember {
-        (screenWidth * 0.6f)
-    }
+    val mapHeight =
+        remember {
+            (screenWidth * 0.6f)
+        }
 
     Card(
         modifier =
@@ -84,21 +84,23 @@ fun RouteDetailCard(
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.LightGray),
             ) {
-                val staticMapUrl = remember(route, apiKey) {
-                    generateStaticMapUrl(
-                        route = route,
-                        apiKey = apiKey,
-                        width = screenWidth.value.toInt().coerceAtLeast(200),
-                        height = mapHeight.value.toInt().coerceAtLeast(150),
-                        scale = 2,
-                    )
-                }
+                val staticMapUrl =
+                    remember(route, apiKey) {
+                        generateStaticMapUrl(
+                            route = route,
+                            apiKey = apiKey,
+                            width = screenWidth.value.toInt().coerceAtLeast(200),
+                            height = mapHeight.value.toInt().coerceAtLeast(150),
+                            scale = 2,
+                        )
+                    }
 
                 SubcomposeAsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(staticMapUrl)
-                        .crossfade(true)
-                        .build(),
+                    model =
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(staticMapUrl)
+                            .crossfade(true)
+                            .build(),
                     contentDescription = "Mapa de la ruta",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,

@@ -7,22 +7,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.SwipeToDismissBoxState
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ar.edu.unlam.scaffoldingandroid3.domain.model.History
-import androidx.compose.ui.draw.clip
 
 /**
  * Ítem de historial con soporte de gesto swipe-to-delete (tipo Gmail).
@@ -35,17 +35,18 @@ fun DismissibleHistoryItem(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val dismissState: SwipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.StartToEnd || value == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
-                true
-            } else {
-                false
-            }
-        },
-        positionalThreshold = { totalDistance: Float -> totalDistance * 0.5f },
-    )
+    val dismissState: SwipeToDismissBoxState =
+        rememberSwipeToDismissBoxState(
+            confirmValueChange = { value ->
+                if (value == SwipeToDismissBoxValue.StartToEnd || value == SwipeToDismissBoxValue.EndToStart) {
+                    onDelete()
+                    true
+                } else {
+                    false
+                }
+            },
+            positionalThreshold = { totalDistance: Float -> totalDistance * 0.5f },
+        )
 
     val progress by animateFloatAsState(targetValue = dismissState.progress)
 
