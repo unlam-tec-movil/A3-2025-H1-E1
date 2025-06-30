@@ -1,8 +1,10 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.explore
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,6 +54,11 @@ import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
 import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
 import com.google.android.gms.maps.model.MapStyleOptions
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.core.content.FileProvider
 
 /**
  * Pantalla principal del mapa que muestra la ubicación actual y permite la interacción con rutas.
@@ -73,6 +80,7 @@ fun MapScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    var photoUri by remember { mutableStateOf<Uri?>(null) }
 
     val permissionLauncher =
         rememberLauncherForActivityResult(
@@ -85,7 +93,9 @@ fun MapScreen(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        viewModel.onPhotoTaken()
+        if (result.resultCode == Activity.RESULT_OK && photoUri != null) {
+            viewModel.onPhotoTaken(photoUri!!) // Pasás el URI al ViewModel
+        }
     }
 
     val cameraPermissionLauncher =
@@ -175,7 +185,15 @@ fun MapScreen(
                             Manifest.permission.CAMERA
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        val photoFile = viewModel.createImageFile(context)
+                        photoUri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.provider",
+                            photoFile
+                        )
+                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                            putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                        }
                         cameraLauncher.launch(intent)
                     } else {
                         cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
