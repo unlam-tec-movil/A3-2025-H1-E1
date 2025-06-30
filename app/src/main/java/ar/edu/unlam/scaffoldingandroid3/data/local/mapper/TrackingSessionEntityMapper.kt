@@ -27,6 +27,7 @@ object TrackingSessionEntityMapper {
             minAltitude = this.metrics.minElevation,
             maxAltitude = this.metrics.maxElevation,
             createdAt = System.currentTimeMillis(),
+            photo = this.photo
         )
     }
 

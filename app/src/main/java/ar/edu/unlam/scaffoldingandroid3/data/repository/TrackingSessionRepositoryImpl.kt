@@ -89,6 +89,10 @@ class TrackingSessionRepositoryImpl
             return session
         }
 
+        override fun setPhoto(uri: String) {
+            currentSession.value = currentSession.value?.copy(photo = uri)
+        }
+
         /**
          * Pausa la sesión de tracking actual
          * Compatible con CU-011: Pausar grabación de ruta
