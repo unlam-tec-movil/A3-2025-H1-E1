@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Scaffolding Android 3</string>
+    <string name="app_name">Pathly</string>
     <string name="load_routes">Cargar rutas</string>
     <string name="new_route">Nueva ruta</string>
     <string name="record_route">Grabar ruta</string>
