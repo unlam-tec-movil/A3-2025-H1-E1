@@ -45,12 +45,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ConfettiAnimation
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.RouteImage
+import coil.compose.AsyncImage
 
 /**
  * Pantalla para guardar el recorrido completado
@@ -129,7 +132,7 @@ fun SaveRouteScreen(
 
                     // Sección de fotos con animación
                     AnimatedPhotosSection(
-                        photos = result.fotosCapturadas,
+                        photos = result.foto,
                         onAddPhoto = { /* TODO: Implementar agregar foto */ },
                     )
                 } ?: run {
@@ -277,7 +280,7 @@ private fun NameInputSection(
 
 @Composable
 private fun PhotosSection(
-    photos: List<ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto>,
+    photos: String,
     onAddPhoto: () -> Unit,
 ) {
     Card(
@@ -293,12 +296,6 @@ private fun PhotosSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = "Fotos: ${photos.size}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-
                 IconButton(onClick = onAddPhoto) {
                     Text(
                         text = "+",
@@ -309,13 +306,7 @@ private fun PhotosSection(
             }
 
             if (photos.isNotEmpty()) {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(photos) { photo ->
-                        PhotoThumbnail()
-                    }
-                }
+                RouteImage(modifier = Modifier, photos)
             } else {
                 Text(
                     text = "No hay fotos capturadas",
@@ -326,7 +317,21 @@ private fun PhotosSection(
         }
     }
 }
-
+@Composable
+private fun PhotoThumbnail(photoUri: String) {
+    Card(
+        modifier = Modifier.size(80.dp),
+        shape = RoundedCornerShape(8.dp),
+    ) {
+        AsyncImage(
+            model = photoUri,
+            contentDescription = "Foto del recorrido",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+/*
 @Composable
 private fun PhotoThumbnail() {
     Card(
@@ -345,6 +350,8 @@ private fun PhotoThumbnail() {
         }
     }
 }
+
+ */
 
 @Composable
 private fun DiscardRouteDialog(
@@ -461,7 +468,7 @@ private fun AnimatedNameInputSection(
  */
 @Composable
 private fun AnimatedPhotosSection(
-    photos: List<ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto>,
+    photos: String,
     onAddPhoto: () -> Unit,
 ) {
     val visible = remember { mutableStateOf(false) }

@@ -56,6 +56,7 @@ object TrackingSessionEntityMapper {
             status = TrackingStatus.COMPLETED,
             // Los puntos se manejan por separado
             routePoint = emptyList(),
+            photo = ""
         )
     }
 

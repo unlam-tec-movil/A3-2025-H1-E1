@@ -2,7 +2,6 @@ package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -332,7 +330,7 @@ class TrackingViewModel
                 lastPhotoUri = uri.toString()
             )
         }
-
+/*
         fun capturePhoto() {
             // TEMPORALMENTE DESHABILITADO para debug de crash
             // La funcionalidad de cámara se implementará después de solucionar el crash
@@ -354,6 +352,8 @@ class TrackingViewModel
                 )
         }
 
+ */
+
         private fun createTrackingResult(session: TrackingSession): TrackingResult {
             // Usar solo tiempo de movimiento (sin pausas)
             val duracion = formatTime(session.metrics.currentDuration)
@@ -370,7 +370,7 @@ class TrackingViewModel
                 // Simplificado por ahora
                 altitudMaxima = session.metrics.currentElevation + 50,
                 rutaCompleta = session.routePoint,
-                fotosCapturadas = _uiState.value.capturedPhotos,
+                foto = _uiState.value.lastPhotoUri ?: "",
                 nombreRecorrido = "",
                 fechaCreacion = System.currentTimeMillis(),
             )

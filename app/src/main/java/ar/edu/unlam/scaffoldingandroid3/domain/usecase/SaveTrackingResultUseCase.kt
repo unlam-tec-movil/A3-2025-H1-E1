@@ -61,6 +61,7 @@ class SaveTrackingResultUseCase
                 startTime = result.fechaCreacion,
                 endTime = System.currentTimeMillis(),
                 routePoint = result.rutaCompleta,
+                photo = result.foto,
                 metrics =
                     TrackingMetrics(
                         currentSpeed = 0.0,
@@ -93,7 +94,7 @@ class SaveTrackingResultUseCase
                 points = routePoints,
                 distance = result.distanciaTotal,
                 duration = parseDurationStringToMillis(result.duracion),
-                photoUri = result.fotosCapturadas.firstOrNull()?.uri ?: "",
+                photoUri = result.foto ?: "",
             )
         }
 
@@ -115,7 +116,7 @@ class SaveTrackingResultUseCase
                 routeName = result.nombreRecorrido,
                 date = dateStr,
                 metrics = metrics,
-                photoUri = result.fotosCapturadas.firstOrNull()?.uri ?: "",
+                photoUri = result.foto ?: "",
                 routePoint = result.rutaCompleta,
             )
         }

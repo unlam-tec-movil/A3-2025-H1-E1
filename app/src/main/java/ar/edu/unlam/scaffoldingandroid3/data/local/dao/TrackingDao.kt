@@ -19,12 +19,19 @@ interface TrackingDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPhotos(photos: List<PhotoEntity>)
+/*
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun instertPhoto(photo: String)
+
+ */
 
     @Query("SELECT * FROM tracking_sessions ORDER BY createdAt DESC")
     suspend fun getAllTrackingSessions(): List<TrackingSessionEntity>
-
+/*
     @Query("SELECT * FROM tracking_photos WHERE sessionId = :sessionId")
-    suspend fun getPhotosForSession(sessionId: Long): List<PhotoEntity>
+    suspend fun getPhotoForSession(sessionId: Long): String
+
+ */
 
     @Query("SELECT * FROM tracking_sessions WHERE id = :sessionId")
     suspend fun getTrackingSessionById(sessionId: Long): TrackingSessionEntity?
