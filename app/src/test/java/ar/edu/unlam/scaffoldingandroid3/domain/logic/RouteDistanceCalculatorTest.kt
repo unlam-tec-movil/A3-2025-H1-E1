@@ -9,7 +9,6 @@ import org.junit.Before
 import org.junit.Test
 
 class RouteDistanceCalculatorTest {
-
     private val calculator = RouteDistanceCalculator()
 
     @Before
@@ -32,13 +31,14 @@ class RouteDistanceCalculatorTest {
     @Test
     fun `calculate deberia retornar cero para un solo punto`() {
         // Given
-        val points = listOf(
-            Route.Point(
-                latitude = -34.670533,
-                longitude = -58.562867,
-                timestamp = 0L
+        val points =
+            listOf(
+                Route.Point(
+                    latitude = -34.670533,
+                    longitude = -58.562867,
+                    timestamp = 0L,
+                ),
             )
-        )
 
         // When
         val distance = calculator.calculate(points)
@@ -50,18 +50,19 @@ class RouteDistanceCalculatorTest {
     @Test
     fun `calculate deberia retornar la distancia correcta entre dos puntos`() {
         // Given
-        val points = listOf(
-            Route.Point(
-                latitude = -34.670533,
-                longitude = -58.562867,
-                timestamp = 0L
-            ),
-            Route.Point(
-                latitude = -34.671533,
-                longitude = -58.563867,
-                timestamp = 1000L
+        val points =
+            listOf(
+                Route.Point(
+                    latitude = -34.670533,
+                    longitude = -58.562867,
+                    timestamp = 0L,
+                ),
+                Route.Point(
+                    latitude = -34.671533,
+                    longitude = -58.563867,
+                    timestamp = 1000L,
+                ),
             )
-        )
 
         // Mock del metodo estatico distanceBetween
         every {
@@ -70,7 +71,7 @@ class RouteDistanceCalculatorTest {
                 -58.562867,
                 -34.671533,
                 -58.563867,
-                any()
+                any(),
             )
         } answers {
             val results = arg<FloatArray>(4)
@@ -87,23 +88,24 @@ class RouteDistanceCalculatorTest {
     @Test
     fun `calculate deberia sumar todas las distancias para multiples puntos`() {
         // Given
-        val points = listOf(
-            Route.Point(
-                latitude = -34.670533,
-                longitude = -58.562867,
-                timestamp = 0L
-            ),
-            Route.Point(
-                latitude = -34.671533,
-                longitude = -58.563867,
-                timestamp = 1000L
-            ),
-            Route.Point(
-                latitude = -34.672533,
-                longitude = -58.564867,
-                timestamp = 2000L
+        val points =
+            listOf(
+                Route.Point(
+                    latitude = -34.670533,
+                    longitude = -58.562867,
+                    timestamp = 0L,
+                ),
+                Route.Point(
+                    latitude = -34.671533,
+                    longitude = -58.563867,
+                    timestamp = 1000L,
+                ),
+                Route.Point(
+                    latitude = -34.672533,
+                    longitude = -58.564867,
+                    timestamp = 2000L,
+                ),
             )
-        )
 
         // Mock para el primer segmento
         every {
@@ -112,7 +114,7 @@ class RouteDistanceCalculatorTest {
                 -58.562867,
                 -34.671533,
                 -58.563867,
-                any()
+                any(),
             )
         } answers {
             val results = arg<FloatArray>(4)
@@ -126,7 +128,7 @@ class RouteDistanceCalculatorTest {
                 -58.563867,
                 -34.672533,
                 -58.564867,
-                any()
+                any(),
             )
         } answers {
             val results = arg<FloatArray>(4)
