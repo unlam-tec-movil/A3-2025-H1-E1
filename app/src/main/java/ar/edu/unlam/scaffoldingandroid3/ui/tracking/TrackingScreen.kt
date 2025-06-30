@@ -118,12 +118,26 @@ fun TrackingScreen(
             viewModel.onPhotoTaken(photoUri!!)
         }
     }
+
+    val photoFile = viewModel.createImageFile(context)
+    photoUri = FileProvider.getUriForFile(context,"${context.packageName}.fileprovider", photoFile)
+    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+        putExtra(MediaStore.EXTRA_OUTPUT, photoUri)}
+
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { isGranted ->
                 if (isGranted) {
-                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    val photoFile = viewModel.createImageFile(context)
+                    photoUri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        photoFile
+                    )
+                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                        putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                    }
                     cameraLauncher.launch(intent)
                 }
             },
