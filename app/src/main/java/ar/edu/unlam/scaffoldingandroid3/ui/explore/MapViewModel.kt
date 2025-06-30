@@ -1,6 +1,10 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.explore
 
+import android.content.Context
 import android.location.Location
+import android.net.Uri
+import android.os.Environment
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
@@ -14,6 +18,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -123,15 +131,30 @@ class MapViewModel
             _uiState.update { it.copy(showNoResultsMessage = false) }
         }
 
-        fun onPhotoTaken() {
-            _uiState.update { 
-                it.copy(
-                    error = "Foto tomada exitosamente. Funcionalidad de guardado en desarrollo."
-                )
-            }
-        }
+    fun createImageFile(context: Context): File {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("JPEG_${timestamp}_", ".jpg", storageDir)
+    }
 
-        private fun fetchClosestRoutesInArea(location: LocationPoint) {
+
+    private val _photoUri = MutableStateFlow<Uri?>(null)
+    val photoUri: StateFlow<Uri?> = _photoUri
+
+
+    fun onPhotoTaken(uri: Uri) {
+        _photoUri.value = uri
+
+        _uiState.update {
+            it.copy(
+                error = "Foto tomada exitosamente. Guardando URI...",
+                lastPhotoUri = uri.toString()
+            )
+        }
+    }
+
+
+    private fun fetchClosestRoutesInArea(location: LocationPoint) {
             _uiState.update { it.copy(isLoading = true, lastSearchedLocation = location) }
             viewModelScope.launch {
                 val result =
