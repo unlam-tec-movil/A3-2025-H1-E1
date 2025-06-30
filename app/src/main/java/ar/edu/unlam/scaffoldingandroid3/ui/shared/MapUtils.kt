@@ -9,7 +9,6 @@ import ar.edu.unlam.scaffoldingandroid3.R
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
-import android.util.Log
 
 /**
  * Convierte un recurso de drawable vectorial (Vector Drawable) a un Bitmap.
@@ -132,7 +131,5 @@ fun generateStaticMapUrl(
                 append("&key=$apiKey")
             }
         }
-    val fullUrl = "$baseUrl?$params"
-    Log.d("StaticMap", "Generated URL (len=${fullUrl.length}): $fullUrl")
-    return fullUrl
+    return "$baseUrl?$params"
 }

@@ -38,10 +38,7 @@ import coil.compose.AsyncImage
 import androidx.compose.foundation.layout.fillMaxSize
 import ar.edu.unlam.scaffoldingandroid3.BuildConfig
 import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
-import coil.compose.rememberAsyncImagePainter
-import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -96,7 +93,6 @@ fun RouteDetailCard(
                         scale = 2,
                     )
                 }
-                Log.d("RouteDetailCard", "Loading static map with URL: $staticMapUrl")
 
                 SubcomposeAsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -106,13 +102,6 @@ fun RouteDetailCard(
                     contentDescription = "Mapa de la ruta",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    loading = {
-                        // Podrías mostrar un spinner aquí
-                        Log.d("RouteDetailCard", "Static map loading…")
-                    },
-                    error = {
-                        Log.e("RouteDetailCard", "Error cargando static map")
-                    },
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
