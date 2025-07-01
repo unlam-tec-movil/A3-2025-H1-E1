@@ -6,7 +6,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ErrorDialogTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
