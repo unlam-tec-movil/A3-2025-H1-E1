@@ -74,7 +74,7 @@ class TrackingSessionRepositoryImpl
                     metrics = metricsCalculator.getCurrentMetrics(),
                     status = TrackingStatus.ACTIVE,
                     routePoint = emptyList(),
-                    photo = ""
+                    photo = "",
                 )
 
             currentSession.value = session

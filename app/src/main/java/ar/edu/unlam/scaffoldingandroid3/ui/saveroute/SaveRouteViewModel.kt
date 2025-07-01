@@ -2,7 +2,6 @@ package ar.edu.unlam.scaffoldingandroid3.ui.saveroute
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
@@ -134,13 +133,7 @@ class SaveRouteViewModel
             }
         }
 
-        fun addPhoto(uri: String) {
-            val current = _trackingResult.value ?: return
-            val updatedPhotos = current.foto + TrackingPhoto(uri, 1)
-            _trackingResult.value = current.copy(foto = updatedPhotos)
-        }
-
-    /**
+        /**
          * Guarda el resultado de tracking en base de datos
          */
         fun saveTrackingResult(

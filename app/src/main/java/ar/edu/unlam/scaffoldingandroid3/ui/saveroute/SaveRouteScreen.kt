@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -133,7 +131,6 @@ fun SaveRouteScreen(
                     // Sección de fotos con animación
                     AnimatedPhotosSection(
                         photos = result.foto,
-                        onAddPhoto = { /* TODO: Implementar agregar foto */ },
                     )
                 } ?: run {
                     Card(
@@ -279,10 +276,7 @@ private fun NameInputSection(
 }
 
 @Composable
-private fun PhotosSection(
-    photos: String,
-    onAddPhoto: () -> Unit,
-) {
+private fun PhotosSection(photos: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -291,20 +285,6 @@ private fun PhotosSection(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(onClick = onAddPhoto) {
-                    Text(
-                        text = "+",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
-
             if (photos.isNotEmpty()) {
                 RouteImage(modifier = Modifier, photos)
             } else {
@@ -317,6 +297,7 @@ private fun PhotosSection(
         }
     }
 }
+
 @Composable
 private fun PhotoThumbnail(photoUri: String) {
     Card(
@@ -327,31 +308,10 @@ private fun PhotoThumbnail(photoUri: String) {
             model = photoUri,
             contentDescription = "Foto del recorrido",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }
-/*
-@Composable
-private fun PhotoThumbnail() {
-    Card(
-        modifier = Modifier.size(80.dp),
-        shape = RoundedCornerShape(8.dp),
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            // TODO: Cargar imagen real usando Coil o similar
-            Text(
-                text = "📷",
-                style = MaterialTheme.typography.headlineMedium,
-            )
-        }
-    }
-}
-
- */
 
 @Composable
 private fun DiscardRouteDialog(
@@ -467,10 +427,7 @@ private fun AnimatedNameInputSection(
  * Sección de fotos con animación espectacular
  */
 @Composable
-private fun AnimatedPhotosSection(
-    photos: String,
-    onAddPhoto: () -> Unit,
-) {
+private fun AnimatedPhotosSection(photos: String) {
     val visible = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -503,7 +460,6 @@ private fun AnimatedPhotosSection(
     ) {
         PhotosSection(
             photos = photos,
-            onAddPhoto = onAddPhoto,
         )
     }
 }

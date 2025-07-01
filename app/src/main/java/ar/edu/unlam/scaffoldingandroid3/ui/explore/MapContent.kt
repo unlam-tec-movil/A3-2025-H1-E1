@@ -52,7 +52,6 @@ internal fun MapContent(
     markerBitmap: Bitmap?,
     hikerBitmap: Bitmap?,
 ) {
-    // This LaunchedEffect is tied to the lifecycle of MapContent
     LaunchedEffect(cameraPositionState) {
         snapshotFlow { cameraPositionState.isMoving }
             .collect { isMoving ->

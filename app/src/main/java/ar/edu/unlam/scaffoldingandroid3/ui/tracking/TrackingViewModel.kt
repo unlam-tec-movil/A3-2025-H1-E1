@@ -316,46 +316,25 @@ class TrackingViewModel
         }
 
         fun onPhotoTaken(uri: Uri) {
-            val photo = TrackingPhoto(
-                uri = uri.toString(),
-                orderInRoute = _uiState.value.capturedPhotos.size
-            )
-
-            val currentPhotos = _uiState.value.capturedPhotos.toMutableList()
-            currentPhotos.add(photo)
-
-            _uiState.value = _uiState.value.copy(
-                capturedPhotos = currentPhotos,
-                photoCount = currentPhotos.size,
-                lastPhotoUri = uri.toString()
-            )
-            viewModelScope.launch {
-                trackingSessionRepository.setPhoto(uri.toString())
-            }
-        }
-/*
-        fun capturePhoto() {
-            // TEMPORALMENTE DESHABILITADO para debug de crash
-            // La funcionalidad de cámara se implementará después de solucionar el crash
-            handleError("Funcionalidad de cámara temporalmente deshabilitada")
-
-            // Simular captura de foto para testing
-            val fakePhoto =
-                ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto(
-                    uri = "fake://photo_${System.currentTimeMillis()}",
+            val photo =
+                TrackingPhoto(
+                    uri = uri.toString(),
                     orderInRoute = _uiState.value.capturedPhotos.size,
                 )
 
             val currentPhotos = _uiState.value.capturedPhotos.toMutableList()
-            currentPhotos.add(fakePhoto)
+            currentPhotos.add(photo)
+
             _uiState.value =
                 _uiState.value.copy(
                     capturedPhotos = currentPhotos,
                     photoCount = currentPhotos.size,
+                    lastPhotoUri = uri.toString(),
                 )
+            viewModelScope.launch {
+                trackingSessionRepository.setPhoto(uri.toString())
+            }
         }
-
- */
 
         private fun createTrackingResult(session: TrackingSession): TrackingResult {
             // Usar solo tiempo de movimiento (sin pausas)

@@ -27,7 +27,7 @@ object TrackingSessionEntityMapper {
             minAltitude = this.metrics.minElevation,
             maxAltitude = this.metrics.maxElevation,
             createdAt = System.currentTimeMillis(),
-            photo = this.photo
+            photo = this.photo,
         )
     }
 
@@ -57,7 +57,7 @@ object TrackingSessionEntityMapper {
             status = TrackingStatus.COMPLETED,
             // Los puntos se manejan por separado
             routePoint = emptyList(),
-            photo = ""
+            photo = "",
         )
     }
 
