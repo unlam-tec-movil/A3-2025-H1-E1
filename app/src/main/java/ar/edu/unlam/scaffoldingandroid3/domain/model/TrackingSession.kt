@@ -21,4 +21,5 @@ data class TrackingSession(
     val metrics: TrackingMetrics,
     val status: TrackingStatus,
     val routePoint: List<LocationPoint>,
+    val photo: String,
 )

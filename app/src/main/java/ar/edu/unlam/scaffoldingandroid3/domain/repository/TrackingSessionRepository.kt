@@ -80,4 +80,6 @@ interface TrackingSessionRepository {
      * Obtiene los puntos GPS de una sesión guardada
      */
     suspend fun getLocationPointsBySession(sessionId: Long): List<ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint>
+
+    suspend fun setPhoto(uri: String)
 }

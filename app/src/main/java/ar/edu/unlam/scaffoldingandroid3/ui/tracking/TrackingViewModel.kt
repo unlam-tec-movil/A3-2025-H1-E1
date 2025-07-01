@@ -1,8 +1,11 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
+import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
@@ -17,6 +20,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -299,25 +306,34 @@ class TrackingViewModel
             }
         }
 
-        fun capturePhoto() {
-            // TEMPORALMENTE DESHABILITADO para debug de crash
-            // La funcionalidad de cámara se implementará después de solucionar el crash
-            handleError("Funcionalidad de cámara temporalmente deshabilitada")
+        fun createImageFile(context: Context): File {
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val storageDir = File(context.getExternalFilesDir(null), "tracking_photos")
+            if (!storageDir.exists()) {
+                storageDir.mkdirs()
+            }
+            return File.createTempFile("JPEG_${timestamp}_", ".jpg", storageDir)
+        }
 
-            // Simular captura de foto para testing
-            val fakePhoto =
-                ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto(
-                    uri = "fake://photo_${System.currentTimeMillis()}",
+        fun onPhotoTaken(uri: Uri) {
+            val photo =
+                TrackingPhoto(
+                    uri = uri.toString(),
                     orderInRoute = _uiState.value.capturedPhotos.size,
                 )
 
             val currentPhotos = _uiState.value.capturedPhotos.toMutableList()
-            currentPhotos.add(fakePhoto)
+            currentPhotos.add(photo)
+
             _uiState.value =
                 _uiState.value.copy(
                     capturedPhotos = currentPhotos,
                     photoCount = currentPhotos.size,
+                    lastPhotoUri = uri.toString(),
                 )
+            viewModelScope.launch {
+                trackingSessionRepository.setPhoto(uri.toString())
+            }
         }
 
         private fun createTrackingResult(session: TrackingSession): TrackingResult {
@@ -336,7 +352,7 @@ class TrackingViewModel
                 // Simplificado por ahora
                 altitudMaxima = session.metrics.currentElevation + 50,
                 rutaCompleta = session.routePoint,
-                fotosCapturadas = _uiState.value.capturedPhotos,
+                foto = _uiState.value.lastPhotoUri ?: "",
                 nombreRecorrido = "",
                 fechaCreacion = System.currentTimeMillis(),
             )

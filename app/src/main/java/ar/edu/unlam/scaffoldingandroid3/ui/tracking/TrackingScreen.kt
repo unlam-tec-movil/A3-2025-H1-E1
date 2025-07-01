@@ -1,6 +1,13 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -60,6 +67,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -100,6 +108,39 @@ fun TrackingScreen(
         }
     }
 
+    val context = LocalContext.current
+    var photoUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK && photoUri != null) {
+                viewModel.onPhotoTaken(photoUri!!)
+            }
+        }
+
+    val cameraPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                if (isGranted) {
+                    val photoFile = viewModel.createImageFile(context)
+                    photoUri =
+                        FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            photoFile,
+                        )
+                    val intent =
+                        Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                            putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                        }
+                    cameraLauncher.launch(intent)
+                }
+            },
+        )
+
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
             snackbarHostState.showSnackbar(error)
@@ -135,7 +176,28 @@ fun TrackingScreen(
             },
             isPermissionGranted = activityRecognitionPermissionState.status.isGranted,
             onExpandStats = viewModel::toggleStatsExpansion,
-            onCapturePhoto = viewModel::capturePhoto,
+            onCapturePhoto = {
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.CAMERA,
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    val photoFile = viewModel.createImageFile(context)
+                    photoUri =
+                        FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            photoFile,
+                        )
+                    val intent =
+                        Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                            putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                        }
+                    cameraLauncher.launch(intent)
+                } else {
+                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            },
         )
 
         if (uiState.isLoading) {

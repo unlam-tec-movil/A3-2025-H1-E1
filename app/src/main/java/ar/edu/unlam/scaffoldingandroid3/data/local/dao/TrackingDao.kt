@@ -23,9 +23,6 @@ interface TrackingDao {
     @Query("SELECT * FROM tracking_sessions ORDER BY createdAt DESC")
     suspend fun getAllTrackingSessions(): List<TrackingSessionEntity>
 
-    @Query("SELECT * FROM tracking_photos WHERE sessionId = :sessionId")
-    suspend fun getPhotosForSession(sessionId: Long): List<PhotoEntity>
-
     @Query("SELECT * FROM tracking_sessions WHERE id = :sessionId")
     suspend fun getTrackingSessionById(sessionId: Long): TrackingSessionEntity?
 

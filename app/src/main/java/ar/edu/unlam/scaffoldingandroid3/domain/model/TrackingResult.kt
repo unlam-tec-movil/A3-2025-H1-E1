@@ -21,7 +21,7 @@ data class TrackingResult(
     // todos los puntos GPS
     val rutaCompleta: List<LocationPoint>,
     // todas las fotos
-    val fotosCapturadas: List<TrackingPhoto>,
+    val foto: String,
     // ingresado por usuario
     var nombreRecorrido: String = "",
     // timestamp de creación

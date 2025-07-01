@@ -22,4 +22,5 @@ data class TrackingSessionEntity(
     val minAltitude: Double,
     val maxAltitude: Double,
     val createdAt: Long,
+    val photo: String,
 )

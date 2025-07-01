@@ -29,5 +29,4 @@ data class MapUiState(
     val selectedRoute: Route? = null,
     val error: String? = null,
     val cameraPositionState: CameraPositionState = CameraPositionState(),
-    val lastPhotoUri: String? = null,
 )

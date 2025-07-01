@@ -65,7 +65,7 @@ class SaveRouteViewModel
                 altitudMaxima = session.metrics.maxElevation,
                 rutaCompleta = session.routePoint,
                 // Se obtendrán del UI state
-                fotosCapturadas = emptyList(),
+                foto = session.photo,
                 nombreRecorrido = "",
                 fechaCreacion = System.currentTimeMillis(),
             )

@@ -34,4 +34,5 @@ data class TrackingUiState(
     val sensorErrors: List<String> = emptyList(),
     val capturedPhotos: List<TrackingPhoto> = emptyList(),
     val showDiscardDialog: Boolean = false,
+    val lastPhotoUri: String? = null,
 )

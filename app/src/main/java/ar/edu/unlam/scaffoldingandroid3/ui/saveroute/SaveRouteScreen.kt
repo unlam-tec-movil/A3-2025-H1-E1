@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -45,12 +43,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingResult
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ConfettiAnimation
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.RouteImage
+import coil.compose.AsyncImage
 
 /**
  * Pantalla para guardar el recorrido completado
@@ -129,8 +130,7 @@ fun SaveRouteScreen(
 
                     // Sección de fotos con animación
                     AnimatedPhotosSection(
-                        photos = result.fotosCapturadas,
-                        onAddPhoto = { /* TODO: Implementar agregar foto */ },
+                        photos = result.foto,
                     )
                 } ?: run {
                     Card(
@@ -276,10 +276,7 @@ private fun NameInputSection(
 }
 
 @Composable
-private fun PhotosSection(
-    photos: List<ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto>,
-    onAddPhoto: () -> Unit,
-) {
+private fun PhotosSection(photos: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -288,34 +285,8 @@ private fun PhotosSection(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "Fotos: ${photos.size}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                IconButton(onClick = onAddPhoto) {
-                    Text(
-                        text = "+",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
-
             if (photos.isNotEmpty()) {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(photos) { photo ->
-                        PhotoThumbnail()
-                    }
-                }
+                RouteImage(modifier = Modifier, photos)
             } else {
                 Text(
                     text = "No hay fotos capturadas",
@@ -328,21 +299,17 @@ private fun PhotosSection(
 }
 
 @Composable
-private fun PhotoThumbnail() {
+private fun PhotoThumbnail(photoUri: String) {
     Card(
         modifier = Modifier.size(80.dp),
         shape = RoundedCornerShape(8.dp),
     ) {
-        Box(
+        AsyncImage(
+            model = photoUri,
+            contentDescription = "Foto del recorrido",
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            // TODO: Cargar imagen real usando Coil o similar
-            Text(
-                text = "📷",
-                style = MaterialTheme.typography.headlineMedium,
-            )
-        }
+        )
     }
 }
 
@@ -460,10 +427,7 @@ private fun AnimatedNameInputSection(
  * Sección de fotos con animación espectacular
  */
 @Composable
-private fun AnimatedPhotosSection(
-    photos: List<ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto>,
-    onAddPhoto: () -> Unit,
-) {
+private fun AnimatedPhotosSection(photos: String) {
     val visible = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -496,7 +460,6 @@ private fun AnimatedPhotosSection(
     ) {
         PhotosSection(
             photos = photos,
-            onAddPhoto = onAddPhoto,
         )
     }
 }

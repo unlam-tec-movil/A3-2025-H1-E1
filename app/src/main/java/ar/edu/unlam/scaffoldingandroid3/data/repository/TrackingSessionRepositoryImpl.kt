@@ -74,6 +74,7 @@ class TrackingSessionRepositoryImpl
                     metrics = metricsCalculator.getCurrentMetrics(),
                     status = TrackingStatus.ACTIVE,
                     routePoint = emptyList(),
+                    photo = "",
                 )
 
             currentSession.value = session
@@ -86,6 +87,10 @@ class TrackingSessionRepositoryImpl
             startMetricsTimer()
 
             return session
+        }
+
+        override suspend fun setPhoto(uri: String) {
+            currentSession.value = currentSession.value?.copy(photo = uri)
         }
 
         /**

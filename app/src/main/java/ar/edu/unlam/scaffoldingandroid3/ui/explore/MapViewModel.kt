@@ -1,9 +1,6 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.explore
 
-import android.content.Context
 import android.location.Location
-import android.net.Uri
-import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
@@ -19,10 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -130,26 +123,6 @@ class MapViewModel
 
         fun onMessageShown() {
             _uiState.update { it.copy(showNoResultsMessage = false) }
-        }
-
-        fun createImageFile(context: Context): File {
-            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            return File.createTempFile("JPEG_${timestamp}_", ".jpg", storageDir)
-        }
-
-        private val _photoUri = MutableStateFlow<Uri?>(null)
-        val photoUri: StateFlow<Uri?> = _photoUri
-
-        fun onPhotoTaken(uri: Uri) {
-            _photoUri.value = uri
-
-            _uiState.update {
-                it.copy(
-                    error = "Foto tomada exitosamente. Guardando URI...",
-                    lastPhotoUri = uri.toString(),
-                )
-            }
         }
 
         private fun fetchClosestRoutesInArea(location: LocationPoint) {
