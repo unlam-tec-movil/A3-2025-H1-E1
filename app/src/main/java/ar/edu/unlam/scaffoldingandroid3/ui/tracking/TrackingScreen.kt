@@ -119,7 +119,7 @@ fun TrackingScreen(
                 viewModel.onPhotoTaken(photoUri!!)
             }
         }
-
+    
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
