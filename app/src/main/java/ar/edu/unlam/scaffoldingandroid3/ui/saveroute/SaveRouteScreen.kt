@@ -465,16 +465,9 @@ private fun AnimatedPhotosSection(photos: String) {
 }
 
 /**
- * Formatea distancia dinámicamente: metros si < 1km, kilómetros si >= 1km
- * Misma lógica que TrackingScreen para consistencia de UI
+ * Formatea distancia siempre en metros
  */
 private fun formatDistance(distanceKm: Double): String {
-    return if (distanceKm < 1.0) {
-        // Mostrar en metros para distancias pequeñas
-        val meters = (distanceKm * 1000).toInt()
-        "$meters m"
-    } else {
-        // Mostrar en kilómetros para distancias grandes
-        "%.2f km".format(distanceKm)
-    }
+    val meters = (distanceKm * 1000).toInt()
+    return "$meters m"
 }

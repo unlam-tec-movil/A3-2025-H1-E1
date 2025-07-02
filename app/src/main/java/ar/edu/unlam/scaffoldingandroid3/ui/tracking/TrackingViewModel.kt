@@ -2,6 +2,7 @@ package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
 import android.content.Context
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
@@ -11,6 +12,8 @@ import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingStatus
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.SensorRepository
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.TrackingSessionRepository
+import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
+import ar.edu.unlam.scaffoldingandroid3.domain.usecase.SaveFollowedRouteUseCase
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.StartTrackingUseCase
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.StopTrackingUseCase
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.UpdateTrackingUseCase
@@ -20,6 +23,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -37,8 +42,11 @@ class TrackingViewModel
         private val startTrackingUseCase: StartTrackingUseCase,
         private val stopTrackingUseCase: StopTrackingUseCase,
         private val updateTrackingUseCase: UpdateTrackingUseCase,
+        private val saveFollowedRouteUseCase: SaveFollowedRouteUseCase,
+        private val routeRepository: RouteRepository,
         private val trackingSessionRepository: TrackingSessionRepository,
         private val sensorRepository: SensorRepository,
+        private val savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(TrackingUiState())
         val uiState: StateFlow<TrackingUiState> = _uiState.asStateFlow()
@@ -53,7 +61,27 @@ class TrackingViewModel
         val detailedStats: StateFlow<Map<String, Any>> = _detailedStats.asStateFlow()
 
         init {
+            val followId: String? = savedStateHandle["followId"]
+            val routeObj: ar.edu.unlam.scaffoldingandroid3.domain.model.Route? = savedStateHandle["followRoute"]
+            
             observeTrackingData()
+
+            // Prioridad 1: Objeto Route directo (rutas de Overpass)
+            if (routeObj != null) {
+                setupFollowingRoute(routeObj)
+            }
+            // Prioridad 2: ID para buscar en BD local (rutas guardadas)
+            else if (!followId.isNullOrBlank()) {
+                viewModelScope.launch {
+                    routeRepository.getAllRoutes().collect { allRoutes ->
+                        val route = routeRepository.getRoute(followId)
+                        if (route != null) {
+                            setupFollowingRoute(route)
+                        }
+                        return@collect // Solo necesitamos la primera emisión
+                    }
+                }
+            }
         }
 
         private fun observeTrackingData() {
@@ -156,6 +184,8 @@ class TrackingViewModel
                             routePoints = routePoints,
                             currentLocation = currentLocation,
                             photoCount = _uiState.value.capturedPhotos.size,
+                            distanceRemaining = calculateDistanceRemaining(metrics),
+                            progress = calculateProgress(metrics),
                         )
                 } catch (e: Exception) {
                     // Error updating UI from metrics
@@ -252,6 +282,15 @@ class TrackingViewModel
                 stopTrackingUseCase.execute()
                     .onSuccess { session ->
                         _uiState.value = _uiState.value.copy(isLoading = false)
+                        
+                        // Si estaba siguiendo una ruta, guardar automáticamente en historial
+                        if (_uiState.value.isFollowing && _uiState.value.followingRoute != null) {
+                            val originalRouteName = _uiState.value.followingRoute!!.name
+                            viewModelScope.launch {
+                                saveFollowedRouteUseCase.execute(session, originalRouteName)
+                            }
+                        }
+                        
                         val trackingResult = createTrackingResult(session)
                         onCompleted(trackingResult)
                     }
@@ -386,5 +425,39 @@ class TrackingViewModel
                     error = message,
                     isLoading = false,
                 )
+        }
+
+        private fun calculateDistanceRemaining(metrics: TrackingMetrics): Double {
+            val route = _uiState.value.followingRoute ?: return 0.0
+            val routeDistanceKm = route.distance / 1000.0 // Convertir metros a km
+            val remaining = (routeDistanceKm - metrics.currentDistance).coerceAtLeast(0.0)
+            return remaining
+        }
+
+        private fun calculateProgress(metrics: TrackingMetrics): Float {
+            val route = _uiState.value.followingRoute ?: return 0f
+            val routeDistanceKm = route.distance / 1000.0 // Convertir metros a km
+            return if (routeDistanceKm > 0) {
+                (metrics.currentDistance / routeDistanceKm).toFloat().coerceIn(0f, 1f)
+            } else 0f
+        }
+
+        fun setFollowRoute(route: ar.edu.unlam.scaffoldingandroid3.domain.model.Route) {
+            if (_uiState.value.followingRoute == null) {
+                setupFollowingRoute(route)
+            }
+        }
+
+        private fun setupFollowingRoute(route: ar.edu.unlam.scaffoldingandroid3.domain.model.Route) {
+            _uiState.value =
+                _uiState.value.copy(
+                    isFollowing = true,
+                    followingRoute = route,
+                    screenState = TrackingScreenState.RECORDING,
+                    canStop = true,
+                    canPause = true,
+                )
+
+            startTracking(route.name)
         }
     }

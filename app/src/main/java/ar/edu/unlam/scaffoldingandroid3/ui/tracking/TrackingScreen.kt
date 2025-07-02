@@ -45,6 +45,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -88,6 +89,7 @@ import kotlin.coroutines.resumeWithException
 fun TrackingScreen(
     onNavigationBack: () -> Unit,
     onTrackingCompleted: (TrackingResult) -> Unit = {},
+    followRoute: ar.edu.unlam.scaffoldingandroid3.domain.model.Route? = null,
     viewModel: TrackingViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -148,6 +150,13 @@ fun TrackingScreen(
         }
     }
 
+    // Notificar al ViewModel si hay una ruta para seguir
+    LaunchedEffect(followRoute) {
+        followRoute?.let { route ->
+            viewModel.setFollowRoute(route)
+        }
+    }
+
     // Dialog de confirmación para descartar tracking
     if (uiState.showDiscardDialog) {
         DiscardTrackingDialog(
@@ -159,6 +168,8 @@ fun TrackingScreen(
             onDismiss = { viewModel.hideDiscardDialog() },
         )
     }
+
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         TrackingMapScreen(
@@ -229,10 +240,16 @@ fun TrackingMapScreen(
     onCapturePhoto: () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Mapa de fondo con ruta en tiempo real
+        val referenceRoutePoints = uiState.followingRoute?.points?.map {
+            com.google.android.gms.maps.model.LatLng(it.latitude, it.longitude)
+        } ?: emptyList()
+
+
+
         ActiveTrackingMap(
             modifier = Modifier.fillMaxSize(),
             routePoints = uiState.routePoints,
+            referencePoints = referenceRoutePoints,
             currentLocation = uiState.currentLocation,
             showZoomControls = false,
         )
@@ -372,6 +389,7 @@ fun TrackingMapScreen(
 fun ActiveTrackingMap(
     modifier: Modifier = Modifier,
     routePoints: List<com.google.android.gms.maps.model.LatLng> = emptyList(),
+    referencePoints: List<com.google.android.gms.maps.model.LatLng> = emptyList(),
     currentLocation: com.google.android.gms.maps.model.LatLng? = null,
     showZoomControls: Boolean = true,
 ) {
@@ -444,6 +462,15 @@ fun ActiveTrackingMap(
                 zoomControlsEnabled = showZoomControls,
             ),
     ) {
+        // Dibujar ruta de referencia si existe
+        if (referencePoints.size > 1) {
+            com.google.maps.android.compose.Polyline(
+                points = referencePoints,
+                color = Color.Red,
+                width = 6f,
+            )
+        }
+
         // Dibujar polyline de la ruta en tiempo real
         if (routePoints.size >= 2) {
             com.google.maps.android.compose.Polyline(
@@ -605,6 +632,15 @@ private fun TrackingPanelContent(
                             modifier = Modifier.weight(1f),
                         )
                     }
+                }
+
+                // Progreso de ruta (solo en modo seguimiento)
+                if (uiState.isFollowing) {
+                    FollowingRouteProgress(
+                        progress = uiState.progress,
+                        distanceRemaining = uiState.distanceRemaining,
+                        routeName = uiState.followingRoute?.name ?: "Ruta",
+                    )
                 }
 
                 // Estadísticas base siempre visibles
@@ -790,17 +826,71 @@ private fun DiscardTrackingDialog(
 }
 
 /**
- * Formatea distancia dinámicamente: metros si < 1km, kilómetros si >= 1km
- * Comportamiento profesional como Strava/Nike Run
+ * Formatea distancia siempre en metros
  */
 private fun formatDistance(distanceKm: Double): String {
-    return if (distanceKm < 1.0) {
-        // Mostrar en metros para distancias pequeñas
-        val meters = (distanceKm * 1000).toInt()
-        "$meters m"
-    } else {
-        // Mostrar en kilómetros para distancias grandes
-        "%.2f km".format(distanceKm)
+    val meters = (distanceKm * 1000).toInt()
+    return "$meters m"
+}
+
+/**
+ * Componente de progreso para modo seguimiento de ruta
+ */
+@Composable
+private fun FollowingRouteProgress(
+    progress: Float,
+    distanceRemaining: Double,
+    routeName: String,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+        ),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // Encabezado con nombre de ruta
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "🧭 Siguiendo: $routeName",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                Text(
+                    text = "${(progress * 100).toInt()}%",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
+            // Barra de progreso
+            LinearProgressIndicator(
+                progress = { progress.coerceIn(0f, 1f) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.primaryContainer,
+            )
+
+            // Distancia restante
+            Text(
+                text = "Distancia restante: ${formatDistance(distanceRemaining)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+            )
+        }
     }
 }
 

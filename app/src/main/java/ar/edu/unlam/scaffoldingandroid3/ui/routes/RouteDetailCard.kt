@@ -121,14 +121,16 @@ fun RouteDetailCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column {
+                    val routeDisplayCalculator = ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator()
                     Text(
-                        text = "Distancia: ${String.format("%.1f", route.distance / 1000)} km",
+                        text = "Distancia: ${String.format("%.0f", routeDisplayCalculator.getDistanceInMeters(route))} m",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
                 Column {
+                    val routeDisplayCalculator = ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator()
                     Text(
-                        text = "Duración: ${route.duration / (1000 * 60)} min",
+                        text = "Duración: ${routeDisplayCalculator.formatDuration(routeDisplayCalculator.calculateEstimatedDuration(route))}",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }

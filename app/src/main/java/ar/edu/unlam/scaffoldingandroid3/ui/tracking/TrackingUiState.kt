@@ -1,6 +1,7 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
 /**
  * Estados de la pantalla de tracking
@@ -35,4 +36,8 @@ data class TrackingUiState(
     val capturedPhotos: List<TrackingPhoto> = emptyList(),
     val showDiscardDialog: Boolean = false,
     val lastPhotoUri: String? = null,
+    val isFollowing: Boolean = false,
+    val followingRoute: Route? = null,
+    val distanceRemaining: Double = 0.0, // en km
+    val progress: Float = 0f, // 0..1
 )

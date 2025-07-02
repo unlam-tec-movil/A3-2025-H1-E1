@@ -73,7 +73,7 @@ fun HistoryCard(
                     )
                     Row {
                         Text(
-                            text = "${String.format("%.1f", history.metrics.currentDistance)} km",
+                            text = "${String.format("%.0f", history.metrics.currentDistance * 1000)} m",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
