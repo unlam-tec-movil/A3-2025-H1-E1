@@ -74,7 +74,7 @@ fun RouteCard(
                     )
                     Row {
                         Text(
-                            text = "${String.format("%.1f", route.distance)} km",
+                            text = "${String.format("%.1f", route.distance / 1000)} km",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
