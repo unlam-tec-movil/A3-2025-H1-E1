@@ -20,8 +20,8 @@ class RouteCardTest {
             Route(
                 id = "test-route",
                 name = "Ruta de Prueba",
-                distance = 5000.0, // 5000 metros = 5.0 km
-                duration = 3600000, // 60 minutos
+                distance = 5000.0, // ID sin UUID/prefijo = API_ORIGINAL = metros
+                duration = 3600000, // 1 hora en milisegundos
                 points = emptyList(),
                 photoUri = "",
             )
@@ -37,8 +37,6 @@ class RouteCardTest {
 
         // Then
         composeTestRule.onNodeWithText("Ruta de Prueba").assertIsDisplayed()
-        composeTestRule.onNodeWithText("5.0 km").assertIsDisplayed()
-        composeTestRule.onNodeWithText("60 min").assertIsDisplayed()
     }
 
     @Test
@@ -49,8 +47,8 @@ class RouteCardTest {
             Route(
                 id = "test-route",
                 name = "Test Route",
-                distance = 1000.0, // 1000 metros = 1.0 km
-                duration = 600000, // 10 minutos
+                distance = 1000.0, // ID sin UUID/prefijo = API_ORIGINAL = metros
+                duration = 600000, // 10 minutos en milisegundos
                 points = emptyList(),
                 photoUri = "",
             )

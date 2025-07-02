@@ -14,4 +14,6 @@ data class RouteDetailUiState(
     val isLoading: Boolean = false,
     val route: Route? = null,
     val error: String? = null,
+    val isSaving: Boolean = false,
+    val isSaved: Boolean = false,
 )

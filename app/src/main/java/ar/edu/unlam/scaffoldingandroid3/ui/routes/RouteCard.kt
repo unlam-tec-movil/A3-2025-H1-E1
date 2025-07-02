@@ -1,7 +1,6 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
@@ -40,6 +40,8 @@ fun RouteCard(
     route: Route,
     onPlayClick: () -> Unit,
     onDeleteItem: () -> Unit,
+    routeDisplayCalculator: ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator =
+        ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator(),
 ) {
     Card(
         modifier =
@@ -52,41 +54,48 @@ fun RouteCard(
                     .padding(16.dp)
                     .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            // Imagen de la ruta
+            Box(
+                modifier =
+                    Modifier
+                        .size(76.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.LightGray),
             ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(76.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.LightGray),
-                ) {
-                    RouteImage(modifier, route.photoUri)
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
+                RouteImage(modifier, route.photoUri)
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Información de la ruta - ocupa el espacio restante
+            Column(
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = route.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Row {
                     Text(
-                        text = route.name,
-                        style = MaterialTheme.typography.titleLarge,
+                        text = "${String.format("%.0f", routeDisplayCalculator.getDistanceInMeters(route))} m",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
                     )
-                    Row {
-                        Text(
-                            text = "${String.format("%.1f", route.distance / 1000)} km",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "${route.duration / 60000} min",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray,
-                        )
-                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = routeDisplayCalculator.formatDuration(routeDisplayCalculator.calculateEstimatedDuration(route)),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                    )
                 }
             }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Botón de play - posición fija
             IconButton(
                 onClick = onPlayClick,
                 modifier =
@@ -114,7 +123,7 @@ fun RouteCardPreview() {
         route =
             Route(
                 id = "1",
-                name = "Ruta 1",
+                name = "Ruta de senderismo muy larga por la montaña que puede llegar a ocupar más de dos líneas",
                 photoUri = "",
                 distance = 10.0,
                 duration = 600000,

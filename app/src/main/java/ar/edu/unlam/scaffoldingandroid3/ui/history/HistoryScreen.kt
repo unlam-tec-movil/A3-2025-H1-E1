@@ -17,6 +17,7 @@ import ar.edu.unlam.scaffoldingandroid3.R
 import ar.edu.unlam.scaffoldingandroid3.domain.model.History
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.navigation.Screen
+import ar.edu.unlam.scaffoldingandroid3.ui.routes.dto.toDto
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
 import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
 
@@ -65,7 +66,12 @@ fun HistoryScreen(
                     onItemClick = { history ->
                         val route = history.toRoute()
                         navController.navigate(Screen.RouteDetail.route)
-                        navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] = route
+                        navController.getBackStackEntry(Screen.RouteDetail.route)
+                            .savedStateHandle["route"] = route
+                        navController.getBackStackEntry(Screen.RouteDetail.route)
+                            .savedStateHandle["isFromHistory"] = true
+                        navController.getBackStackEntry(Screen.RouteDetail.route)
+                            .savedStateHandle["historyMetrics"] = history.metrics.toDto()
                     },
                 )
             }
