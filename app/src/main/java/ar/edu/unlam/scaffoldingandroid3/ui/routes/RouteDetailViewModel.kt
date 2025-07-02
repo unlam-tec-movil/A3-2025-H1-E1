@@ -21,23 +21,27 @@ class RouteDetailViewModel
     constructor(
         private val saveApiRouteUseCase: SaveApiRouteUseCase,
     ) : ViewModel() {
-
         private val _uiState = MutableStateFlow(RouteDetailUiState())
         val uiState: StateFlow<RouteDetailUiState> = _uiState.asStateFlow()
 
         /**
          * Guarda una ruta de la API en el almacenamiento local
          */
-        fun saveRoute(route: Route, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        fun saveRoute(
+            route: Route,
+            onSuccess: () -> Unit,
+            onError: (String) -> Unit,
+        ) {
             viewModelScope.launch {
                 _uiState.value = _uiState.value.copy(isSaving = true)
-                
+
                 saveApiRouteUseCase.execute(route)
                     .onSuccess {
-                        _uiState.value = _uiState.value.copy(
-                            isSaving = false,
-                            isSaved = true
-                        )
+                        _uiState.value =
+                            _uiState.value.copy(
+                                isSaving = false,
+                                isSaved = true,
+                            )
                         onSuccess()
                     }
                     .onFailure { exception ->
@@ -65,5 +69,3 @@ class RouteDetailViewModel
             _uiState.value = _uiState.value.copy(isSaved = false)
         }
     }
-
-

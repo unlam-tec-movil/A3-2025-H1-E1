@@ -1,7 +1,7 @@
 package ar.edu.unlam.scaffoldingandroid3.di
 
-import ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDistanceCalculator
 import ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator
+import ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDistanceCalculator
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
 import ar.edu.unlam.scaffoldingandroid3.domain.usecase.SaveApiRouteUseCase
 import dagger.Module
@@ -18,18 +18,16 @@ object DomainModule {
     fun provideRouteDistanceCalculator(): RouteDistanceCalculator {
         return RouteDistanceCalculator()
     }
-    
+
     @Provides
     @Singleton
     fun provideRouteDisplayCalculator(): RouteDisplayCalculator {
         return RouteDisplayCalculator()
     }
-    
+
     @Provides
     @Singleton
-    fun provideSaveApiRouteUseCase(
-        routeRepository: RouteRepository
-    ): SaveApiRouteUseCase {
+    fun provideSaveApiRouteUseCase(routeRepository: RouteRepository): SaveApiRouteUseCase {
         return SaveApiRouteUseCase(routeRepository)
     }
 }

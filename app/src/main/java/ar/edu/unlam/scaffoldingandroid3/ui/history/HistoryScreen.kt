@@ -66,9 +66,12 @@ fun HistoryScreen(
                     onItemClick = { history ->
                         val route = history.toRoute()
                         navController.navigate(Screen.RouteDetail.route)
-                        navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] = route
-                        navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["isFromHistory"] = true
-                        navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["historyMetrics"] = history.metrics.toDto()
+                        navController.getBackStackEntry(Screen.RouteDetail.route)
+                            .savedStateHandle["route"] = route
+                        navController.getBackStackEntry(Screen.RouteDetail.route)
+                            .savedStateHandle["isFromHistory"] = true
+                        navController.getBackStackEntry(Screen.RouteDetail.route)
+                            .savedStateHandle["historyMetrics"] = history.metrics.toDto()
                     },
                 )
             }

@@ -9,6 +9,7 @@ package ar.edu.unlam.scaffoldingandroid3.ui.navigation
 sealed class Screen(val route: String) {
     object Tracking : Screen("tracking") {
         const val ARG_FOLLOW_ID = "followId"
+
         fun routeWithFollowId(routeId: String) = "tracking?${ARG_FOLLOW_ID}=$routeId"
     }
 

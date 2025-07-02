@@ -130,7 +130,9 @@ fun RouteDetailCard(
                 Column {
                     val routeDisplayCalculator = ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator()
                     Text(
-                        text = "Duración: ${routeDisplayCalculator.formatDuration(routeDisplayCalculator.calculateEstimatedDuration(route))}",
+                        text = "Duración: ${routeDisplayCalculator.formatDuration(
+                            routeDisplayCalculator.calculateEstimatedDuration(route),
+                        )}",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }

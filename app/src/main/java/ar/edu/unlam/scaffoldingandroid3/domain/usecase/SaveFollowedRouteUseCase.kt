@@ -1,7 +1,6 @@
 package ar.edu.unlam.scaffoldingandroid3.domain.usecase
 
 import ar.edu.unlam.scaffoldingandroid3.domain.model.History
-import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
 import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingSession
 import ar.edu.unlam.scaffoldingandroid3.domain.repository.HistoryRepository
 import java.text.SimpleDateFormat
@@ -23,7 +22,10 @@ class SaveFollowedRouteUseCase
          * @param session Sesión completada de tracking
          * @param originalRouteName Nombre de la ruta original que se siguió
          */
-        suspend fun execute(session: TrackingSession, originalRouteName: String): Result<Unit> {
+        suspend fun execute(
+            session: TrackingSession,
+            originalRouteName: String,
+        ): Result<Unit> {
             return try {
                 val history = buildHistoryFromSession(session, originalRouteName)
                 historyRepository.saveCompletedActivity(history)
@@ -33,7 +35,10 @@ class SaveFollowedRouteUseCase
             }
         }
 
-        private fun buildHistoryFromSession(session: TrackingSession, originalRouteName: String): History {
+        private fun buildHistoryFromSession(
+            session: TrackingSession,
+            originalRouteName: String,
+        ): History {
             val dateStr = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
             return History(
@@ -44,4 +49,4 @@ class SaveFollowedRouteUseCase
                 routePoint = session.routePoint,
             )
         }
-    } 
+    }

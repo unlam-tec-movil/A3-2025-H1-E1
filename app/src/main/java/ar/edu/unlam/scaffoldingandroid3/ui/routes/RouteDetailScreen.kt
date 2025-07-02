@@ -19,7 +19,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,7 +66,7 @@ fun RouteDetailScreen(
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val mapHeight = (screenWidth * 0.6f)
-    
+
     val uiState by viewModel.uiState.collectAsState()
     var showMessage by remember { mutableStateOf<String?>(null) }
 
@@ -81,7 +80,7 @@ fun RouteDetailScreen(
                 scale = 2,
             )
         }
-    
+
     // Verificar si la ruta ya está guardada al cargar la pantalla (solo si no viene del historial)
     LaunchedEffect(route) {
         if (!isFromHistory) {
@@ -111,23 +110,23 @@ fun RouteDetailScreen(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = route.name, 
+                    text = route.name,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
-                
+
                 Spacer(modifier = Modifier.width(8.dp))
-                
+
                 // Botón de guardar/descarga (solo si no viene del historial)
                 if (!isFromHistory) {
                     when {
                         uiState.isSaving -> {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
-                                strokeWidth = 2.dp
+                                strokeWidth = 2.dp,
                             )
                         }
                         uiState.isSaved -> {
@@ -135,7 +134,7 @@ fun RouteDetailScreen(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Ruta guardada",
                                 tint = Color.Green,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         }
                         else -> {
@@ -148,60 +147,61 @@ fun RouteDetailScreen(
                                         },
                                         onError = { error ->
                                             showMessage = error
-                                        }
+                                        },
                                     )
-                                }
+                                },
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
                                     contentDescription = "Guardar ruta",
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = MaterialTheme.colorScheme.primary,
                                 )
                             }
                         }
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = if (isFromHistory) {
-                    "Distancia recorrida: ${String.format("%.0f", route.distance * 1000)} m"
-                } else {
-                    "Distancia: ${String.format("%.0f", routeDisplayCalculator.getDistanceInMeters(route))} m"
-                }, 
-                style = MaterialTheme.typography.bodyLarge
+                text =
+                    if (isFromHistory) {
+                        "Distancia recorrida: ${String.format("%.0f", route.distance * 1000)} m"
+                    } else {
+                        "Distancia: ${String.format("%.0f", routeDisplayCalculator.getDistanceInMeters(route))} m"
+                    },
+                style = MaterialTheme.typography.bodyLarge,
             )
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             if (isFromHistory) {
                 Text(
-                    text = "Tiempo empleado: ${routeDisplayCalculator.formatDuration(route.duration)}", 
-                    style = MaterialTheme.typography.bodyLarge
+                    text = "Tiempo empleado: ${routeDisplayCalculator.formatDuration(route.duration)}",
+                    style = MaterialTheme.typography.bodyLarge,
                 )
             } else {
                 val estimatedDuration = routeDisplayCalculator.calculateEstimatedDuration(route)
                 Text(
-                    text = "Duración estimada: ${routeDisplayCalculator.formatDuration(estimatedDuration)}", 
-                    style = MaterialTheme.typography.bodyLarge
+                    text = "Duración estimada: ${routeDisplayCalculator.formatDuration(estimatedDuration)}",
+                    style = MaterialTheme.typography.bodyLarge,
                 )
             }
-            
+
             // Mostrar métricas detalladas si están disponibles (solo desde historial)
             historyMetricsDto?.let { metricsDto ->
                 Spacer(modifier = Modifier.height(16.dp))
                 DetailedMetricsSection(metrics = metricsDto.toDomain())
             }
-            
+
             // Mostrar mensaje si existe
             showMessage?.let { message ->
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (message.contains("Error")) MaterialTheme.colorScheme.error else Color.Green
+                    color = if (message.contains("Error")) MaterialTheme.colorScheme.error else Color.Green,
                 )
-                
+
                 // Limpiar mensaje después de 3 segundos
                 LaunchedEffect(message) {
                     kotlinx.coroutines.delay(3000)
@@ -222,8 +222,8 @@ fun RouteDetailScreen(
                     .height(56.dp),
         ) {
             Text(
-                text = if (isFromHistory) "Ver en mapa" else "Iniciar recorrido", 
-                style = MaterialTheme.typography.titleMedium
+                text = if (isFromHistory) "Ver en mapa" else "Iniciar recorrido",
+                style = MaterialTheme.typography.titleMedium,
             )
         }
     }
@@ -267,58 +267,58 @@ fun RouteDetailScreenPreview() {
 private fun DetailedMetricsSection(metrics: TrackingMetrics) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
             text = "Métricas del recorrido",
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         )
-        
+
         // Primera fila: Pasos y Velocidades
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             MetricItem(
                 label = "Pasos",
                 value = "${metrics.totalSteps}",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             MetricItem(
                 label = "Vel. Promedio",
                 value = "${String.format("%.1f", metrics.averageSpeed)} km/h",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
-        
+
         // Segunda fila: Velocidad máxima y Altitudes
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             MetricItem(
                 label = "Vel. Máxima",
                 value = "${String.format("%.1f", metrics.maxSpeed)} km/h",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             MetricItem(
                 label = "Alt. Máxima",
                 value = "${String.format("%.0f", metrics.maxElevation)} m",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
-        
+
         // Tercera fila: Altitud mínima (si es diferente de la máxima)
         if (metrics.minElevation != metrics.maxElevation) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 MetricItem(
                     label = "Alt. Mínima",
                     value = "${String.format("%.0f", metrics.minElevation)} m",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
@@ -330,21 +330,21 @@ private fun DetailedMetricsSection(metrics: TrackingMetrics) {
 private fun MetricItem(
     label: String,
     value: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = value,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
+            color = Color.Gray,
         )
     }
 }

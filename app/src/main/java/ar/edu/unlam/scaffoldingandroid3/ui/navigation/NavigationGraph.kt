@@ -6,16 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 import ar.edu.unlam.scaffoldingandroid3.ui.explore.MapScreen
-import ar.edu.unlam.scaffoldingandroid3.ui.routes.dto.TrackingMetricsDto
 import ar.edu.unlam.scaffoldingandroid3.ui.history.HistoryScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.routes.MyRoutesScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.routes.RouteDetailScreen
+import ar.edu.unlam.scaffoldingandroid3.ui.routes.dto.TrackingMetricsDto
 import ar.edu.unlam.scaffoldingandroid3.ui.saveroute.SaveRouteScreen
 import ar.edu.unlam.scaffoldingandroid3.ui.tracking.TrackingScreen
 
@@ -40,13 +40,14 @@ fun NavGraph(
     ) {
         composable(
             route = "${Screen.Tracking.route}?${Screen.Tracking.ARG_FOLLOW_ID}={${Screen.Tracking.ARG_FOLLOW_ID}}",
-            arguments = listOf(
-                navArgument(Screen.Tracking.ARG_FOLLOW_ID) {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                },
-            ),
+            arguments =
+                listOf(
+                    navArgument(Screen.Tracking.ARG_FOLLOW_ID) {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                ),
         ) { backStackEntry ->
             val followId = backStackEntry.arguments?.getString(Screen.Tracking.ARG_FOLLOW_ID)
 
@@ -115,7 +116,7 @@ fun NavGraph(
                         } else {
                             // Detectar si es ruta local (UUID) o ruta de Overpass (número)
                             val isLocalRoute = route.id.contains("-") // UUIDs contienen guiones
-                            
+
                             if (isLocalRoute) {
                                 // Ruta guardada localmente - usar ID
                                 navController.navigate("${Screen.Tracking.route}?${Screen.Tracking.ARG_FOLLOW_ID}=${route.id}")

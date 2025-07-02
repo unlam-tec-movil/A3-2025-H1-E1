@@ -1,9 +1,9 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes.dto
 
 import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
 import ar.edu.unlam.scaffoldingandroid3.domain.model.LocationPoint
+import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingMetrics
+import kotlinx.parcelize.Parcelize
 
 /**
  * DTO para navegación - Métricas de tracking serializables
@@ -53,7 +53,7 @@ fun TrackingMetrics.toDto(): TrackingMetricsDto {
         minElevation = minElevation,
         maxElevation = maxElevation,
         totalSteps = totalSteps,
-        lastLocation = lastLocation?.toDto()
+        lastLocation = lastLocation?.toDto(),
     )
 }
 
@@ -69,7 +69,7 @@ fun TrackingMetricsDto.toDomain(): TrackingMetrics {
         minElevation = minElevation,
         maxElevation = maxElevation,
         totalSteps = totalSteps,
-        lastLocation = lastLocation?.toDomain()
+        lastLocation = lastLocation?.toDomain(),
     )
 }
 
@@ -80,7 +80,7 @@ fun LocationPoint.toDto(): LocationPointDto {
         altitude = altitude,
         latitude = latitude,
         longitude = longitude,
-        timestamp = timestamp
+        timestamp = timestamp,
     )
 }
 
@@ -91,6 +91,6 @@ fun LocationPointDto.toDomain(): LocationPoint {
         altitude = altitude,
         latitude = latitude,
         longitude = longitude,
-        timestamp = timestamp
+        timestamp = timestamp,
     )
-} 
+}

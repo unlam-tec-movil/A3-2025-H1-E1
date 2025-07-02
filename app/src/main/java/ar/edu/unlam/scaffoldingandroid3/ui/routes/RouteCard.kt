@@ -1,7 +1,6 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,12 +18,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
@@ -41,7 +40,8 @@ fun RouteCard(
     route: Route,
     onPlayClick: () -> Unit,
     onDeleteItem: () -> Unit,
-    routeDisplayCalculator: ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator = ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator(),
+    routeDisplayCalculator: ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator =
+        ar.edu.unlam.scaffoldingandroid3.domain.logic.RouteDisplayCalculator(),
 ) {
     Card(
         modifier =
@@ -65,18 +65,18 @@ fun RouteCard(
             ) {
                 RouteImage(modifier, route.photoUri)
             }
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             // Información de la ruta - ocupa el espacio restante
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Text(
                     text = route.name,
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Row {
                     Text(
@@ -92,9 +92,9 @@ fun RouteCard(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             // Botón de play - posición fija
             IconButton(
                 onClick = onPlayClick,

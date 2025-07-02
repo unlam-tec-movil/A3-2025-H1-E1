@@ -169,8 +169,6 @@ fun TrackingScreen(
         )
     }
 
-
-
     Box(modifier = Modifier.fillMaxSize()) {
         TrackingMapScreen(
             metrics = metrics,
@@ -240,11 +238,10 @@ fun TrackingMapScreen(
     onCapturePhoto: () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        val referenceRoutePoints = uiState.followingRoute?.points?.map {
-            com.google.android.gms.maps.model.LatLng(it.latitude, it.longitude)
-        } ?: emptyList()
-
-
+        val referenceRoutePoints =
+            uiState.followingRoute?.points?.map {
+                com.google.android.gms.maps.model.LatLng(it.latitude, it.longitude)
+            } ?: emptyList()
 
         ActiveTrackingMap(
             modifier = Modifier.fillMaxSize(),
@@ -845,9 +842,10 @@ private fun FollowingRouteProgress(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+            ),
         shape = RoundedCornerShape(12.dp),
     ) {
         Column(
@@ -877,9 +875,10 @@ private fun FollowingRouteProgress(
             // Barra de progreso
             LinearProgressIndicator(
                 progress = { progress.coerceIn(0f, 1f) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(8.dp),
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.primaryContainer,
             )
