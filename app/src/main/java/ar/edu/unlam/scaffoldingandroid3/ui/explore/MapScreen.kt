@@ -2,47 +2,50 @@ package ar.edu.unlam.scaffoldingandroid3.ui.explore
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.location.Location
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import ar.edu.unlam.scaffoldingandroid3.R
-import ar.edu.unlam.scaffoldingandroid3.ui.shared.BottomNavigationBar
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
+import ar.edu.unlam.scaffoldingandroid3.ui.navigation.Screen
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.ErrorDialog
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.LoadingSpinner
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.bitmapFromVector
+import ar.edu.unlam.scaffoldingandroid3.ui.theme.dimens
+import com.google.android.gms.maps.model.MapStyleOptions
 
 /**
  * Pantalla principal del mapa que muestra la ubicación actual y permite la interacción con rutas.
@@ -54,143 +57,179 @@ import kotlin.coroutines.resumeWithException
  * - Botones de acción para grabar y cargar rutas
  * - Navegación inferior
  *
- * @param onNewRouteClick Callback para iniciar la grabación de una nueva ruta
- * @param onLoadRoutesClick Callback para cargar rutas existentes
+ * @param navController controla la navegación hacia otras pantallas
+ * @param selectedRoute la ruta seleccionada para mostrar
  */
+
 @Composable
 fun MapScreen(
-    onNewRouteClick: () -> Unit,
-    onLoadRoutesClick: () -> Unit,
+    navController: NavHostController,
+    selectedRoute: Route? = null,
+    viewModel: MapViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    var hasLocationPermission by remember {
-        mutableStateOf(
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                viewModel.onPermissionResult(isGranted)
+            },
+        )
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Hoisted, unconditional remembers
+    val markerBitmap = remember { bitmapFromVector(context, R.drawable.ic_marker_background) }
+    val hikerBitmap = remember { bitmapFromVector(context, R.drawable.ic_hiking) }
+    val mapStyleOptions =
+        remember {
+            MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
+        }
+
+    // Si llega una ruta externa, pedir al ViewModel que la muestre
+    LaunchedEffect(selectedRoute) {
+        selectedRoute?.let { viewModel.showRoute(it) }
+    }
+
+    LaunchedEffect(uiState.showNoResultsMessage) {
+        if (uiState.showNoResultsMessage) {
+            snackbarHostState.showSnackbar(context.getString(R.string.map_no_results_found))
+            viewModel.onMessageShown()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val hasPermission =
             ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION,
-            ) == PackageManager.PERMISSION_GRANTED,
-        )
-    }
+            ) == PackageManager.PERMISSION_GRANTED
 
-    val launcher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission(),
-        ) { isGranted ->
-            hasLocationPermission = isGranted
-        }
-
-    // Ubicación inicial (Buenos Aires)
-    val defaultLocation = LatLng(-34.6037, -58.3816)
-    val cameraPositionState =
-        rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(defaultLocation, 12f)
-        }
-
-    // Obtener la ubicación actual
-    LaunchedEffect(hasLocationPermission) {
-        if (hasLocationPermission) {
-            try {
-                val fusedLocationClient: FusedLocationProviderClient =
-                    LocationServices.getFusedLocationProviderClient(context)
-
-                val location =
-                    suspendCancellableCoroutine<Location?> { continuation ->
-                        fusedLocationClient.lastLocation
-                            .addOnSuccessListener { location ->
-                                continuation.resume(location)
-                            }
-                            .addOnFailureListener { e ->
-                                continuation.resumeWithException(e)
-                            }
-                    }
-
-                location?.let {
-                    val currentLatLng = LatLng(it.latitude, it.longitude)
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(currentLatLng, 15f)
-                }
-            } catch (e: Exception) {
-                // Si hay algún error, mantenemos la ubicación por defecto
-                e.printStackTrace()
-            }
+        if (hasPermission) {
+            viewModel.onPermissionResult(true)
         } else {
-            launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Mapa que se ajusta al espacio disponible
-        GoogleMap(
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+    ) { paddingValues ->
+        Box(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(bottom = 144.dp),
-            // Espacio para los botones y el navigation bar
-            cameraPositionState = cameraPositionState,
-            properties =
-                MapProperties(
-                    isMyLocationEnabled = hasLocationPermission,
-                ),
-        )
-
-        // Contenedor de botones superpuesto con fondo blanco
-        Surface(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp),
-            // Espacio para el navigation bar
-            color = Color.White,
-            shadowElevation = 8.dp,
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
-            Row(
+            val mapAlpha by animateFloatAsState(
+                targetValue = if (uiState.currentLocation != null) 1f else 0f,
+                label = "Map Alpha Animation",
+            )
+
+            // MapContent is the "dumb" composable that just displays the map and markers
+            MapContent(
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .alpha(mapAlpha),
+                uiState = uiState,
+                cameraPositionState = uiState.cameraPositionState,
+                mapStyleOptions = mapStyleOptions,
+                onRouteClick = { selectedRoute ->
+                    navController.navigate(Screen.RouteDetail.route)
+                    navController.getBackStackEntry(Screen.RouteDetail.route).savedStateHandle["route"] =
+                        selectedRoute
+                },
+                onMapIdle = viewModel::onMapIdle,
+                markerBitmap = markerBitmap,
+                hikerBitmap = hikerBitmap,
+            )
+
+            // The loading spinner is now just an overlay
+            if (uiState.isLoading) {
+                LoadingSpinner()
+            }
+
+            AnimatedVisibility(
+                visible = uiState.showSearchInAreaButton,
+                modifier =
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = MaterialTheme.dimens.paddingMedium),
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                Button(
+                    onClick = {
+                        uiState.cameraPositionState.position.target.let { newCenter ->
+                            viewModel.searchInMapArea(newCenter)
+                        }
+                    },
+                    shape = RoundedCornerShape(MaterialTheme.dimens.cornerRadiusMedium),
+                ) {
+                    Text(text = stringResource(id = R.string.map_search_in_area))
+                }
+            }
+
+            uiState.error?.let {
+                ErrorDialog(
+                    errorMessage = it,
+                    onDismiss = { viewModel.clearError() },
+                )
+            }
+
+            Surface(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        .align(Alignment.BottomCenter),
+                color = MaterialTheme.colorScheme.inversePrimary,
             ) {
-                // Botón "Cargar ruta"
-                Button(
-                    onClick = onLoadRoutesClick,
+                Row(
                     modifier =
                         Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ),
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.dimens.paddingMedium),
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.paddingSmall),
                 ) {
-                    Text(text = "Cargar ruta")
-                }
-
-                // Botón "Grabar ruta"
-                Button(
-                    onClick = onNewRouteClick,
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ),
-                ) {
-                    Text(text = stringResource(R.string.record_route))
+                    if (uiState.selectedRoute != null) {
+                        Button(
+                            onClick = {
+                                viewModel.clearSelectedRoute()
+                                navController.navigate(Screen.Tracking.route)
+                            },
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(MaterialTheme.dimens.buttonHeightNormal),
+                        ) {
+                            Text(text = stringResource(id = R.string.start_route))
+                        }
+                    } else {
+                        Button(
+                            onClick = { navController.navigate(Screen.Tracking.route) },
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(MaterialTheme.dimens.buttonHeightNormal),
+                        ) {
+                            Text(text = stringResource(id = R.string.new_route))
+                        }
+                    }
                 }
             }
         }
+    }
+}
 
-        // Navigation Bar
-        BottomNavigationBar(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
+@Preview(showBackground = true)
+@Composable
+private fun MapScreenPreview() {
+    MaterialTheme {
+        MapScreen(
+            navController = NavHostController(LocalContext.current),
         )
     }
 }

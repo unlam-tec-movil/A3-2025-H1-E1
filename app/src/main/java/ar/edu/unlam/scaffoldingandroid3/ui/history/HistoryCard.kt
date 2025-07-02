@@ -1,6 +1,7 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.history
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import ar.edu.unlam.scaffoldingandroid3.domain.model.History
+import ar.edu.unlam.scaffoldingandroid3.ui.shared.RouteImage
 
 /**
  * Card de las rutas recorridas, se visualizan en el historial de actividad.
@@ -27,17 +30,15 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HistoryCard(
     modifier: Modifier = Modifier,
-    date: String,
-    location: String,
-    distance: String,
-    duration: String,
-    onPlayClick: () -> Unit = {},
+    history: History,
+    onClickItem: () -> Unit = {},
+    onDeleteItem: () -> Unit = {},
 ) {
     Card(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .clickable { onClickItem() },
     ) {
         Row(
             modifier =
@@ -53,30 +54,32 @@ fun HistoryCard(
                 Box(
                     modifier =
                         Modifier
-                            .size(64.dp)
+                            .size(76.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.LightGray),
-                )
+                ) {
+                    RouteImage(modifier = Modifier.matchParentSize(), image = history.photoUri)
+                }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = date,
+                        text = history.routeName,
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Text(
+                        text = history.date,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray,
                     )
-                    Text(
-                        text = location,
-                        style = MaterialTheme.typography.titleMedium,
-                    )
                     Row {
                         Text(
-                            text = distance,
+                            text = "${String.format("%.0f", history.metrics.currentDistance * 1000)} m",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = duration,
+                            text = "${history.metrics.currentDuration / 60000} min",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                         )

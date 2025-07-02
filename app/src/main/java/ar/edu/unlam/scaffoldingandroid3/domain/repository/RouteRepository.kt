@@ -15,6 +15,22 @@ import kotlinx.coroutines.flow.Flow
  */
 interface RouteRepository {
     /**
+     * Obtiene las rutas cercanas desde una fuente de datos remota (API).
+     *
+     * @param latitude Latitud de la ubicación actual
+     * @param longitude Longitud de la ubicación actual
+     * @param radius Radio de búsqueda en metros
+     * @param limit Límite de resultados (opcional)
+     * @return Un Result con la lista de rutas cercanas o un error.
+     */
+    suspend fun getNearbyRoutes(
+        latitude: Double,
+        longitude: Double,
+        radius: Int,
+        limit: Int? = null,
+    ): Result<List<Route>>
+
+    /**
      * Guarda una ruta en el repositorio.
      *
      * @param route La ruta a guardar

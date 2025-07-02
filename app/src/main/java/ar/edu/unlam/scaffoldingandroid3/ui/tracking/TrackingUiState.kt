@@ -1,7 +1,45 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.tracking
 
-/**
- * TODO: Data class - Estado UI del tracking en tiempo real
- */
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
+import ar.edu.unlam.scaffoldingandroid3.domain.model.TrackingPhoto
 
-data class TrackingUiState(val isLoading: Boolean = false)
+/**
+ * Estados de la pantalla de tracking
+ */
+enum class TrackingScreenState {
+    PREPARATION, // Preparación: input nombre, validaciones, botón start
+    RECORDING, // Grabación: mapa activo, métricas básicas, pause/stop
+    EXPANDED_STATS, // Estadísticas: panel expandido con todos los sensores
+}
+
+/**
+ * Estado de UI para la pantalla de tracking
+ */
+data class TrackingUiState(
+    val screenState: TrackingScreenState = TrackingScreenState.PREPARATION,
+    val routeName: String = "",
+    val isTracking: Boolean = false,
+    val isPaused: Boolean = false,
+    val isLoading: Boolean = false,
+    val isStatsExpanded: Boolean = false,
+    val canPause: Boolean = false,
+    val canResume: Boolean = false,
+    val canStop: Boolean = false,
+    val error: String? = null,
+    val elapsedTime: String = "00:00:00",
+    val routePoints: List<com.google.android.gms.maps.model.LatLng> = emptyList(),
+    val photoCount: Int = 0,
+    val currentLocation: com.google.android.gms.maps.model.LatLng? = null,
+    val stepCount: Int = 0,
+    val currentAltitude: Double = 0.0,
+    val sensorErrors: List<String> = emptyList(),
+    val capturedPhotos: List<TrackingPhoto> = emptyList(),
+    val showDiscardDialog: Boolean = false,
+    val lastPhotoUri: String? = null,
+    val isFollowing: Boolean = false,
+    val followingRoute: Route? = null,
+    // en km
+    val distanceRemaining: Double = 0.0,
+    // 0..1
+    val progress: Float = 0f,
+)

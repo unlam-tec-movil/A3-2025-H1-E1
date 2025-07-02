@@ -9,6 +9,7 @@ activityCompose = "1.10.1"
 composeBom = "2025.04.01"
 coroutines = "1.7.3"
 maps-compose = "4.3.0"
+navigationCompose = "2.9.0"
 play-services-maps = "18.2.0"
 play-services-location = "21.1.0"
 coil = "2.7.0"
@@ -21,13 +22,15 @@ mockk = "1.13.9"
 roomCompiler = "2.7.1"
 roomRuntime = "2.7.1"
 roomTestingVersion = "2.7.1"
-
+retrofit = "2.9.0"
+accompanist = "0.34.0"
 
 [libraries]
 
 androidx-core = { module = "androidx.test:core", version = "1.5.0" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version = "1.1.5" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version = "3.5.1" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-rules = { module = "androidx.test:rules", version = "1.5.0" }
 androidx-runner = { module = "androidx.test:runner", version = "1.5.2" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -53,6 +56,8 @@ google-dagger-hilt-android-testing = { group = "com.google.dagger", name = "hilt
 
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "maps-compose" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "play-services-maps" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "play-services-location" }
@@ -64,6 +69,9 @@ coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-co
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
@@ -72,7 +80,6 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
 daggerHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }

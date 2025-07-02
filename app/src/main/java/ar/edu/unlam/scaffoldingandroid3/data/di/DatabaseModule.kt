@@ -3,17 +3,19 @@ package ar.edu.unlam.scaffoldingandroid3.data.di
 import android.content.Context
 import androidx.room.Room
 import ar.edu.unlam.scaffoldingandroid3.data.local.AppDatabase
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.HistoryDao
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.LocationPointDao
 import ar.edu.unlam.scaffoldingandroid3.data.local.dao.RouteDao
-import ar.edu.unlam.scaffoldingandroid3.data.repository.RouteRepositoryImpl
-import ar.edu.unlam.scaffoldingandroid3.domain.repository.RouteRepository
+import ar.edu.unlam.scaffoldingandroid3.data.local.dao.TrackingDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Singleton
+import javax.inject.Singleton
 
 /**
- * TODO: Módulo Hilt - Configuración Room database
+ * Módulo Hilt - Configuración Room database
  * @Provides @Singleton AppDatabase, todos los DAOs
  * Room.databaseBuilder + configuración de database
  */
@@ -23,14 +25,22 @@ import jakarta.inject.Singleton
 object DatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(appContext: Context): AppDatabase =
+    fun provideDatabase(
+        @ApplicationContext appContext: Context,
+    ): AppDatabase =
         Room.databaseBuilder(appContext, AppDatabase::class.java, "routes.db")
+            .fallbackToDestructiveMigration(true)
             .build()
 
     @Provides
     fun provideRouteDao(db: AppDatabase): RouteDao = db.routeDao()
 
     @Provides
-    @Singleton
-    fun provideRouteRepository(dao: RouteDao): RouteRepository = RouteRepositoryImpl(dao)
+    fun provideHistoryDao(db: AppDatabase): HistoryDao = db.historyDao()
+
+    @Provides
+    fun provideTrackingDao(db: AppDatabase): TrackingDao = db.trackingDao()
+
+    @Provides
+    fun provideLocationPointDao(db: AppDatabase): LocationPointDao = db.locationPointDao()
 }

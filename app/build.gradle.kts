@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.daggerHiltAndroid)
     alias(libs.plugins.kover)
+    id("kotlin-parcelize")
 }
 
 // Leer la API key desde local.properties
@@ -36,7 +37,10 @@ android {
             useSupportLibrary = true
         }
 
-        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY", "")
+        // Exponer la API key como constante BuildConfig para acceder desde código
+        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY", "")
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -57,6 +61,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.6.10"
@@ -133,4 +138,14 @@ dependencies {
 
     // Gson converter
     implementation(libs.gson)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
+    // navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Accompanist
+    implementation(libs.accompanist.permissions)
 }

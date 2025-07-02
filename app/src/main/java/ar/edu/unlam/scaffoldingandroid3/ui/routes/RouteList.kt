@@ -1,34 +1,36 @@
 package ar.edu.unlam.scaffoldingandroid3.ui.routes
 
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import ar.edu.unlam.scaffoldingandroid3.domain.model.Route
 
-/**
- * TODO
- * Este routeList tendriamos que refactorizarlo para que reciba por parametro un
- * data class History que tenga toda la info para pasarle al HistoryCard y un onPlayClick Dinamico,
- * para que el composable no sea el que decida a donde va, si no, que sea la screen cuando lo
- * llame el que decida que info va y a donde redirige.
- * Para esta refactorizacion necesitamos crear un objeto de dominio, implementar la base de datos,
- * implementar un viewModel que se conecte con la screen, llamar con un mapper a los objetos de
- * la base de datos y pasarlos a dominio para que despues el view model se los pueda pasar a la screen
- */
 @Composable
 fun RouteList(
-    userName: String,
-    location: String,
-    distance: String,
-    duration: String,
+    routeList: List<Route>,
+    onPlayClick: (Route) -> Unit,
+    onDeleteItem: (String) -> Unit,
 ) {
     LazyColumn {
-        items(5) { index ->
-            RouteCard(
-                userName = userName,
-                location = location,
-                distance = distance,
-                duration = duration,
-                onPlayClick = {},
+        items(routeList, key = { it.id }) { route ->
+            DismissibleRouteItem(
+                route = route,
+                onPlayClick = { onPlayClick(route) },
+                onDelete = { onDeleteItem(route.id) },
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun RouteListPreview() {
+    val list =
+        listOf(
+            Route("1", "Ruta 1", emptyList(), 10.0, 6),
+            Route("2", "Ruta 2", emptyList(), 20.0, 12),
+            Route("3", "Ruta 3", emptyList(), 30.0, 18),
+        )
+    RouteList(routeList = list, onPlayClick = {}, onDeleteItem = {})
 }
